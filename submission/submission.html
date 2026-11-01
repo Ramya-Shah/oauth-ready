@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OAuth Ready: APM Integrations take-home submission</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@87..100,600..800&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 16mm 16mm 18mm; }
+  :root { --ground:#f3f5f2; --sheet:#f8faf7; --ink:#1b1f24; --muted:#4a5160; --rule:#23408e; --grid:#d3dbea; --hi:#ffd23f; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; color: var(--ink); font: 10.4pt/1.55 "Public Sans", system-ui, sans-serif; }
+  h1, h2, h3 { font-family: "Archivo", system-ui, sans-serif; letter-spacing: -0.01em; margin: 0; }
+  h2 { font-size: 17pt; font-weight: 800; border-bottom: 2px solid var(--rule); padding-bottom: 4pt; margin: 0 0 9pt; break-after: avoid; }
+  h3 { font-size: 11.5pt; font-weight: 700; margin: 12pt 0 4pt; break-after: avoid; }
+  p { margin: 0 0 7pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  li { margin: 2pt 0; }
+  a { color: var(--rule); }
+  code, .mono { font-family: "JetBrains Mono", Consolas, monospace; font-size: 8.6pt; }
+  mark { background: var(--hi); color: var(--ink); padding: 0 2pt; }
+  section { margin-bottom: 14pt; }
+  .page { break-before: page; }
+  .tight { font-size: 9.7pt; line-height: 1.48; }
+  .tight h3 { margin-top: 9pt; }
+  .tight li { margin: 1pt 0; }
+  .tight table td { padding: 3.5pt 6pt 3.5pt 0; }
+  .toc { margin-top: 18pt; border-top: 1px solid var(--rule); padding-top: 8pt; columns: 2; column-gap: 14pt; font-size: 10pt; }
+  .toc div { break-inside: avoid; margin: 0 0 4pt; }
+  .toc b { font-family: "Archivo"; color: var(--rule); margin-right: 5pt; }
+  .muted { color: var(--muted); }
+  .small { font-size: 9pt; }
+
+  /* Cover */
+  .cover { border: 2px solid var(--rule); padding: 22pt 22pt 18pt; min-height: 255mm; display: flex; flex-direction: column;
+    background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0/22pt 22pt, linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/22pt 22pt, var(--sheet); }
+  .cover .kick { font: 600 10pt "Archivo"; color: var(--rule); }
+  .cover h1 { font-size: 40pt; line-height: .98; font-weight: 800; letter-spacing: -0.035em; margin: 16pt 0 10pt; }
+  .cover .lede { font-size: 12pt; max-width: 135mm; }
+  .links { margin-top: 16pt; border: 2px solid var(--rule); background: var(--sheet); display: grid; grid-template-columns: 34mm 1fr; }
+  .links div { padding: 6pt 9pt; border-bottom: 1px solid var(--rule); }
+  .links div:nth-child(odd) { font: 700 9pt "Archivo"; color: var(--rule); border-right: 1px solid var(--rule); }
+  .links div:nth-last-child(-n+2) { border-bottom: 0; }
+  .cover .bar { margin-top: auto; }
+  .axis { position: relative; height: 34pt; border-top: 2px solid var(--rule); border-bottom: 1px solid var(--rule); margin-top: 8pt; }
+  .axis .w { position: absolute; left: 0; top: 7pt; height: 9pt; width: 24%; background: var(--ink); }
+  .axis .h { position: absolute; left: 24%; top: 19pt; height: 9pt; width: 52%; background: var(--hi); }
+  .axis .m { position: absolute; left: 76%; top: 19pt; height: 9pt; width: 18%; border: 1.5px dashed var(--rule); border-left: 0;
+    background: repeating-linear-gradient(135deg, rgba(255,210,63,.6) 0 5px, transparent 5px 10px); }
+  .ticks { display: flex; justify-content: space-between; font: 600 8pt "Archivo"; color: var(--rule); margin-top: 3pt; }
+
+  /* Content blocks */
+  table { width: 100%; border-collapse: collapse; font-size: 9.2pt; margin: 4pt 0 10pt; break-inside: avoid; }
+  th { text-align: left; font: 700 8.6pt "Archivo"; color: var(--rule); padding: 4pt 6pt 3pt 0; border-bottom: 1px solid var(--rule); }
+  td { padding: 5pt 6pt 5pt 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  .callout { border: 1px solid var(--ink); background: #fff3c4; padding: 8pt 10pt; margin: 6pt 0 10pt; break-inside: avoid; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt; }
+  figure { margin: 6pt 0 10pt; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid var(--rule); display: block; }
+  figcaption { font-size: 8.6pt; color: var(--muted); margin-top: 3pt; }
+  .label { display: inline-block; font: 700 8pt "Archivo"; padding: 0 5pt; border: 1px solid var(--rule); color: var(--rule); }
+  .label.t { background: var(--rule); color: #fff; }
+  .label.c { border-style: dashed; }
+  .label.u { border-style: dotted; color: var(--muted); border-color: var(--muted); }
+  .stream { font-family: "JetBrains Mono", Consolas, monospace; font-size: 7.8pt; line-height: 1.5; background: var(--sheet); border: 1px solid var(--grid); padding: 7pt 9pt; white-space: pre-wrap; break-inside: avoid; }
+  .nums { display: grid; grid-template-columns: repeat(4, 1fr); border: 2px solid var(--rule); margin: 4pt 0 10pt; break-inside: avoid; }
+  .nums div { padding: 6pt 8pt; border-right: 1px solid var(--rule); }
+  .nums div:last-child { border-right: 0; }
+  .nums b { display: block; font: 800 18pt "Archivo"; }
+  .nums span { font-size: 8.6pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="kick">APM Integrations take-home submission · 1 November 2026</div>
+  <h1>OAuth Ready: an hour, or <mark>six weeks?</mark></h1>
+  <p class="lede">Setup and approval guides for provider OAuth apps. Each guide answers, before anything else, how much of the path is your team's work, how much is waiting on the provider, and what is most likely to stop you. An agent can write a new guide for any app in about a minute, and every fact shows how we know it.</p>
+
+  <div class="links">
+    <div>Working app</div><div><a href="https://oauth-ready-ten.vercel.app">https://oauth-ready-ten.vercel.app</a></div>
+    <div>Source code</div><div><a href="https://github.com/Ramya-Shah/oauth-ready">https://github.com/Ramya-Shah/oauth-ready</a> (README: setup, key decisions, limitations)</div>
+    <div>Try it live</div><div><a href="https://oauth-ready-ten.vercel.app/generate">oauth-ready-ten.vercel.app/generate</a>: type any app name or website</div>
+    <div>Evidence log</div><div><a href="https://oauth-ready-ten.vercel.app/verification">oauth-ready-ten.vercel.app/verification</a>: 172 checks, what was confirmed, corrected, unverifiable</div>
+  </div>
+
+  <div class="toc">
+    <div><b>1</b>The problem and the scope I chose</div>
+    <div><b>2</b>What the experience does</div>
+    <div><b>3</b>Real apps with different setup challenges</div>
+    <div><b>4</b>How agents are used</div>
+    <div><b>5</b>What was tested, sourced, and uncertain</div>
+    <div><b>6</b>Trying it, running it, and its limits</div>
+  </div>
+
+  <div class="bar">
+    <p class="small muted" style="margin:18pt 0 0">The question every guide answers, drawn on one scale for every app: your hands-on work, then the wait that blocks customers from connecting, then optional listings.</p>
+    <div class="axis"><span class="w"></span><span class="h"></span><span class="m"></span></div>
+    <div class="ticks"><span>Start</span><span>1 day</span><span>1 week</span><span>1 month</span><span>3 months</span></div>
+  </div>
+</div>
+
+<!-- ============ 1. PROBLEM ============ -->
+<section class="page">
+  <h2>1. The problem as I understood it</h2>
+  <p>To let users connect Gmail, Slack or HubSpot to an AI agent, a developer first registers an <b>OAuth app</b> with that provider: the product's identity, with a client ID, secret, redirect URI and scopes. Every end user who clicks "Connect" creates a <b>connection</b> through that one app. Creating the app usually takes minutes. Getting it to the point where <i>any</i> customer can connect can take weeks: brand and scope verification, publisher verification, security assessments, and customers' own admin approval.</p>
+  <p>Composio's managed OAuth directory (read 1 November 2026) lists <b>387 OAuth toolkits</b>: 125 where Composio supplies the OAuth app, and <b>262 where the developer must bring their own</b>. Those 262 are this tool's core audience. Teams on managed apps hit the same path once they need their own branding, rate limits, or an enterprise security review.</p>
+  <div class="callout"><b>The developer's real question is "an hour or six weeks?"</b> Today they piece it together from scattered docs and forum posts, and can't tell how much is their work, how much is waiting, or what will block them. That uncertainty is what stops them planning a launch.</div>
+
+  <h3>Scope I chose, and why</h3>
+  <ul>
+    <li><b>Answer the verdict first.</b> Every guide opens with difficulty (fixed 1–5 rubric), hands-on hours, and the <i>required</i> provider wait as a separate number, plus the single most likely blocker.</li>
+    <li><b>Separate three things the docs mix up.</b> (1) The wait required before any customer can connect through OAuth, the headline number; (2) optional listings such as marketplaces and certification, with their own waits; (3) limits after users connect: rate limits, install caps, customer admin consent.</li>
+    <li><b>Say who does each step.</b> An agent (drafting, configuring redirect URIs and scopes, running test sign-ins), you (identity, company, payment, sign-in, judgment), or the provider (queues you can only wait on).</li>
+    <li><b>Be honest about evidence.</b> Every claim is labelled by code, never by the model, so a guide can be trusted as far as its labels say and no further.</li>
+    <li><b>Out of scope on purpose:</b> token handling and the connection runtime (Composio already does that), completing real approvals, and paid accounts.</li>
+  </ul>
+</section>
+
+<!-- ============ 2. WHAT IT DOES ============ -->
+<section class="page">
+  <h2>2. What the experience does</h2>
+  <figure>
+    <img src="img/gmail.png" alt="Gmail guide first screen">
+    <figcaption>A guide's first screen (Gmail). The verdict is the headline; the time axis shows 10–40 hours of work, then a 42–70 day required wait; the blocker and a title block with difficulty, facts checked and review date sit below.</figcaption>
+  </figure>
+  <div class="two">
+    <div>
+      <h3>Library</h3>
+      <p>Six reviewed guides chosen for varied setup paths, plus guides written live by the agent. Every app is a row with its own bar on the same time scale, so "no wait" and "ten weeks" can be compared at a glance. Filters: no review wait, needs a review, security assessment.</p>
+      <h3>Guide pages</h3>
+      <p>Steps in three phases (create the app, test with your own account, go to production), each marked agent / you / provider. Then requirements, scopes that trigger review, optional listings, limits after users connect, fixes for when you get stuck, and the evidence. Share by link, copy as Markdown, or download.</p>
+    </div>
+    <div>
+      <h3>Live generation</h3>
+      <p>Type any app name or website. The run streams each stage as it happens, can be stopped, recovers if the connection drops, and ends on a shareable guide. Unknown names get a clear message, and a guessed different product gets "Did you mean …?" instead of a wrong guide.</p>
+      <h3>Verification log</h3>
+      <p>Every claim checked against the providers' own docs, with what the guide said before, what it says now, and the evidence. A "What we learned" section explains the patterns behind the corrections.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. DEMO APPS ============ -->
+<section class="page">
+  <h2>3. Real apps with different setup challenges</h2>
+  <p>"Required wait" counts only what blocks any customer from connecting through OAuth. Optional listings and post-connection limits are shown separately on each guide.</p>
+  <table>
+    <thead><tr><th style="width:22%">App</th><th>The challenge</th><th style="width:12%">Difficulty</th><th style="width:16%">Required wait</th></tr></thead>
+    <tbody>
+      <tr><td><b>GitHub</b></td><td>Instant self-serve. The friction is on the customer side: organizations block third-party OAuth apps until an owner approves.</td><td>2 of 5</td><td>none</td></tr>
+      <tr><td><b>Slack</b></td><td>No review to distribute, but unlisted apps get 1 request/min on message history, so message-reading agents are pushed toward the optional Marketplace (up to ~12 weeks).</td><td>2 of 5</td><td>none</td></tr>
+      <tr><td><b>HubSpot</b></td><td>Apps are now created with the HubSpot CLI; unlisted apps are capped at 25 installs, so a listing becomes practical for real customer bases.</td><td>2 of 5</td><td>none</td></tr>
+      <tr><td><b>Notion</b></td><td>Public connections need no review; installation scope can't be changed after creation; Marketplace listing is optional.</td><td>2 of 5</td><td>none</td></tr>
+      <tr><td><b>Microsoft Entra ID</b></td><td>Partner account verification for publisher verification; the real blocker is customer tenants' admin consent for mail, calendar and files.</td><td>3 of 5</td><td>3–7 days</td></tr>
+      <tr><td><b>Google (Gmail)</b></td><td>The scopes an agent needs are restricted: brand verification, then restricted-scope verification with a paid, yearly CASA security assessment.</td><td>5 of 5</td><td>42–70 days</td></tr>
+    </tbody>
+  </table>
+  <p>Guides also written live by the agent and kept as examples: Xero, Linear, Calendly, and on the deployed site Pipedrive and Intuit QuickBooks. These were not reviewed by hand.</p>
+
+  <h3>A live run, as it streamed</h3>
+  <p class="small muted">Excerpt from generating Pipedrive on the deployed site (1 November 2026); it took about a minute.</p>
+  <div class="stream">identify  done   Pipedrive · pipedrive.com (first run, before the labelling fix)
+search    done   14 official, 2 community results
+fetch     done   11 pages read (2 unreachable or empty)
+probe     Passed: Discovery document found at https://oauth.pipedrive.com/.well-known/oauth-authorization-server
+probe     Passed: Authorization endpoint https://oauth.pipedrive.com/oauth/authorize is live; an unknown client_id was redirected
+write     done   7 steps, 11 claims
+enforce   done   tested 2 · sourced 11 · community 0 · uncertain 0
+result    pipedrive (saved, shareable link)</div>
+  <p class="small">This run also exposed a labelling bug: Pipedrive's developer forum (<code>devcommunity.pipedrive.com</code>) was counted as an official source. It is now fixed in code, so forum subdomains count as community and shared docs platforms such as readme.io only count the vendor's own subdomain. The Pipedrive guide was then regenerated on the live site: its 3 forum claims are now labelled community and its 16 documentation claims official.</p>
+</section>
+
+<!-- ============ 4. AGENTS ============ -->
+<section class="page">
+  <h2>4. How agents are used</h2>
+  <h3>The live guide-writing agent</h3>
+  <ol>
+    <li><b>Identify</b> the product and its official domains. Code rejects a product that doesn't match what was typed, so a typo never silently becomes a guide for a different app.</li>
+    <li><b>Search</b> the provider's own domain (app registration, review and verification, scopes) plus one broad search for community reports (Tavily).</li>
+    <li><b>Read</b> up to about 11 pages through a guarded fetcher: HTTPS only, public addresses only, IP checked at connection time, every redirect re-checked, size and time limits.</li>
+    <li><b>Probe</b> live endpoints: the OAuth discovery document, and the authorize endpoint with a deliberately invalid <code>client_id</code>. The response proves the endpoint exists and shows how it rejects unknown clients, with no account needed.</li>
+    <li><b>Draft</b> the guide from the fetched text and probe results only (Gemini, free tier, JSON output). The prompt keeps required waits, optional listings and post-connection limits apart.</li>
+    <li><b>Enforce evidence</b> in code, then save and return a shareable link.</li>
+  </ol>
+  <p>The free tier allows 20 requests per model per day, so the client rotates through six Gemini models, uses a lighter model for identification, and records which model drafted each guide. Runs can be stopped mid-way, and if the browser disconnects the server finishes the guide and the page opens it when ready.</p>
+
+  <h3>Reviewer agents</h3>
+  <p>Independent reviewer agents, one per guide, read each library guide and checked claims against the providers' own documentation, prioritising the verdict. Their findings were applied by a script, so every correction is recorded with what the guide said before. They were told the guides came from a small free model and to be skeptical.</p>
+
+  <h3>Agents in building it</h3>
+  <p>The app was built with Claude Code. Agents also reviewed the implementation plan before any code was written, and ran an independent design review of the guide page against a written direction contract. Credentials never went into the repository; the API keys live only in Vercel and a local, git-ignored file.</p>
+</section>
+
+<!-- ============ 5. EVIDENCE ============ -->
+<section class="page tight">
+  <h2>5. What was tested, what sources support, what remains uncertain</h2>
+  <h3>Evidence labels: assigned by code, never by the model</h3>
+  <table>
+    <tbody>
+      <tr><td style="width:24%"><span class="label t">Tested</span></td><td>We ran it: an endpoint probe from this run, with the raw response recorded. The model can't mark anything tested.</td></tr>
+      <tr><td><span class="label">Official source</span></td><td>The model cited a page and a quote; code found that quote word for word in the fetched page, on the provider's own domain.</td></tr>
+      <tr><td><span class="label c">Community source</span></td><td>Quote verified on a third-party page: forum, blog, integration vendor.</td></tr>
+      <tr><td><span class="label u">Uncertain</span></td><td>No matching quote or probe; the reason is shown. Unknown waits stay "unknown" instead of being guessed.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Checked against sources</h3>
+  <div class="nums">
+    <div><b>172</b><span>claims checked in two review rounds</span></div>
+    <div><b>110</b><span>confirmed</span></div>
+    <div><b>50</b><span>corrected and applied</span></div>
+    <div><b>12</b><span>could not be verified</span></div>
+  </div>
+  <p class="small muted">Round 1: GitHub, Slack, Gmail, 52 items (36 confirmed, 11 corrected, 5 unverifiable). Round 2: all six library guides, 120 items (74 confirmed, 39 corrected, 7 unverifiable). Details per claim at /verification.</p>
+
+  <h3>What I learned and corrected</h3>
+  <ul>
+    <li><b>The agent's biggest error was treating optional marketplace reviews as OAuth approval.</b> Slack (0–84 days), HubSpot (1–10) and Notion (1–7) all showed a required wait that was really an optional listing; none of them needs a provider review before customers can connect. This changed the product: the schema, the prompt and the page now keep required waits, optional listings and limits apart.</li>
+    <li><b>Gmail went the other way.</b> The real required wait is 42–70 days, because the scopes an agent needs are restricted, and CASA is mandatory and paid, not optional.</li>
+    <li><b>Facts were mostly right; verdicts were where it went wrong.</b> GitHub's and Microsoft's top blockers were wrong (customer org approval and tenant admin consent are the real ones), so reviewers now check the verdict first.</li>
+    <li><b>Quote checking catches invented sources but not misapplied ones.</b> A real Google quote about Workspace Marketplace review was used as the OAuth verification timeline. Labels show where a quote came from, not whether it answers the question.</li>
+    <li><b>Docs go stale.</b> HubSpot's guide described dashboard app creation, which HubSpot retired in 2026 in favour of the CLI.</li>
+  </ul>
+
+  <h3>What remains uncertain</h3>
+  <ul>
+    <li>Most review timelines and assessment costs aren't published; Google's verification FAQ is the exception. Where only community figures exist they are labelled community.</li>
+    <li>Whether Slack's 2025 rate limit applies to existing installs: the changelog and a community report disagree.</li>
+    <li>No hands-on setup attempts with real accounts were made, so "tested" covers endpoint probes only.</li>
+  </ul>
+</section>
+
+<!-- ============ 6. TRY / SETUP / LIMITS ============ -->
+<section class="page">
+  <h2>6. Trying it, running it, and its limits</h2>
+  <h3>Trying it live</h3>
+  <ul>
+    <li>Open <a href="https://oauth-ready-ten.vercel.app/generate">/generate</a>, type any app name or website (for example <i>Zoom</i>, <i>Shopify</i> or <i>docusign.com</i>), and watch the stages stream. A guide takes about 30–90 seconds. <b>Stop</b> ends a run without saving.</li>
+    <li>Apps already in the library open immediately. Each visitor can write 5 new guides per hour; if the free AI quota for the day is used up, the page says so in plain words.</li>
+  </ul>
+
+  <h3>Running it locally</h3>
+  <div class="stream">npm install
+cp .env.example .env.local     # add GEMINI_API_KEY (free tier) and TAVILY_API_KEY (free tier)
+npm run dev                     # http://localhost:3000
+npm test                        # 11 tests: SSRF guard, quote matching, evidence labels, domain and product checks</div>
+  <p class="small">Stack: Next.js and TypeScript, Zod schemas, Gemini (free tier) for writing, Tavily for search, Upstash Redis on Vercel for generated guides, stop flags and rate limits. The library and guide pages need no keys.</p>
+
+  <h3>Limitations</h3>
+  <ul>
+    <li><b>Live guides are only as good as the docs they can read.</b> Some sites block automated reading; the search engine's copy is then used and marked as such.</li>
+    <li><b>The free tier varies.</b> When the stronger models are busy, a lighter model writes a thinner guide; the model is shown on each guide.</li>
+    <li><b>Quote checking can't catch a real quote used for the wrong question,</b> which is why verdicts get a review pass.</li>
+    <li><b>Live-generated guides aren't reviewed by hand,</b> and the page says so on every one.</li>
+    <li><b>No completed provider approvals or hands-on registrations.</b> The natural next step is a few real setup attempts (a GitHub OAuth app, a Google project in Testing mode, a free Slack workspace) to add hands-on "tested" claims.</li>
+  </ul>
+
+  <h3>What I'd build next</h3>
+  <ul>
+    <li>Scale the library toward the 262 bring-your-own apps, with a review queue that checks verdicts first.</li>
+    <li>Re-check guides on a schedule, since provider docs change (HubSpot's did this year).</li>
+    <li>Let the agent take over the steps marked "agent can do", such as drafting the privacy policy, scope justifications and listing copy, once the developer is signed in.</li>
+  </ul>
+</section>
+
+</body>
+</html>

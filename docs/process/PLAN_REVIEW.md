@@ -1,3 +1,5 @@
+> **Historical record.** This is the original pre-build plan (and its review) from 1 November 2026, kept to show the process. Parts were superseded during the build: the models (Gemini 2.5 grounding was unavailable, so search moved to Tavily and writing to rotating Gemini 3.x models), the library was reviewed by reviewer agents rather than hand-tested, and guides now separate required waits from optional listings. See README.md for the current design.
+
 # Goldfish Review Report
 
 **Target:** `U:\oauth-ready\PLAN.md` (L1-76)
