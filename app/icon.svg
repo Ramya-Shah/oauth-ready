@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- OAuth Ready mark: a schedule sheet with your work (ink) followed by the provider wait (highlighter). -->
+  <rect x="2" y="2" width="28" height="28" fill="#f8faf7" stroke="#23408e" stroke-width="3"/>
+  <rect x="6" y="12" width="7" height="8" fill="#1b1f24"/>
+  <rect x="13" y="12" width="13" height="8" fill="#ffd23f"/>
+</svg>
