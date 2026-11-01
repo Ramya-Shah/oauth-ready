@@ -40,6 +40,13 @@ function rootDomain(host: string): string {
 // Platforms that host many companies' docs or sites; a vendor owns only its subdomain there.
 const SHARED_HOSTS = new Set(["readme.io", "gitbook.io", "github.io", "notion.site", "zendesk.com", "helpscoutdocs.com", "mintlify.app", "netlify.app", "vercel.app", "webflow.io", "medium.com", "postman.com", "stoplight.io", "apiary.io", "swaggerhub.com"]);
 
+// Signs that a page is actually about OAuth for third-party apps.
+const OAUTH_EVIDENCE = /oauth|client[ _-]?id|client[ _-]?secret|authori[sz]ation code|redirect[ _-]?ur[il]/i;
+
+export function noOAuthMessage(name: string, domain: string): string {
+  return `We couldn't find OAuth for third-party apps at ${name} (${domain}): none of its official pages describe it and no OAuth endpoint answered. If you meant a different app, enter its website (for example, example.com). Nothing was saved.`;
+}
+
 // The identified product must share a word with what the user typed, so a typo or an
 // unknown name never silently becomes a guide for a different product.
 export function matchesQuery(query: string, name: string, domain: string): boolean {
@@ -273,6 +280,11 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
   yield { type: "stage", stage: "probe", status: "done", detail: probes.length ? `${probes.filter((p) => p.ok).length}/${probes.length} probes succeeded` : "No discovery document or authorize URL found" };
 
   // 5. Write
+  // Only write a guide when there is OAuth to write about: an official page that discusses it,
+  // or a live OAuth endpoint. Otherwise the model would fill a guide from unrelated pages.
+  const oauthPages = sources.filter((s) => s.official && OAUTH_EVIDENCE.test(s.text)).length;
+  if (oauthPages === 0 && !probes.some((p) => p.ok))
+    return yield { type: "fatal", message: noOAuthMessage(name, root) };
   if (await stopped()) return yield { type: "stopped" };
   yield { type: "stage", stage: "write", status: "start", detail: "Drafting the guide from the evidence" };
   let draft: Draft | null = null;
@@ -293,6 +305,8 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
     }
   }
   if (!draft) return yield { type: "fatal", message: "The AI's draft didn't pass our checks twice in a row, so nothing was saved. Try again; a second run usually works." };
+  if (draft.supportsOAuth === false || draft.verdict.activeEffortHours.max <= 0)
+    return yield { type: "fatal", message: noOAuthMessage(name, root) };
   if (await stopped()) return yield { type: "stopped" };
   yield { type: "stage", stage: "write", status: "done", detail: `${draft.steps.length} steps, ${draft.claims.length} claims (${model})` };
 
