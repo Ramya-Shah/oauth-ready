@@ -5,6 +5,7 @@ import { DIFFICULTY_RUBRIC, formatWait, labelCounts, type Guide } from "@/lib/sc
 import { toMarkdown } from "@/lib/markdown";
 import { Difficulty, EvidenceBar, Refs, LABEL_TEXT, LABEL_HELP } from "@/components/bits";
 import ShareBar from "@/components/ShareBar";
+import OpenEvidenceOnLink from "@/components/OpenEvidenceOnLink";
 import RouteBar, { hoursText, waitText } from "@/components/RouteBar";
 
 export const dynamic = "force-dynamic";
@@ -188,7 +189,11 @@ function Evidence({ g }: { g: Guide }) {
       <p className="small muted">
         Labels are assigned by code, not the model: <b>tested</b> requires a probe or setup attempt run by us; <b>official source</b> requires the quote to appear verbatim on a fetched page on the provider's domain.
       </p>
-      <div className="panel" style={{ padding: 0 }}>
+      <details id="evidence" className="evidence">
+        <summary>
+          Show all {g.claims.length} facts and where each came from
+        </summary>
+      <div className="panel" style={{ padding: 0, marginTop: 10 }}>
         {g.claims.map((c) => (
           <div key={c.id} id={c.id} className="claim">
             <div className="row">
@@ -204,6 +209,8 @@ function Evidence({ g }: { g: Guide }) {
           </div>
         ))}
       </div>
+      </details>
+      <OpenEvidenceOnLink />
       {g.sourcesConsulted.length > 0 && (
         <details style={{ marginTop: 12 }}>
           <summary className="small muted">Pages the agent read ({g.sourcesConsulted.length})</summary>

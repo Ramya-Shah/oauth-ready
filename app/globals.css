@@ -206,3 +206,6 @@ tr:last-child td { border-bottom: 0; }
   .top .wrap { flex-wrap: wrap; height: auto; padding-top: 10px; padding-bottom: 10px; gap: 6px 16px; }
   .nav { width: 100%; gap: 16px; overflow-x: auto; }
 }
+.evidence > summary { cursor: pointer; font-weight: 600; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); list-style-position: inside; }
+.evidence > summary:hover { border-color: var(--ink); }
+.evidence[open] > summary { background: var(--stamp-soft); }
