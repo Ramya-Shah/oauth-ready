@@ -1,7 +1,8 @@
 import { listCurated, listGenerated } from "@/lib/store";
 import Library from "@/components/Library";
 
-export const dynamic = "force-dynamic";
+// Served from cache; refreshed every 5 minutes and right after the agent saves a guide.
+export const revalidate = 300;
 
 export default async function Home() {
   const [curated, generated] = await Promise.all([listCurated(), listGenerated(30)]);

@@ -41,6 +41,11 @@ export async function listCurated(): Promise<Guide[]> {
   return (await readDir(CURATED)).sort((a, b) => a.verdict.difficulty - b.verdict.difficulty);
 }
 
+// Guides shipped in data/generated (no Redis), for prerendering.
+export async function listSeededGenerated(): Promise<Guide[]> {
+  return readDir(GENERATED);
+}
+
 export async function listGenerated(limit = 30): Promise<Guide[]> {
   // Files in data/generated ship with the repo (pre-generated demos); Redis holds live ones on Vercel.
   const seeded = await readDir(GENERATED);

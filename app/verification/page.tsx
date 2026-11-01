@@ -3,7 +3,6 @@ import path from "node:path";
 import Link from "next/link";
 
 export const metadata = { title: "Verification log · OAuth Ready" };
-export const dynamic = "force-dynamic";
 
 type Entry = {
   guide: string; claimId?: string; claim: string; method: string;

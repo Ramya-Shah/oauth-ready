@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Ev =
   | { type: "stage"; stage: string; status: "start" | "progress" | "done" | "error"; detail: string }
@@ -27,7 +27,9 @@ const RECOVER_EVERY_MS = 5_000;
 const newRunId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `run-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
-export default function Generator({ initial }: { initial: string }) {
+export default function Generator() {
+  // Read in the browser so the page itself can be served from cache.
+  const initial = useSearchParams().get("q") ?? "";
   const [q, setQ] = useState(initial);
   const [events, setEvents] = useState<Ev[]>([]);
   const [phase, setPhase] = useState<Phase>("idle");

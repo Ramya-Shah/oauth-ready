@@ -1,9 +1,9 @@
+import { Suspense } from "react";
 import Generator from "@/components/Generator";
 
 export const metadata = { title: "Generate a guide · OAuth Ready" };
 
-export default async function GeneratePage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q } = await searchParams;
+export default function GeneratePage() {
   return (
     <section className="sheet page-sheet">
       <h1>Generate a guide for any app</h1>
@@ -11,7 +11,9 @@ export default async function GeneratePage({ searchParams }: { searchParams: Pro
         The agent finds the provider's official developer docs, reads them, probes the provider's live OAuth endpoints, drafts a
         guide, then code checks every claim against what was actually fetched. Takes about 30–90 seconds on the free model tier.
       </p>
-      <Generator initial={q ?? ""} />
+      <Suspense fallback={null}>
+        <Generator />
+      </Suspense>
     </section>
   );
 }

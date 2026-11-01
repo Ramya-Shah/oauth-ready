@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getGuide } from "@/lib/store";
+import { getGuide, listCurated, listSeededGenerated } from "@/lib/store";
 import { DIFFICULTY_RUBRIC, formatWait, labelCounts, type DayRange, type Guide } from "@/lib/schema";
 import { toMarkdown } from "@/lib/markdown";
 import { Refs, LABEL_TEXT, LABEL_HELP } from "@/components/bits";
@@ -11,7 +11,15 @@ import CurrentStep from "@/components/CurrentStep";
 import { hoursText, waitText } from "@/components/RouteBar";
 import "./print.css";
 
-export const dynamic = "force-dynamic";
+// Library and seeded guides are prerendered; live-generated ones render on first visit and are
+// refreshed when the agent saves them (see the generate route).
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const [curated, generated] = await Promise.all([listCurated(), listSeededGenerated()]);
+  return [...curated, ...generated].map((g) => ({ slug: g.slug }));
+}
 
 type P = { params: Promise<{ slug: string }> };
 
