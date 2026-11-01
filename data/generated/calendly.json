@@ -1,0 +1,584 @@
+{
+  "schemaVersion": 1,
+  "slug": "calendly",
+  "name": "Calendly",
+  "aliases": [
+    "calendly.com"
+  ],
+  "officialDomain": "calendly.com",
+  "supportsOAuth": true,
+  "origin": "generated",
+  "model": "gemini-3.5-flash-lite",
+  "generatedAt": "2026-11-01T12:19:34.367Z",
+  "verdict": {
+    "difficulty": 2,
+    "activeEffortHours": {
+      "min": 2,
+      "max": 5
+    },
+    "approvalWait": {
+      "minDays": 0,
+      "maxDays": 0
+    },
+    "topBlocker": "Strict PKCE enforcement with S256 method on every authorization request, and correct space-separated scope formatting.",
+    "summary": "Calendly provides a self-serve developer portal where you can instantly create and configure sandbox or production OAuth apps. Active effort involves setting up PKCE, redirect URIs, and scopes without any mandatory marketplace review gate for standard usage.",
+    "claimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4",
+      "c5"
+    ]
+  },
+  "steps": [
+    {
+      "id": "st1",
+      "phase": "dev",
+      "title": "Log in to Calendly Developer Tools",
+      "detail": "Log in to Calendly, or sign up for a Calendly account. Open Developer tools by opening the Profile menu and selecting Developer.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c1"
+      ]
+    },
+    {
+      "id": "st2",
+      "phase": "dev",
+      "title": "Create your OAuth App in the Portal",
+      "detail": "On the OAuth apps tab, select Create OAuth app. Enter the app name using letters, numbers, hyphens, and spaces only, specify your redirect URI, and select the environment type (Sandbox for development and testing, or Production).",
+      "owner": "you",
+      "minutes": 10,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c2",
+        "c6"
+      ]
+    },
+    {
+      "id": "st3",
+      "phase": "dev",
+      "title": "Select Required API Scopes",
+      "detail": "Select at least one scope that your app needs based on the API endpoints you plan to call (e.g., scheduled_events:read, users:read).",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+        "https://developer.calendly.com/docs/authentication/scopes"
+      ],
+      "claimIds": [
+        "c3",
+        "c7"
+      ]
+    },
+    {
+      "id": "st4",
+      "phase": "dev",
+      "title": "Securely Save Client Credentials",
+      "detail": "Copy and securely store your Client ID, Client secret, and Webhook signing key immediately upon creation, as they cannot be viewed again.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c4",
+        "c8"
+      ]
+    },
+    {
+      "id": "st5",
+      "phase": "test",
+      "title": "Draft Privacy Policy and Terms",
+      "detail": "Draft and host the required legal compliance pages (privacy policy and terms of service) for your application server.",
+      "owner": "agent",
+      "minutes": 30,
+      "links": [],
+      "claimIds": []
+    },
+    {
+      "id": "st6",
+      "phase": "test",
+      "title": "Implement PKCE Code Verifier and Challenge Generation",
+      "detail": "Write server or client code to generate a CODE_VERIFIER and build a CODE_CHALLENGE using SHA-256 for the required PKCE S256 flow.",
+      "owner": "agent",
+      "minutes": 45,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+        "https://developer.calendly.com/api-docs/calendly-o-auth/o-auth/get-oauth-authorize"
+      ],
+      "claimIds": [
+        "c5",
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "id": "st7",
+      "phase": "test",
+      "title": "Build and Run Test Authorization Flow",
+      "detail": "Redirect users to Calendly's authorization page with client_id, response_type=code, redirect_uri, code_challenge_method=S256, code_challenge, and space-separated scopes.",
+      "owner": "agent",
+      "minutes": 60,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+        "https://developer.calendly.com/docs/authentication/scopes"
+      ],
+      "claimIds": [
+        "c11",
+        "c12"
+      ]
+    },
+    {
+      "id": "st8",
+      "phase": "test",
+      "title": "Exchange Authorization Code for Access Token",
+      "detail": "Send a POST request to https://auth.calendly.com/oauth/token with grant_type=authorization_code, code, redirect_uri, client_id, code_verifier, and HTTP Basic authentication using client secret.",
+      "owner": "agent",
+      "minutes": 30,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c13"
+      ]
+    },
+    {
+      "id": "st9",
+      "phase": "production",
+      "title": "Configure Production Environment App",
+      "detail": "Create a second app for Production in the developer portal using an HTTPS-only redirect URI when your integration is ready for real customer data.",
+      "owner": "you",
+      "minutes": 10,
+      "links": [
+        "https://developer.calendly.com/docs/authentication/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c14",
+        "c15"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "kind": "developer_account",
+      "requiredFor": "test",
+      "note": "Log in to Calendly, or sign up for a Calendly account to access Developer tools.",
+      "claimIds": [
+        "c1"
+      ]
+    },
+    {
+      "kind": "domain",
+      "requiredFor": "test",
+      "note": "Sandbox environment allows http URIs on localhost, while Production requires https URIs only.",
+      "claimIds": [
+        "c14",
+        "c15"
+      ]
+    },
+    {
+      "kind": "privacy_policy",
+      "requiredFor": "production",
+      "note": "Standard compliance requirement for public integrations handling user accounts.",
+      "claimIds": []
+    }
+  ],
+  "scopes": [
+    {
+      "scope": "scheduled_events:read",
+      "triggersReview": false,
+      "note": "Retrieve scheduled events and event invitee information.",
+      "claimIds": [
+        "c16"
+      ]
+    },
+    {
+      "scope": "scheduled_events:write",
+      "triggersReview": false,
+      "note": "Create event invitees, cancel events or mark invitees as no-show.",
+      "claimIds": [
+        "c17"
+      ]
+    },
+    {
+      "scope": "event_types:read",
+      "triggersReview": false,
+      "note": "Retrieve event type details and available times.",
+      "claimIds": [
+        "c18"
+      ]
+    },
+    {
+      "scope": "event_types:write",
+      "triggersReview": false,
+      "note": "Create or update event types.",
+      "claimIds": [
+        "c19"
+      ]
+    },
+    {
+      "scope": "availability:read",
+      "triggersReview": false,
+      "note": "Retrieve user and event-type availability.",
+      "claimIds": [
+        "c20"
+      ]
+    },
+    {
+      "scope": "users:read",
+      "triggersReview": false,
+      "note": "Retrieve user information.",
+      "claimIds": [
+        "c21"
+      ]
+    },
+    {
+      "scope": "webhooks:write",
+      "triggersReview": false,
+      "note": "Create or delete webhook subscriptions.",
+      "claimIds": [
+        "c22"
+      ]
+    },
+    {
+      "scope": "contacts:read",
+      "triggersReview": false,
+      "note": "Retrieve Contact details.",
+      "claimIds": [
+        "c23"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "symptom": "The requested scope is invalid, unknown, or malformed.",
+      "cause": "Incorrect formatting of the scope parameter or unexpected characters/separators in the authorization URL.",
+      "unblock": "Ensure individual permissions are separated by spaces as a single properly formatted string.",
+      "claimIds": [
+        "c11",
+        "c24"
+      ]
+    },
+    {
+      "symptom": "Authorization request fails or errors out immediately.",
+      "cause": "Missing code_challenge parameter in the authorization request.",
+      "unblock": "Every OAuth app must use Proof Key for Code Exchange (PKCE) with the S256 method and supply a valid code_challenge.",
+      "claimIds": [
+        "c5",
+        "c10"
+      ]
+    },
+    {
+      "symptom": "Redirect URI mismatch error during auth flow.",
+      "cause": "The redirect_uri sent in the authorization request does not match exactly with the URI registered in the Calendly developer portal.",
+      "unblock": "Verify that the redirect URI string matches byte-for-byte between your code and the app configuration.",
+      "claimIds": [
+        "c25"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "text": "Log in to Calendly, or sign up for a Calendly account. Open Developer tools . In Calendly, open the Profile menu and select Developer .",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Log in to Calendly, or sign up for a Calendly account. Open Developer tools . In Calendly, open the Profile menu and select Developer .",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c2",
+      "text": "On the OAuth apps tab, select Create OAuth app . Enter the app details: App name : use letters, numbers, hyphens, and spaces only. Redirect URI : the URL where Calendly sends users after they authorize your app. Enter exactly one URI. Environment type : select Sandbox for development and testing, or Production when your app is ready for real users.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "On the OAuth apps tab, select Create OAuth app . Enter the app details: App name : use letters, numbers, hyphens, and spaces only. Redirect URI : the URL where Calendly sends users after they authorize your app. Enter exactly one URI. Environment type : select Sandbox for development and testing, or Production when your app is ready for real users.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c3",
+      "text": "Select the scopes that your app needs. Select at least one scope. Learn more about scopes .",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Select the scopes that your app needs. Select at least one scope. Learn more about scopes .",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c4",
+      "text": "After you create the app, Calendly shows these values: Client ID : your app’s identifier. Send it in each OAuth request. Client secret : a secret that your server uses to authenticate with Calendly. Webhook signing key : a key that you use to verify webhook signatures . Copy all three values and store them securely before you leave this screen. You cannot view the client secret or the webhook signing key again.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "After you create the app, Calendly shows these values: Client ID : your app’s identifier. Send it in each OAuth request. Client secret : a secret that your server uses to authenticate with Calendly. Webhook signing key : a key that you use to verify webhook signatures . Copy all three values and store them securely before you leave this screen. You cannot view the client secret or the webhook signing key again.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c5",
+      "text": "Every OAuth app must use Proof Key for Code Exchange (PKCE) with the S256 method. If the authorization request does not include a code challenge, the request fails.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Every OAuth app must use Proof Key for Code Exchange (PKCE) with the S256 method. If the authorization request does not include a code challenge, the request fails.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c6",
+      "text": "Environment type : select Sandbox for development and testing, or Production when your app is ready for real users.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Environment type : select Sandbox for development and testing, or Production when your app is ready for real users.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c7",
+      "text": "For newly created OAuth apps and new Personal Access Tokens, no API access is granted until scopes are explicitly requested and approved.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "For newly created OAuth apps and new Personal Access Tokens, no API access is granted until scopes are explicitly requested and approved.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c8",
+      "text": "At this time, you also cannot view the client ID again in Developer tools.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "At this time, you also cannot view the client ID again in Developer tools.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c9",
+      "text": "Generate a CODE_VERIFIER . Build a CODE_CHALLENGE from the verifier with SHA-256.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Generate a CODE_VERIFIER . Build a CODE_CHALLENGE from the verifier with SHA-256.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c10",
+      "text": "code_challenge string Required The PKCE code challenge, built from your code verifier with SHA-256. Required for every app.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/api-docs/calendly-o-auth/o-auth/get-oauth-authorize",
+      "quote": "code_challenge string Required \nThe PKCE code challenge, built from your code verifier with SHA-256. Required for every app.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c11",
+      "text": "https://auth.calendly.com/oauth/authorize?client_id=CLIENT_ID & response_type= code & redirect_uri= REDIRECT_URI & code_challenge_method= S256 & code_challenge= CODE_CHALLENGE",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "https://auth.calendly.com/oauth/authorize?client_id=CLIENT_ID \n& response_type= code \n& redirect_uri= REDIRECT_URI \n& code_challenge_method= S256 \n& code_challenge= CODE_CHALLENGE",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c12",
+      "text": "List scopes separated by spaces. Only include the scopes your app needs.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "List scopes separated by spaces. Only include the scopes your app needs.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c13",
+      "text": "Send a POST request to Get Access Token at https://auth.calendly.com/oauth/token . Include these parameters: grant_type : authorization_code , code : the authorization code, redirect_uri : the same redirect URI that you used to get the code, client_id : your client ID, code_verifier : the verifier that you generated in step 1",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Send a POST request to Get Access Token at https://auth.calendly.com/oauth/token . Include these parameters:\ngrant_type : authorization_code \ncode : the authorization code\nredirect_uri : the same redirect URI that you used to get the code\nclient_id : your client ID\ncode_verifier : the verifier that you generated in step 1",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c14",
+      "text": "Sandbox https URIs, and http URIs on localhost . Example: http://localhost:1234/callback",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Sandbox https URIs, and http URIs on localhost . Example: http://localhost:1234/callback",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c15",
+      "text": "Production https URIs only",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "quote": "Production https URIs only",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c16",
+      "text": "scheduled_events:read Retrieve scheduled events and event invitee information.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "scheduled_events:read Retrieve scheduled events and event invitee information.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c17",
+      "text": "scheduled_events:write Create event invitees, cancel events or mark invitees as no-show.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "scheduled_events:write Create event invitees, cancel events or mark invitees as no-show.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c18",
+      "text": "event_types:read Retrieve event type details and available times.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "event_types:read Retrieve event type details and available times.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c19",
+      "text": "event_types:write Create or update event types.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "event_types:write Create or update event types.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c20",
+      "text": "availability:read Retrieve user and event-type availability.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "availability:read Retrieve user and event-type availability.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c21",
+      "text": "users:read Retrieve user information.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "users:read Retrieve user information.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c22",
+      "text": "webhooks:write Create or delete webhook subscriptions.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "webhooks:write Create or delete webhook subscriptions.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c23",
+      "text": "contacts:read Retrieve Contact details.",
+      "label": "sourced",
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "quote": "contacts:read Retrieve Contact details.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c24",
+      "text": "The scope parameter in the URL should be formatted correctly, with the individual permissions separated by spaces.",
+      "label": "community",
+      "url": "https://community.calendly.com/api-webhook-help-61/an-error-has-occurred-the-requested-scope-is-invalid-unknown-or-malformed-3657",
+      "quote": "The scope parameter in the URL should be formatted correctly, with the individual permissions separated by spaces.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "c25",
+      "text": "Ensure that the client_id you're using is correct and matches what's registered in your Calendly app, and that the redirect_uri matches exactly with the URI you’ve registered in the Calendly developer portal.",
+      "label": "community",
+      "url": "https://community.calendly.com/api-webhook-help-61/an-error-has-occurred-the-requested-scope-is-invalid-unknown-or-malformed-3657",
+      "quote": "Ensure that the client_id you're using is correct and matches what's registered in your Calendly app, and that the redirect_uri matches exactly with the URI you’ve registered in the Calendly developer portal.",
+      "checkedAt": "2026-11-01T12:19:34.367Z"
+    },
+    {
+      "id": "t1",
+      "text": "Discovery document found at https://calendly.com/.well-known/openid-configuration: authorization endpoint https://calendly.com/oauth/authorize, token endpoint https://calendly.com/oauth/token, PKCE methods S256.",
+      "label": "tested",
+      "url": "https://calendly.com/.well-known/openid-configuration",
+      "method": "Fetched OAuth discovery document",
+      "artifact": "GET https://calendly.com/.well-known/openid-configuration → HTTP 200\n{\n \"issuer\": \"https://calendly.com/\",\n \"authorization_endpoint\": \"https://calendly.com/oauth/authorize\",\n \"token_endpoint\": \"https://calendly.com/oauth/token\",\n \"code_challenge_methods_supported\": [\n  \"S256\"\n ]\n}",
+      "checkedAt": "2026-11-01T12:19:18.741Z"
+    },
+    {
+      "id": "t2",
+      "text": "Discovery document found at https://login.calendly.com/.well-known/openid-configuration: authorization endpoint https://login.calendly.com/oauth2/v1/authorize, token endpoint https://login.calendly.com/oauth2/v1/token, PKCE methods S256.",
+      "label": "tested",
+      "url": "https://login.calendly.com/.well-known/openid-configuration",
+      "method": "Fetched OAuth discovery document",
+      "artifact": "GET https://login.calendly.com/.well-known/openid-configuration → HTTP 200\n{\n \"issuer\": \"https://login.calendly.com\",\n \"authorization_endpoint\": \"https://login.calendly.com/oauth2/v1/authorize\",\n \"token_endpoint\": \"https://login.calendly.com/oauth2/v1/token\",\n \"scopes_supported\": [\n  \"openid\",\n  \"email\",\n  \"profile\",\n  \"address\",\n  \"phone\",\n  \"offline_access\",\n  \"groups\"\n ],\n \"code_challenge_methods_supported\": [\n  \"S256\"\n ],\n \"grant_types_supported\": [\n  \"authorization_code\",\n  \"implicit\",\n  \"refresh_token\",\n  \"password\",\n  \"urn:ietf:params:oauth:grant-type:device_code\"\n ]\n}",
+      "checkedAt": "2026-11-01T12:19:19.479Z"
+    },
+    {
+      "id": "t5",
+      "text": "Authorization endpoint https://calendly.com/oauth/authorize is live; an unknown client_id was redirected (HTTP 302) to https://calendly.com/app/login — the client is not validated before that step.",
+      "label": "tested",
+      "url": "https://calendly.com/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://calendly.com/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 302\nLocation: https://calendly.com/app/login\nExcerpt: You are being redirected",
+      "checkedAt": "2026-11-01T12:19:20.040Z"
+    },
+    {
+      "id": "t6",
+      "text": "Authorization endpoint https://login.calendly.com/oauth2/v1/authorize is live and rejects an unknown client_id with HTTP 400: \"Your request resulted in an error\".",
+      "label": "tested",
+      "url": "https://login.calendly.com/oauth2/v1/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://login.calendly.com/oauth2/v1/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 400\nExcerpt: Your request resulted in an error",
+      "checkedAt": "2026-11-01T12:19:20.302Z"
+    }
+  ],
+  "gaps": [
+    "Partner marketplace submission and public directory listing review timelines are not explicitly documented in developer sources."
+  ],
+  "sourcesConsulted": [
+    {
+      "url": "https://developer.calendly.com/docs/authentication/creating-an-oauth-app",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://community.calendly.com/how-do-i-40/how-to-implement-add-integration-my-app-oauth-sign-in-redirect-back-to-calendly-flow-for-partner-marketplace-4819",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://community.calendly.com/api-webhook-help-61/an-error-has-occurred-the-requested-scope-is-invalid-unknown-or-malformed-3657",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.calendly.com/api-docs/calendly-o-auth/o-auth/get-oauth-authorize",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://community.calendly.com/developer-community-60/index13.html",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.calendly.com/docs/getting-started/introduction",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.calendly.com/docs/authentication/overview",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.calendly.com/api-docs/overview/api/reference",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://forum.figma.com/report-a-problem-6/oauth-app-review-time-59362",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://community.klaviyo.com/accounts-and-settings-2/title-oauth-app-pending-review-for-over-a-month-has-anyone-experienced-this-19822",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.calendly.com/docs/authentication/scopes",
+      "official": true,
+      "fetched": true
+    }
+  ]
+}

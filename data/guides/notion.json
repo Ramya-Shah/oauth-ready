@@ -1,0 +1,414 @@
+{
+  "schemaVersion": 1,
+  "slug": "notion",
+  "name": "Notion",
+  "aliases": [
+    "notion.com",
+    "Notion Public Connection"
+  ],
+  "officialDomain": "notion.com",
+  "supportsOAuth": true,
+  "origin": "curated",
+  "model": "gemini-3.5-flash-lite",
+  "generatedAt": "2026-11-01T12:06:09.778Z",
+  "verdict": {
+    "difficulty": 3,
+    "activeEffortHours": {
+      "min": 2,
+      "max": 6
+    },
+    "approvalWait": {
+      "minDays": 1,
+      "maxDays": 7
+    },
+    "topBlocker": "Public connections must undergo a Notion security review before being listed on the Marketplace.",
+    "summary": "Registering an OAuth app with Notion requires setting up a public connection in the Developer portal, implementing the OAuth 2.0 authorization code grant flow, and submitting for marketplace review if listing publicly.",
+    "claimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ]
+  },
+  "steps": [
+    {
+      "id": "st1",
+      "phase": "dev",
+      "title": "Create a new public connection in the Developer portal",
+      "detail": "Navigate to the Developer portal and create a new public connection, choosing your installation scope (Any workspace or Selected workspaces only).",
+      "owner": "you",
+      "minutes": 15,
+      "links": [
+        "https://www.notion.so/developers"
+      ],
+      "claimIds": [
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "id": "st2",
+      "phase": "dev",
+      "title": "Configure OAuth redirect URIs and scopes",
+      "detail": "Fill out connection details including your redirect URI(s) under the OAuth configuration section. This cannot be changed after creation.",
+      "owner": "agent",
+      "minutes": 15,
+      "links": [
+        "https://developers.notion.com/docs/authorization"
+      ],
+      "claimIds": [
+        "c7",
+        "c8"
+      ]
+    },
+    {
+      "id": "st3",
+      "phase": "dev",
+      "title": "Draft privacy policy and terms of service",
+      "detail": "Prepare standard legal compliance documents required for public application distribution.",
+      "owner": "agent",
+      "minutes": 30,
+      "links": [],
+      "claimIds": [
+        "c9"
+      ]
+    },
+    {
+      "id": "st4",
+      "phase": "test",
+      "title": "Implement OAuth authorization code flow and page picker",
+      "detail": "Construct the authorization URL pointing to https://api.notion.com/v1/oauth/authorize with client_id, redirect_uri, and response_type=code.",
+      "owner": "agent",
+      "minutes": 60,
+      "links": [
+        "https://api.notion.com/v1/oauth/authorize"
+      ],
+      "claimIds": [
+        "c10",
+        "c11"
+      ]
+    },
+    {
+      "id": "st5",
+      "phase": "test",
+      "title": "Exchange temporary authorization code for an access token",
+      "detail": "Make a POST request to exchange the temporary code returned by Notion for an access token and store it securely.",
+      "owner": "agent",
+      "minutes": 45,
+      "links": [
+        "https://developers.notion.com/docs/authorization"
+      ],
+      "claimIds": [
+        "c12",
+        "c13"
+      ]
+    },
+    {
+      "id": "st6",
+      "phase": "production",
+      "title": "Submit public connection for security review and marketplace listing",
+      "detail": "Manage marketplace listing details via the Listings section and submit the public connection for Notion security review.",
+      "owner": "you",
+      "minutes": 30,
+      "links": [
+        "https://developers.notion.com/docs/authorization"
+      ],
+      "claimIds": [
+        "c3",
+        "c14"
+      ]
+    },
+    {
+      "id": "st7",
+      "phase": "production",
+      "title": "Await Notion marketplace and security review",
+      "detail": "Wait for Notion's team to complete the security review and approve the public application for the Marketplace.",
+      "owner": "provider",
+      "minutes": 0,
+      "links": [],
+      "claimIds": [
+        "c3",
+        "c15"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "kind": "developer_account",
+      "requiredFor": "test",
+      "note": "A Notion developer account is required to access the Developer portal and create connections.",
+      "claimIds": [
+        "c5"
+      ]
+    },
+    {
+      "kind": "privacy_policy",
+      "requiredFor": "production",
+      "note": "Required when publishing your application publicly or listing on the Notion Marketplace.",
+      "claimIds": [
+        "c9"
+      ]
+    },
+    {
+      "kind": "security_assessment",
+      "requiredFor": "production",
+      "note": "Public connections must undergo a Notion security review before being listed on the Marketplace.",
+      "claimIds": [
+        "c3"
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "scope": "default",
+      "triggersReview": true,
+      "note": "All public connections follow the OAuth 2.0 protocol and require security review before marketplace publication.",
+      "claimIds": [
+        "c3",
+        "c4"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "symptom": "Authorization URL field is missing or unpopulated in the connection settings.",
+      "cause": "The Authorization URL field populates only after a public connection is submitted for review.",
+      "unblock": "Submit the public connection for review in the Developer portal to generate the authorization URL.",
+      "claimIds": [
+        "c16"
+      ]
+    },
+    {
+      "symptom": "Redirect URI mismatch errors during OAuth callback.",
+      "cause": "The redirect URI used in the authorization request does not exactly match the URI configured during connection creation.",
+      "unblock": "Ensure the redirect URI specified in code matches the configuration in your Developer portal settings exactly.",
+      "claimIds": [
+        "c7",
+        "c17"
+      ]
+    },
+    {
+      "symptom": "User cancels auth flow and application crashes or hangs.",
+      "cause": "The application does not handle the OAuth error query parameter when a user presses Cancel.",
+      "unblock": "Build your connection to handle the error query parameter (e.g. error=access_denied) gracefully when redirected.",
+      "claimIds": [
+        "c18",
+        "c19"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "text": "Authorization endpoint https://api.notion.com/v1/oauth/authorize is live; an unknown client_id was redirected (HTTP 302) to https://app.notion.com/install-integration?response_type=code&client_id=oauthready-probe-invalid-client&redirect_uri=htt — the client is not validated before that step.",
+      "label": "tested",
+      "url": "https://api.notion.com/v1/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://api.notion.com/v1/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 302\nLocation: https://app.notion.com/install-integration?response_type=code&client_id=oauthready-probe-invalid-client&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe\nExcerpt: Redirecting to https://app",
+      "checkedAt": "2026-11-01T12:01:20.554Z"
+    },
+    {
+      "id": "c2",
+      "text": "Registering an OAuth app with Notion requires setting up a public connection in the Developer portal, implementing the OAuth 2.0 authorization code grant flow, and submitting for marketplace review if listing publicly.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "public connections follow the OAuth 2.0 protocol to authorize a connection to interact with a workspace.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c3",
+      "text": "Public connections must undergo a Notion security review before being listed on the Marketplace.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/guides/get-started/overview",
+      "quote": "Public connections must undergo a Notion security review before being listed on the Marketplace.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c4",
+      "text": "You can create and use a public connection without listing it.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/guides/get-started/overview",
+      "quote": "You can create and use a public connection without listing it.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c5",
+      "text": "Navigate to the Developer portal and create a new public connection.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "Navigate to the Developer portal and create a new public connection.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c6",
+      "text": "A public connection can be installed in any Notion workspace within its installation scope — either any workspace, or a specific set chosen at creation time.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "A public connection can be installed in any Notion workspace within its installation scope — either any workspace, or a specific set chosen at creation time.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c7",
+      "text": "Fill out the form with your connection details, including your redirect URI(s) under the OAuth configuration section and the connection’s installation scope — either Any workspace or Selected workspaces only . This can’t be changed after creation.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "Fill out the form with your connection details, including your redirect URI(s) under the OAuth configuration section and the connection’s installation scope — either Any workspace or Selected workspaces only . This can’t be changed after creation.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c8",
+      "text": "The redirect URI is the URI your users will be redirected to after authorizing the public connection.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "The redirect URI is the URI your users will be redirected to after authorizing the public connection.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c9",
+      "text": "Privacy policy and terms of service requirements for public app distribution.",
+      "label": "uncertain",
+      "note": "Standard industry requirement for public OAuth integrations not explicitly detailed in API docs. No source cited by the agent.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c10",
+      "text": "The URL begins with https://api.notion.com/v1/oauth/authorize and has the following parameters: client_id, redirect_uri, response_type.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "The URL begins with https://api.notion.com/v1/oauth/authorize and has the following parameters:",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c11",
+      "text": "Users can select which pages to give the connection access to, including both private and public pages available to them.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "Users can select which pages to give the connection access to, including both private and public pages available to them.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c12",
+      "text": "Make a POST request to create an access token , which exchanges the temporary code for an access token.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "Make a POST request to create an access token , which exchanges the temporary code for an access token.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c13",
+      "text": "The Notion API responds with an access token and some additional information.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "The Notion API responds with an access token and some additional information.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c14",
+      "text": "Marketplace listing details (such as descriptions, categories, and images) are managed separately through the Listings section.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "Marketplace listing details (such as descriptions, categories, and images) are managed separately through the Listings section.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c15",
+      "text": "Review timelines are not explicitly published by Notion and typically vary between 1 to 7 days.",
+      "label": "uncertain",
+      "note": "Estimated based on standard SaaS developer ecosystem review cycles. No source cited by the agent.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c16",
+      "text": "The Authorization URL field populates after a public connection is submitted for review",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "The Authorization URL field populates after a public connection is submitted for review",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c17",
+      "text": "When you first created the public connection, you specified a redirect URI. If the user follows the prompt to Allow access for the connection, then Notion generates a temporary code and sends a request to the redirect URI",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "When you first created the public connection, you specified a redirect URI. If the user follows the prompt to Allow access for the connection, then Notion generates a temporary code and sends a request to the redirect URI",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c18",
+      "text": "If the user presses Cancel , they will be redirected to the redirect URI with and error query param added.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "If the user presses Cancel , they will be redirected to the redirect URI with and error query param added.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "c19",
+      "text": "User authorization failures can happen. If a user chooses to Cancel the request, then a failure is triggered. Build your connection to handle these cases gracefully, as needed.",
+      "label": "sourced",
+      "url": "https://developers.notion.com/docs/authorization",
+      "quote": "User authorization failures can happen. If a user chooses to Cancel the request, then a failure is triggered. Build your connection to handle these cases gracefully, as needed.",
+      "checkedAt": "2026-11-01T12:06:09.778Z"
+    }
+  ],
+  "gaps": [
+    "Exact SLA duration for Notion security review and marketplace approval team response time.",
+    "Specific automated webhook requirements for app revocation or token expiration handling beyond standard OAuth error codes."
+  ],
+  "sourcesConsulted": [
+    {
+      "url": "https://www.notion.com/zh-cn/help/set-up-the-snowflake-mcp-for-notion",
+      "official": true,
+      "fetched": false
+    },
+    {
+      "url": "https://developers.notion.com/workers/guides/oauth",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.notion.com/docs/authorization",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.notion.com/guides/mcp/enterprise-managed-authorization",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.notion.com/guides/get-started/overview",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.notion.com/guides/get-started/authorization",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.notion.com/docs/getting-started",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.notion.com/reference/authentication",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://www.simpletivity.com/videos/notion-is-truly-an-all-in-one-productivity-tool-app-review",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://www.businessinsider.com/apple-takes-about-15-minutes-to-review-an-app-for-approval-2012-3",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.notion.com/reference/unfurl-attribute-object",
+      "official": true,
+      "fetched": true
+    }
+  ]
+}

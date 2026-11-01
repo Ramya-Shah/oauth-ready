@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 1,
+  "slug": "xero",
+  "name": "Xero",
+  "aliases": [
+    "Xero Accounting"
+  ],
+  "officialDomain": "xero.com",
+  "supportsOAuth": true,
+  "origin": "generated",
+  "model": "gemini-3.5-flash-lite",
+  "generatedAt": "2026-11-01T12:11:31.847Z",
+  "verdict": {
+    "difficulty": 4,
+    "activeEffortHours": {
+      "min": 4,
+      "max": 10
+    },
+    "approvalWait": {
+      "minDays": 7,
+      "maxDays": 90
+    },
+    "topBlocker": "Entering the wrong approval path (standard tier upgrade vs. Financial Services Partnership queue for payment/lending use cases) or hitting connection limits before approval.",
+    "summary": "Xero provides self-serve OAuth configuration and developer account creation, allowing up to a low limit of connected organizations before formal review is required. Scaling beyond self-serve ceilings or handling financial services triggers multi-week partner review queues.",
+    "claimIds": [
+      "c1",
+      "c2",
+      "c3"
+    ]
+  },
+  "steps": [
+    {
+      "id": "st1",
+      "phase": "dev",
+      "title": "Create a Developer Account and App",
+      "detail": "Register on the Xero Developer Portal, enter your company or application URL, agree to terms, and create your app to receive credentials.",
+      "owner": "you",
+      "minutes": 15,
+      "links": [
+        "https://developer.xero.com/faq/oauth2"
+      ],
+      "claimIds": [
+        "c4"
+      ]
+    },
+    {
+      "id": "st2",
+      "phase": "dev",
+      "title": "Configure Redirect URIs and Scopes",
+      "detail": "Set up your absolute redirect URIs (up to 50 allowed, no wildcards) and configure your required scopes in the app settings.",
+      "owner": "agent",
+      "minutes": 20,
+      "links": [
+        "https://developer.xero.com/faq/oauth2"
+      ],
+      "claimIds": [
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "id": "st3",
+      "phase": "dev",
+      "title": "Generate and Secure Client Secret",
+      "detail": "Generate a client secret in the developer console and store it securely since it will not be shown again once you leave the page.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://developer.xero.com/faq/oauth2"
+      ],
+      "claimIds": [
+        "c7"
+      ]
+    },
+    {
+      "id": "st4",
+      "phase": "test",
+      "title": "Implement Authorization Code Flow with PKCE",
+      "detail": "Write the code for handling the OAuth 2.0 authorization endpoint and token exchange, utilizing PKCE if building a native or public client app.",
+      "owner": "agent",
+      "minutes": 120,
+      "links": [
+        "https://developer.xero.com/faq/oauth2"
+      ],
+      "claimIds": [
+        "c8"
+      ]
+    },
+    {
+      "id": "st5",
+      "phase": "test",
+      "title": "Test Local OAuth Connection Flow",
+      "detail": "Execute a test authorization flow against a Demo Company or test organization using your newly created app credentials.",
+      "owner": "agent",
+      "minutes": 30,
+      "links": [
+        "https://developer.xero.com/faq/granular-scopes"
+      ],
+      "claimIds": [
+        "c9"
+      ]
+    },
+    {
+      "id": "st6",
+      "phase": "production",
+      "title": "Determine App Partnership / Review Path",
+      "detail": "Identify whether your product requires a standard tier upgrade/certification or the Financial Services Partnership queue.",
+      "owner": "you",
+      "minutes": 30,
+      "links": [
+        "https://developer.xero.com/faq/oauth2"
+      ],
+      "claimIds": [
+        "c1",
+        "c2"
+      ]
+    },
+    {
+      "id": "st7",
+      "phase": "production",
+      "title": "Submit App Partner or Financial Services Application",
+      "detail": "Submit your application form detailing your end-user journey, data usage, and requested scopes to Xero.",
+      "owner": "you",
+      "minutes": 60,
+      "links": [
+        "https://developer.xero.com/faq/oauth2"
+      ],
+      "claimIds": [
+        "c2"
+      ]
+    },
+    {
+      "id": "st8",
+      "phase": "production",
+      "title": "Undergo Xero Review and App Walkthrough",
+      "detail": "Wait for Xero to review your integration, conduct end-user journey demonstrations (connection, mapping, disconnection), and verify security practices.",
+      "owner": "provider",
+      "minutes": 0,
+      "links": [
+        "https://developer.xero.com/faq/oauth2"
+      ],
+      "claimIds": [
+        "c3",
+        "c10"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "kind": "domain",
+      "requiredFor": "production",
+      "note": "Company or application URL must be provided when registering your app.",
+      "claimIds": [
+        "c4"
+      ]
+    },
+    {
+      "kind": "demo_video",
+      "requiredFor": "production",
+      "note": "Xero reviews the actual product experience, so expect to demo account mapping, connection management, and disconnection flows during partner review.",
+      "claimIds": [
+        "c10"
+      ]
+    },
+    {
+      "kind": "business_verification",
+      "requiredFor": "production",
+      "note": "Financial service providers or apps scaling past self-serve connection limits must complete partner applications and contract reviews.",
+      "claimIds": [
+        "c2"
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "scope": "openid email",
+      "triggersReview": false,
+      "note": "Required for single sign-on and retrieving basic user identity details.",
+      "claimIds": [
+        "c11"
+      ]
+    },
+    {
+      "scope": "offline_access",
+      "triggersReview": false,
+      "note": "Required to get a refresh token in order to maintain an offline connection and refresh access tokens.",
+      "claimIds": [
+        "c12"
+      ]
+    },
+    {
+      "scope": "accounting.transactions (and granular equivalents like accounting.invoices)",
+      "triggersReview": false,
+      "note": "Standard organisation accounting scopes. Web and PKCE apps created after March 2026 use granular scopes by default.",
+      "claimIds": [
+        "c13",
+        "c14"
+      ]
+    },
+    {
+      "scope": "bankfeedsv2 / payment services / practice manager scopes",
+      "triggersReview": true,
+      "note": "Specialized scopes that require additional certification, partner registration, security questionnaires, and commercial agreements.",
+      "claimIds": [
+        "c15",
+        "c16"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "symptom": "Application stuck in standard review queue for months",
+      "cause": "Applying through the standard self-service or tier upgrade path when your app performs financial services (e.g., pulling invoices for payment, lending, or credit decisioning).",
+      "unblock": "Apply directly through Xero's Financial Services Partnership queue from the start of integration work.",
+      "claimIds": [
+        "c2"
+      ]
+    },
+    {
+      "symptom": "Users hit 'maximum number of uncertified apps they can install' error",
+      "cause": "Xero restricts individual users to installing a maximum of 2 uncertified apps.",
+      "unblock": "Successfully complete the Xero certification process or have users remove an existing uncertified app.",
+      "claimIds": [
+        "c17"
+      ]
+    },
+    {
+      "symptom": "Redirect URI mismatch error during OAuth flow",
+      "cause": "Using wildcards in redirect URIs or mismatching absolute URLs configured in the developer portal.",
+      "unblock": "Ensure all redirect URIs are absolute URLs without wildcards (up to 50 supported) matching the exact request string.",
+      "claimIds": [
+        "c5"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "text": "Up to Xero's self-service ceiling, you can raise the limit yourself by moving up a Xero developer pricing tier. No approval is involved — you pay and the limit rises. Past that ceiling, you enter an approval process.",
+      "label": "community",
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "quote": "Up to Xero's self-service ceiling , you can raise the limit yourself by moving up a Xero developer pricing tier . No approval is involved — you pay and the limit rises.\n Past that ceiling , you enter an approval process.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c2",
+      "text": "Financial service providers must apply through Xero's Financial Services Partnership queue rather than the standard self-service app partner tier upgrade.",
+      "label": "community",
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "quote": "Financial service providers must apply through Xero's Financial Services Partnership queue rather than the standard self-service app partner tier upgrade.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c3",
+      "text": "This path involves contract review and a Xero-led review of your product and the scopes you request from your users, and commonly takes several months.",
+      "label": "community",
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "quote": "This path involves contract review and a Xero-led review of your product and the scopes you request from your users, and commonly takes several months .",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c4",
+      "text": "Company or application URL : Enter the URL to your company’s website. Agree to the terms and conditions and click Create App .",
+      "label": "community",
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "quote": "Company or application URL : Enter the URL to your company’s website.\n Agree to the terms and conditions and click Create App .",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c5",
+      "text": "The OAuth 2.0 spec (section 3.1.2 of RFC 6749) requires that a redirection URI must be an absolute URI. The use of wildcards in redirect URI is not supported. You can use up to 50 redirect URIs for your app.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/faq/oauth2",
+      "quote": "The OAuth 2.0 spec (section 3.1.2 of RFC 6749) requires that a redirection URI must be an absolute URI. The use of wildcards in redirect URI is not supported.\n How many redirect URIs can I use for my app? \n You can use up to 50 redirect URIs for your app.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c6",
+      "text": "Scopes will be selected by the developer when a custom connection is created and displayed to the Xero user during authorisation.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/faq",
+      "quote": "Scopes will be selected by the developer when a custom connection is created and displayed to the Xero user during authorisation.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c7",
+      "text": "Copy the Client secret and store it in a safe place. If you leave the configuration page, the client secret won’t be visible anymore and you’ll have to generate a new one if you forget it.",
+      "label": "community",
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "quote": "Copy the Client secret and store it in a safe place. If you leave the configuration page, the client secret won’t be visible anymore and you’ll have to generate a new one if you forget it.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c8",
+      "text": "Xero supports the Proof Key for Code Exchange (PKCE) extension to the authorization code flow. This allows native apps to securely connect to our API without needing to store a client secret.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/faq/oauth2",
+      "quote": "Xero supports the Proof Key for Code Exchange (PKCE) extension to the authorization code flow. This allows native apps to securely connect to our API without needing to store a client secret.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c9",
+      "text": "After March 2, 2026, any new test app you create will use granular scopes by default, allowing you to verify your code against a Demo Company.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/faq/granular-scopes",
+      "quote": "After March 2, 2026, any new test app you create will use granular scopes by default, allowing you to verify your code against a Demo Company.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c10",
+      "text": "Xero reviews the actual product experience before granting full access, so expect to demo account mapping, connection management, and disconnection flows.",
+      "label": "community",
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "quote": "Xero reviews the actual product experience before granting full access, so expect to demo account mapping, connection management, and disconnection flows.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c11",
+      "text": "Use OpenID scopes to retrieve details about the user’s identity. These are required for single sign on.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/documentation/guides/oauth2/scopes",
+      "quote": "Use OpenID scopes to retrieve details about the user’s identity. These are required for single sign on.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c12",
+      "text": "To get a refresh token, you must request the offline_access scope. A refresh token allows you to refresh your access token and maintain an offline connection.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/documentation/guides/oauth2/scopes",
+      "quote": "To get a refresh token, you must request the offline_access scope. A refresh token allows you to refresh your access token and maintain an offline connection.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c13",
+      "text": "When your app is requesting authorisation from a user it will need to ask for a set of scopes. These scopes will be displayed to the user and describe what data your app will be able to access.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/documentation/guides/oauth2/scopes",
+      "quote": "When your app is requesting authorisation from a user it will need to ask for a set of scopes. These scopes will be displayed to the user and describe what data your app will be able to access.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c14",
+      "text": "Apps created on or after 2 March 2026 will use the new granular scopes.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/faq/granular-scopes",
+      "quote": "Apps created on or after 2 March 2026 will use the new granular scopes",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c15",
+      "text": "The following scopes are only available after additional certification. If you require access to these scopes please let us know once you register to be a partner. Additional commercial agreements may apply.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/documentation/guides/oauth2/scopes",
+      "quote": "The following scopes are only available after additional certification. If you require access to these scopes please let us know once you register to be a partner. Additional commercial agreements may apply.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c16",
+      "text": "To access the Practice Manager API you will need to first register as an app partner and complete a security self-assessment questionnaire. Your app won’t be able to request Practice Manager scopes until you’ve started this process.",
+      "label": "sourced",
+      "url": "https://developer.xero.com/documentation/guides/oauth2/scopes",
+      "quote": "To access the Practice Manager API you will need to first register as an app partner and complete a security self-assessment questionnaire. Your app won’t be able to request Practice Manager scopes until you’ve started this process.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "c17",
+      "text": "Xero has a rule that users can only install up to 2 uncertified apps. They need to remove an existing one to install your app if it's uncertified.",
+      "label": "community",
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "quote": "Xero has a rule that users can only install up to 2 uncertified apps. They need to remove an existing one to install your app if it's uncertified.",
+      "checkedAt": "2026-11-01T12:11:31.847Z"
+    },
+    {
+      "id": "t1",
+      "text": "Discovery document found at https://identity.xero.com/.well-known/openid-configuration: authorization endpoint https://login.xero.com/identity/connect/authorize, token endpoint https://identity.xero.com/connect/token, PKCE methods S256.",
+      "label": "tested",
+      "url": "https://identity.xero.com/.well-known/openid-configuration",
+      "method": "Fetched OAuth discovery document",
+      "artifact": "GET https://identity.xero.com/.well-known/openid-configuration → HTTP 200\n{\n \"issuer\": \"https://identity.xero.com\",\n \"authorization_endpoint\": \"https://login.xero.com/identity/connect/authorize\",\n \"token_endpoint\": \"https://identity.xero.com/connect/token\",\n \"code_challenge_methods_supported\": [\n  \"S256\"\n ],\n \"grant_types_supported\": [\n  \"authorization_code\",\n  \"client_credentials\",\n  \"refresh_token\"\n ]\n}",
+      "checkedAt": "2026-11-01T12:16:16.215Z"
+    },
+    {
+      "id": "t2",
+      "text": "Authorization endpoint https://login.xero.com/identity/connect/authorize is live and rejects an unknown client_id by redirecting to its error page (https://login.xero.com/identity/error).",
+      "label": "tested",
+      "url": "https://login.xero.com/identity/connect/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://login.xero.com/identity/connect/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 302\nLocation: https://login.xero.com/identity/error?errorId=CfDJ8MOMn5AHNxVIkNNdLD-L7IGayM8SP6DRiO0F0o77iU1UtfRi3zqvKMxwxfoP3bzY32qHi33qDjC_RLSH775w4nkHgzHY8MCPRdwkLfIxDzkCdYmQWpcBv6ass-OZjbNXbQonKrHS8bDUiLxVeCy4Q3GcOfOLhXNLZneI6pOst7SInM0j40Jqhsk2c8AtSBNcbk4VB7stPfrgEtC21-ZL6P2VUi3AsW155NyEbhKwTXHz3h94Rgfd2-r1Sy\nBody excerpt: ",
+      "checkedAt": "2026-11-01T12:16:17.794Z"
+    }
+  ],
+  "gaps": [
+    "Exact pricing tier thresholds for connection counts before formal review is triggered are dynamic and maintained directly on Xero's pricing page rather than public static docs.",
+    "Exact SLA response time numbers for the Financial Services Partnership queue are not explicitly quantified other than taking 'several months'."
+  ],
+  "sourcesConsulted": [
+    {
+      "url": "https://developer.xero.com/faq/oauth2",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.xero.com/faq",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://apps.xero.com/us/app/annature",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://apps.xero.com/id/app/annature",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.xero.com/documentation/guides/oauth2/scopes",
+      "official": true,
+      "fetched": false
+    },
+    {
+      "url": "https://docs.rutter.com/platforms/accounting/xero",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://community.retool.com/t/xero-app-partner/58713",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://developer.xero.com/faq/granular-scopes",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://apps.xero.com/id/app/annature/reviews",
+      "official": true,
+      "fetched": true
+    }
+  ]
+}

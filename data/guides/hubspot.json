@@ -1,0 +1,453 @@
+{
+  "schemaVersion": 1,
+  "slug": "hubspot",
+  "name": "HubSpot",
+  "aliases": [
+    "HubSpot CRM"
+  ],
+  "officialDomain": "hubspot.com",
+  "supportsOAuth": true,
+  "origin": "curated",
+  "model": "gemini-3.5-flash-lite",
+  "generatedAt": "2026-11-01T12:01:04.675Z",
+  "verdict": {
+    "difficulty": 4,
+    "activeEffortHours": {
+      "min": 4,
+      "max": 8
+    },
+    "approvalWait": {
+      "minDays": 1,
+      "maxDays": 10
+    },
+    "topBlocker": "Manual developer account creation and dashboard app registration with no Dynamic Client Registration or API-based provisioning.",
+    "summary": "HubSpot requires manual app creation in the developer console and a formal review process by the Ecosystem Quality team for marketplace listings, taking up to 10 business days for initial review. Once configured, standard OAuth authorization code flows handle multi-tenant token issuance and 30-minute access token rotation using long-lived refresh tokens.",
+    "claimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ]
+  },
+  "steps": [
+    {
+      "id": "st1",
+      "phase": "dev",
+      "title": "Create Developer Account and App",
+      "detail": "Log in to your HubSpot developer account, navigate to Development > Projects or Apps, and create a new public app to obtain your client ID and client secret.",
+      "owner": "you",
+      "minutes": 15,
+      "links": [
+        "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/overview"
+      ],
+      "claimIds": [
+        "c1",
+        "c2"
+      ]
+    },
+    {
+      "id": "st2",
+      "phase": "dev",
+      "title": "Configure OAuth Settings and Redirect URIs",
+      "detail": "Configure your app schema or auth settings with required scopes and redirect URLs (using https in production and http://localhost for local testing).",
+      "owner": "agent",
+      "minutes": 20,
+      "links": [
+        "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth"
+      ],
+      "claimIds": [
+        "c3"
+      ]
+    },
+    {
+      "id": "st3",
+      "phase": "test",
+      "title": "Implement Authorization Redirect Flow",
+      "detail": "Build the backend logic to direct users to the HubSpot authorization endpoint with client ID, redirect URI, and encoded scopes.",
+      "owner": "agent",
+      "minutes": 45,
+      "links": [
+        "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide"
+      ],
+      "claimIds": [
+        "c4"
+      ]
+    },
+    {
+      "id": "st4",
+      "phase": "test",
+      "title": "Exchange Authorization Code for Tokens",
+      "detail": "Implement a URL-form encoded POST request to exchange the temporary authorization code for an initial access token and long-lived refresh token.",
+      "owner": "agent",
+      "minutes": 45,
+      "links": [
+        "https://developers.hubspot.com/docs/api-reference/legacy/authentication/oauth-tokens/v1/guide"
+      ],
+      "claimIds": [
+        "c5"
+      ]
+    },
+    {
+      "id": "st5",
+      "phase": "test",
+      "title": "Perform Test Installation and Verification",
+      "detail": "Install the app in a developer test account as a Super Admin, execute the connection flow, and verify token metadata and logs.",
+      "owner": "you",
+      "minutes": 30,
+      "links": [
+        "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth"
+      ],
+      "claimIds": [
+        "c6",
+        "c7"
+      ]
+    },
+    {
+      "id": "st6",
+      "phase": "production",
+      "title": "Sign Acceptable Use Policy and Begin Publishing",
+      "detail": "Navigate to the distribution settings of your app and sign the Acceptable Use Policy (AUP) to unlock publishing and review submission.",
+      "owner": "you",
+      "minutes": 15,
+      "links": [
+        "https://developers.hubspot.com/docs/apps/developer-platform/manage-apps-in-hubspot"
+      ],
+      "claimIds": [
+        "c8"
+      ]
+    },
+    {
+      "id": "st7",
+      "phase": "production",
+      "title": "Submit Marketplace Listing and Documentation",
+      "detail": "Complete your marketplace listing details, pricing information, setup documentation links, Terms of Service, and Privacy Policy URLs.",
+      "owner": "agent",
+      "minutes": 60,
+      "links": [
+        "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements"
+      ],
+      "claimIds": [
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "id": "st8",
+      "phase": "production",
+      "title": "Ecosystem Quality Team Review",
+      "detail": "Wait for the HubSpot Ecosystem Quality team to review your app listing and compliance criteria, which takes up to 10 business days for initial review.",
+      "owner": "provider",
+      "minutes": 0,
+      "links": [
+        "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements"
+      ],
+      "claimIds": [
+        "c11"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "kind": "developer_account",
+      "requiredFor": "test",
+      "note": "A HubSpot developer account and associated app are required to retrieve client credentials.",
+      "claimIds": [
+        "c12"
+      ]
+    },
+    {
+      "kind": "tos",
+      "requiredFor": "production",
+      "note": "You must review and agree to HubSpot's Technology Partner Program Agreement and Acceptable Use Policy.",
+      "claimIds": [
+        "c8",
+        "c13"
+      ]
+    },
+    {
+      "kind": "privacy_policy",
+      "requiredFor": "production",
+      "note": "Public marketplace listings require live, up-to-date URLs for your app's Privacy Policy and Terms of Service.",
+      "claimIds": [
+        "c10"
+      ]
+    },
+    {
+      "kind": "other",
+      "requiredFor": "test",
+      "note": "Users installing apps in their HubSpot account must either be a Super Admin or have HubSpot Marketplace Access permissions.",
+      "claimIds": [
+        "c14"
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "scope": "crm.objects.contacts.read",
+      "triggersReview": false,
+      "note": "Grants read access to contact records in the HubSpot CRM.",
+      "claimIds": [
+        "c15"
+      ]
+    },
+    {
+      "scope": "crm.objects.contacts.write",
+      "triggersReview": false,
+      "note": "Grants write access to contact records in the HubSpot CRM.",
+      "claimIds": [
+        "c15"
+      ]
+    },
+    {
+      "scope": "oauth",
+      "triggersReview": false,
+      "note": "Base scope required for OAuth authentication flows.",
+      "claimIds": [
+        "c16"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "symptom": "Unable to provision apps programmatically via API.",
+      "cause": "HubSpot does not support Dynamic Client Registration or API endpoints to create apps; app creation is strictly dashboard-only.",
+      "unblock": "Manually create your application in the HubSpot Developer Account console to obtain client ID and client secret.",
+      "claimIds": [
+        "c1"
+      ]
+    },
+    {
+      "symptom": "Installation fails with permissions error during testing.",
+      "cause": "The user installing the app lacks Super Admin or Marketplace Access permissions, or lacks access to requested scopes.",
+      "unblock": "Ensure the installer is a Super Admin in the target HubSpot account.",
+      "claimIds": [
+        "c14",
+        "c17"
+      ]
+    },
+    {
+      "symptom": "Marketplace submission is rejected or delayed during review.",
+      "cause": "Incomplete listing URLs, missing setup documentation, or mismatching pricing information in the submission.",
+      "unblock": "Verify that all support, privacy policy, terms, and setup documentation URLs are publicly live and accessible to HubSpot's crawler.",
+      "claimIds": [
+        "c10"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "text": "There is no API to create an app. None. If you want a public app, you go to your Developer Account, click into Apps, click Create app, and HubSpot hands you a client_id and a client_secret.",
+      "label": "community",
+      "url": "https://apievangelist.com/2026/08/25/hubspot-oauth-but-create-the-app-by-hand",
+      "quote": "There is no API to create an app. None. If you want a public app, you go to your Developer Account, click into Apps, click Create app, and HubSpot hands you a client_id and a client_secret",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c2",
+      "text": "Create a new app . After creating the app, you’ll be able to find the app’s client ID and client secret on the Auth page of your app settings.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
+      "quote": "Create a new app . After creating the app, you’ll be able to find the app’s client ID and client secret on the Auth page of your app settings",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c3",
+      "text": "You can update these URLs by updating the redirectUrls field in your app’s top-level app-hsmeta.json file , then running hs project upload.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
+      "quote": "You can update these URLs by updating the redirectUrls field in your app’s top-level app-hsmeta.json file , then running hs project upload",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c4",
+      "text": "Send users installing your app to the authorization URL, where they’ll be presented with a screen that allows them to select their account and grant access to your integration.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
+      "quote": "Send users installing your app to the authorization URL, where they’ll be presented with a screen that allows them to select their account and grant access to your integration",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c5",
+      "text": "After your app receives an authorization code from the OAuth 2.0 server, it can exchange that code for an access and refresh token by sending a URL-form encoded POST request to https://api.hubapi.com/oauth/v3/token",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide",
+      "quote": "After your app receives an authorization code from the OAuth 2.0 server, it can exchange that code for an access and refresh token by sending a URL-form encoded POST request to https://api.hubapi.com/oauth/v3/token",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c6",
+      "text": "You must be a Super Admin to install an app in a HubSpot account.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide",
+      "quote": "You must be a Super Admin to install an app in a HubSpot account.",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c7",
+      "text": "After you’ve set up the OAuth authentication flow for your app, you can review installation attempts, successes, and failures in your development settings",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
+      "quote": "After you’ve set up the OAuth authentication flow for your app, you can review installation attempts, successes, and failures in your development settings",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c8",
+      "text": "Review and sign the Acceptable Use Policy (AUP). Until the AUP is signed, you won’t be able to install your app in accounts other than developer test accounts.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
+      "quote": "Review and sign the Acceptable Use Policy (AUP). Until the AUP is signed, you won’t be able to install your app in accounts other than developer test accounts.",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c9",
+      "text": "When submitting your app listing, you must completely and accurately fill out all information. These fields are particularly important and failure to meet these requirements will cause your listing to be set to Draft mode only",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
+      "quote": "When submitting your app listing, you must completely and accurately fill out all information. These fields are particularly important and failure to meet these requirements will cause your listing to be set to Draft mode only",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c10",
+      "text": "URLs for your app’s Terms of Service and Privacy Policy must be live and up-to-date.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
+      "quote": "URLs for your app’s Terms of Service and Privacy Policy must be live and up-to-date.",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c11",
+      "text": "Once you submit your listing, the HubSpot Ecosystem Quality team will complete an initial review within 10 business days.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
+      "quote": "Once you submit your listing, the HubSpot Ecosystem Quality team will complete an initial review within 10 business days.",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c12",
+      "text": "Before you can start using OAuth with HubSpot, you’ll need to have: A developer account, An app associated with your developer account",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/legacy-apps/authentication/oauth-quickstart-guide",
+      "quote": "Before you can start using OAuth with HubSpot, you’ll need to have: \n\nA developer account \nAn app associated with your developer account",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c13",
+      "text": "Terms: you must review and agree to the terms in HubSpot’s Technology Partner Program Agreement.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
+      "quote": "Terms: you must review and agree to the terms in HubSpot’s Technology Partner Program Agreement .",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c14",
+      "text": "Users installing apps in their HubSpot account must either be a Super Admin or have HubSpot Marketplace Access permissions.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
+      "quote": "Users installing apps in their HubSpot account must either be a Super Admin or have HubSpot Marketplace Access permissions.",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c15",
+      "text": "For example, if your app required access to create contacts, you’d need to include the crm.objects.contacts.write .",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/overview",
+      "quote": "For example, if your app required access to create contacts, you’d need to include the crm.objects.contacts.write .",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c16",
+      "text": "Minimal default scope. oauth is implied; override with --scope for real apps.",
+      "label": "community",
+      "url": "https://apievangelist.com/2026/08/25/hubspot-oauth-but-create-the-app-by-hand",
+      "quote": "Minimal default scope. `oauth` is implied; override with --scope for real apps.",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "c17",
+      "text": "If you don’t have the required access, the installation will fail and they will be directed to an error page. If a user sees this permissions error page, they’ll need to have a Super Admin install the app.",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide",
+      "quote": "If you don’t have the required access, the installation will fail and they will be directed to an error page. If a user sees this permissions error page, they’ll need to have a Super Admin install the app.",
+      "checkedAt": "2026-11-01T12:01:04.675Z"
+    },
+    {
+      "id": "t1",
+      "text": "Discovery document found at https://api.hubspot.com/.well-known/oauth-authorization-server: authorization endpoint https://mcp.hubspot.com/oauth/authorize/user, token endpoint https://mcp.hubspot.com/oauth/v3/token, PKCE methods S256.",
+      "label": "tested",
+      "url": "https://api.hubspot.com/.well-known/oauth-authorization-server",
+      "method": "Fetched OAuth discovery document",
+      "artifact": "GET https://api.hubspot.com/.well-known/oauth-authorization-server → HTTP 200\n{\n \"issuer\": \"https://mcp.hubspot.com\",\n \"authorization_endpoint\": \"https://mcp.hubspot.com/oauth/authorize/user\",\n \"token_endpoint\": \"https://mcp.hubspot.com/oauth/v3/token\",\n \"scopes_supported\": [],\n \"code_challenge_methods_supported\": [\n  \"S256\"\n ],\n \"grant_types_supported\": [\n  \"authorization_code\",\n  \"refresh_token\",\n  \"client_credentials\",\n  \"urn:ietf:params:oauth:grant-type:jwt-bearer\"\n ]\n}",
+      "checkedAt": "2026-11-01T12:16:04.813Z"
+    },
+    {
+      "id": "t2",
+      "text": "Authorization endpoint https://mcp.hubspot.com/oauth/authorize/user responded HTTP 200 to an unknown client_id (no explicit error shown).",
+      "label": "tested",
+      "url": "https://mcp.hubspot.com/oauth/authorize/user?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://mcp.hubspot.com/oauth/authorize/user?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 200\nBody excerpt: HubSpot OAuth",
+      "checkedAt": "2026-11-01T12:16:06.643Z"
+    }
+  ],
+  "gaps": [
+    "Exact automated security scanning tools used by the Ecosystem Quality team beyond standard crawler and listing checks."
+  ],
+  "sourcesConsulted": [
+    {
+      "url": "https://developers.hubspot.com/blog/oauth-token-management-hubspot-integrations",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/api-reference/legacy/authentication/oauth-tokens/v1/guide",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://knowledge.hubspot.com/integrations/data-sync-authentication",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/overview",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/apps/legacy-apps/authentication/working-with-oauth",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://developers.hubspot.com/docs/apps/legacy-apps/authentication/oauth-quickstart-guide",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://apievangelist.com/2026/08/25/hubspot-oauth-but-create-the-app-by-hand",
+      "official": false,
+      "fetched": true
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "entries": [
+    {
+      "guide": "github",
+      "claimId": null,
+      "claim": "Verdict: difficulty 2, approval wait 0 days, effort 1-2h; no mandatory review for standard OAuth apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - registration is a self-serve form; the page describes no review step. \"A user or organization can own up to 100 OAuth apps.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": null,
+      "claim": "Top blocker: embedding client_secret in SPA front-ends",
+      "method": "Read docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Embedding the OAuth client secret in single-page front-end apps instead of performing code exchange on a backend server.",
+      "after": "Organization OAuth app access restrictions (on by default for new orgs): members can't grant your app access to org private resources until an org owner approves it.",
+      "evidence": "https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions - \"When you create a new organization, OAuth app access restrictions are enabled by default.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c3",
+      "claim": "An account can own up to 100 OAuth apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - \"A user or organization can own up to 100 OAuth apps.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c4",
+      "claim": "Up to 10 callback URLs",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - \"You can enter up to 10 callback URLs.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c6",
+      "claim": "Token expiration enabled by default for new OAuth apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - \"Expire user access tokens\" is enabled by default; uncheck the box until support is added.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c7",
+      "claim": "Access token 8h, refresh token 6 months without use",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - access token lasts eight hours; refresh token expires after six months without use.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c8",
+      "claim": "offline_access scope returns expiring access + refresh tokens",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps - offline_access: \"Requests an expiring access token and a refresh token\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c10",
+      "claim": "Authorization code expires after 10 minutes",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - \"The temporary code will expire after 10 minutes.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c12",
+      "claim": "PKCE code_challenge requires S256",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - only S256 supported; \"the plain code challenge method is not supported.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c20",
+      "claim": "OAuth tokens use the user's 5,000 req/hour limit",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps - \"OAuth tokens use the user's rate limit of 5,000 requests per hour.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c14",
+      "claim": "Scopes repo/user/admin:org descriptions; scopes shown on consent form",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps - \"requested scopes are displayed to the user on the authorization form.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c16",
+      "claim": "st10: publisher verification needed if listing on Marketplace",
+      "method": "Read docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization on 2026-11-01",
+      "outcome": "corrected",
+      "before": "If listing your app on GitHub Marketplace, transfer ownership to an organization, enable organization 2FA, verify your domain, and submit a Publisher Verification request.",
+      "after": "Publisher verification (org-owned app, org 2FA, verified domain, support email) is required only for paid plans or a Marketplace badge; free listings still need org ownership and an onboarding-expert review.",
+      "evidence": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization - \"To offer paid plans for your app or to include a marketplace badge in your app listing, you must complete the publisher verification\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c18",
+      "claim": "Publisher verification requires org 2FA and verified domain",
+      "method": "Read docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization - \"that you've enabled two-factor authentication for your organization\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c19",
+      "claim": "Marketplace review typically takes 2-6 weeks (community source)",
+      "method": "Read docs.github.com/en/apps/github-marketplace/listing-an-app-on-github-marketplace/submitting-your-listing-for-publication on 2026-11-01",
+      "outcome": "unverifiable",
+      "evidence": "https://docs.github.com/en/apps/github-marketplace/listing-an-app-on-github-marketplace/submitting-your-listing-for-publication - official docs give no timeline: \"An onboarding expert will reach out to you with additional information.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c13",
+      "claim": "client_secret must not be embedded in front-end apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - web flow token exchange requires client_secret; \"The client_secret is not needed for the device flow.\"",
+      "checkedAt": "2026-11-01"
+    }
+  ],
+  "verdictCorrection": {
+    "difficulty": 2,
+    "approvalWait": { "minDays": 0, "maxDays": 0 },
+    "activeEffortHours": { "min": 1, "max": 2 },
+    "topBlocker": "Organization OAuth app access restrictions (on by default for new orgs): members can't grant access to org private resources until an org owner approves the app.",
+    "reason": "Numbers check out (instant self-serve registration, no provider review). But the real blocker is org owner approval under default-on access restrictions, not client_secret handling. Also, the 2-6 week Marketplace figure in the summary comes only from a community source; official docs give no timeline."
+  },
+  "missing": [
+    "GitHub recommends GitHub Apps over OAuth apps (fine-grained permissions, short-lived tokens, rate limits that scale). The guide only mentions this under rate limits: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
+    "OAuth app access restrictions are on by default for new orgs. Unapproved apps get no API access to private org resources, and members must request owner approval: https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions",
+    "Token creation is limited to ten tokens per hour per user/app/scope combination, and device flow to 50 submissions per hour per app: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+    "Paid Marketplace listings need at least 200 users for OAuth apps (100 installations for GitHub Apps), must handle purchase events, and must support monthly and annual billing: https://docs.github.com/en/apps/github-marketplace/creating-apps-for-github-marketplace/requirements-for-listing-an-app",
+    "If redirect_uri is omitted, GitHub uses the first configured callback URL, and without wildcard matching the redirect must match exactly: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+    "The device flow user code must be entered within 15 minutes, and device flow needs no client_secret: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps"
+  ]
+}

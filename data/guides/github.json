@@ -1,0 +1,623 @@
+{
+  "schemaVersion": 1,
+  "slug": "github",
+  "name": "GitHub",
+  "aliases": [
+    "GitHub OAuth",
+    "github.com"
+  ],
+  "officialDomain": "github.com",
+  "supportsOAuth": true,
+  "origin": "curated",
+  "model": "gemini-3.6-flash",
+  "generatedAt": "2026-11-01T11:39:35.609Z",
+  "verdict": {
+    "difficulty": 2,
+    "activeEffortHours": {
+      "min": 1,
+      "max": 2
+    },
+    "approvalWait": {
+      "minDays": 0,
+      "maxDays": 0
+    },
+    "topBlocker": "Customer organizations block third-party OAuth apps by default; an org owner must approve your app before it can reach private org data.",
+    "summary": "Registering an OAuth app is instant and self-serve, with no provider review before any GitHub user can connect. The friction is on the customer side: organizations restrict third-party OAuth apps by default, so an org owner must approve your app before it can reach the org's private repos. Marketplace listing is optional; GitHub publishes no review timeline (community reports say 2–6 weeks).",
+    "claimIds": [
+      "c2",
+      "c13",
+      "c19"
+    ]
+  },
+  "steps": [
+    {
+      "id": "st1",
+      "phase": "dev",
+      "title": "Navigate to GitHub Developer Settings and Create Application",
+      "detail": "Open Developer Settings under your personal profile or organization account settings. Click 'OAuth apps' and select 'New OAuth App'.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c2"
+      ]
+    },
+    {
+      "id": "st2",
+      "phase": "dev",
+      "title": "Draft Application Metadata and Callback URIs",
+      "detail": "Fill out the Application Name, Homepage URL, and Authorization Callback URL. GitHub allows up to 10 callback URLs per registered OAuth application.",
+      "owner": "agent",
+      "minutes": 5,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c4"
+      ]
+    },
+    {
+      "id": "st3",
+      "phase": "dev",
+      "title": "Configure Token Expiration and Device Flow Settings",
+      "detail": "Ensure token expiration is configured (enabled by default). Enable the Device Flow option if your agent runs in headless environments such as CLI applications.",
+      "owner": "agent",
+      "minutes": 5,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "id": "st4",
+      "phase": "dev",
+      "title": "Generate and Secure Client Secret",
+      "detail": "Generate a new client secret on GitHub. Store the secret securely in your backend environment variables; never embed `client_secret` in client-side code.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://github.com/orgs/community/discussions/24796"
+      ],
+      "claimIds": [
+        "c13"
+      ]
+    },
+    {
+      "id": "st5",
+      "phase": "test",
+      "title": "Construct Authorization Request URL",
+      "detail": "Build the authorization redirect URL pointing to `https://github.com/login/oauth/authorize` including `client_id`, `redirect_uri`, `scope`, CSRF `state`, and PKCE parameters (`code_challenge` and `code_challenge_method=S256`).",
+      "owner": "agent",
+      "minutes": 5,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps"
+      ],
+      "claimIds": [
+        "c11",
+        "c12"
+      ]
+    },
+    {
+      "id": "st6",
+      "phase": "test",
+      "title": "Perform Authorization Flow with Test Account",
+      "detail": "Open the generated authorization link in a web browser signed into a GitHub test account and approve the requested scope permissions.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps"
+      ],
+      "claimIds": [
+        "c14"
+      ]
+    },
+    {
+      "id": "st7",
+      "phase": "test",
+      "title": "Exchange Authorization Code for Access Token",
+      "detail": "Receive the temporary code parameter on your redirect URI callback and make a server-side POST request to `https://github.com/login/oauth/access_token` within 10 minutes to obtain an access token.",
+      "owner": "agent",
+      "minutes": 5,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps"
+      ],
+      "claimIds": [
+        "c10",
+        "c13"
+      ]
+    },
+    {
+      "id": "st8",
+      "phase": "test",
+      "title": "Implement Token Expiration and Refresh Logic",
+      "detail": "Handle 8-hour access token expiration and store the 6-month refresh token to obtain fresh access tokens when `offline_access` scope or expiring tokens are enabled.",
+      "owner": "agent",
+      "minutes": 10,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps"
+      ],
+      "claimIds": [
+        "c7",
+        "c8"
+      ]
+    },
+    {
+      "id": "st9",
+      "phase": "production",
+      "title": "Deploy OAuth App to Production",
+      "detail": "Update your production configuration with the Client ID and backend Client Secret. End users can now connect their GitHub accounts directly without waiting for platform approval.",
+      "owner": "you",
+      "minutes": 10,
+      "links": [
+        "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app"
+      ],
+      "claimIds": [
+        "c2"
+      ]
+    },
+    {
+      "id": "st10",
+      "phase": "production",
+      "title": "(Optional) Complete Publisher Verification for GitHub Marketplace",
+      "detail": "If listing your app on GitHub Marketplace, transfer ownership to an organization, enable organization 2FA, verify your domain, and submit a Publisher Verification request.",
+      "owner": "you",
+      "minutes": 30,
+      "links": [
+        "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization"
+      ],
+      "claimIds": [
+        "c16",
+        "c17",
+        "c18"
+      ]
+    },
+    {
+      "id": "st11",
+      "phase": "production",
+      "title": "(Optional) Wait for GitHub Marketplace Submission Review",
+      "detail": "Optional: wait for GitHub to review your Marketplace submission. GitHub does not publish a review timeline; community reports put it at roughly 2–6 weeks.",
+      "owner": "provider",
+      "minutes": 0,
+      "links": [
+        "https://devactivity.com/insights/navigating-github-marketplace-app-submissions-understanding-review-timelines-and-support-a-devactivity-insight"
+      ],
+      "claimIds": [
+        "c19"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "kind": "developer_account",
+      "requiredFor": "test",
+      "note": "A personal GitHub account or organization account with administrative access is required to register OAuth applications.",
+      "claimIds": [
+        "c2"
+      ]
+    },
+    {
+      "kind": "domain",
+      "requiredFor": "production",
+      "note": "Domain verification is optional for basic OAuth applications, but required if submitting to GitHub Marketplace with Publisher Verification.",
+      "claimIds": [
+        "c17"
+      ]
+    },
+    {
+      "kind": "security_assessment",
+      "requiredFor": "production",
+      "note": "Standard GitHub OAuth apps do not undergo mandatory third-party security assessments or manual review pre-approvals.",
+      "claimIds": [
+        "c2"
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "scope": "repo",
+      "triggersReview": false,
+      "note": "Grants full access to public and private repositories. Standard GitHub OAuth apps do not require review to request repo scope.",
+      "claimIds": [
+        "c14",
+        "c21"
+      ]
+    },
+    {
+      "scope": "user",
+      "triggersReview": false,
+      "note": "Grants read/write access to user profile data. Does not trigger manual app review.",
+      "claimIds": [
+        "c14"
+      ]
+    },
+    {
+      "scope": "admin:org",
+      "triggersReview": false,
+      "note": "Grants full management of organization teams, projects, and memberships. Does not trigger manual app review.",
+      "claimIds": [
+        "c14"
+      ]
+    },
+    {
+      "scope": "offline_access",
+      "triggersReview": false,
+      "note": "Requests expiring access tokens (8 hours) and refresh tokens (6 months). Does not trigger manual review.",
+      "claimIds": [
+        "c7",
+        "c8",
+        "c14"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "symptom": "Users in a customer's organization connect successfully but your agent can't see the org's private repositories.",
+      "cause": "OAuth app access restrictions are on by default for new organizations; the app needs org-owner approval.",
+      "unblock": "Tell users to request approval during the consent flow (or in Settings → Applications), and ask an org owner to approve it under Organization settings → Third-party access. Consider a GitHub App instead, which orgs install explicitly.",
+      "claimIds": [
+        "r2"
+      ]
+    },
+    {
+      "symptom": "Security vulnerability from exposing client_secret in single-page applications",
+      "cause": "Attempting to perform the authorization code exchange directly in browser-side JavaScript.",
+      "unblock": "Route the code exchange through a secure backend proxy server holding the confidential `client_secret`.",
+      "claimIds": [
+        "c13"
+      ]
+    },
+    {
+      "symptom": "Authorization code invalid or expired during token exchange",
+      "cause": "The temporary code parameter returned by GitHub expires after 10 minutes or has already been used.",
+      "unblock": "Ensure your backend server exchanges the code for tokens immediately upon receiving the callback.",
+      "claimIds": [
+        "c10"
+      ]
+    },
+    {
+      "symptom": "API rate limits reached unexpectedly",
+      "cause": "GitHub OAuth app tokens share the authorizing user's global limit of 5,000 requests per hour.",
+      "unblock": "Cache API responses or evaluate building a GitHub App, which provides dedicated installation access tokens that scale with organization size.",
+      "claimIds": [
+        "c20"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "text": "The GitHub OAuth authorize endpoint redirects requests before validating client_id.",
+      "label": "tested",
+      "url": "https://github.com/login/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://github.com/login/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe (no redirects followed) → HTTP 302\nLocation: https://github.com/login?client_id=oauthready-probe-invalid-client&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3Doauthready-probe-invalid-client%26redirect_uri%3Dhttps%253A%252F%252Fexample.com%252Fcallback%26response_type%3Dcode%26state%3Dprobe\nBody excerpt: ",
+      "checkedAt": "2026-11-01T11:38:45.988Z"
+    },
+    {
+      "id": "c2",
+      "text": "OAuth apps can be created under personal or organization accounts.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "quote": "You can create and register an OAuth app under your personal account or under any organization you have administrative access to.",
+      "checkedAt": "2026-11-01T11:39:35.609Z"
+    },
+    {
+      "id": "c3",
+      "text": "An account can own up to 100 OAuth apps.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "quote": "A user or organization can own up to 100 OAuth apps.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c4",
+      "text": "GitHub OAuth apps support up to 10 callback URLs.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "quote": "In \"Authorization callback URL\", type the callback URL of your app. You can enter up to 10 callback URLs.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c5",
+      "text": "Device flow must be enabled in settings if used.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "quote": "If your OAuth app will use the device flow to identify and authorize users, click Enable Device Flow.",
+      "checkedAt": "2026-11-01T11:39:35.609Z"
+    },
+    {
+      "id": "c6",
+      "text": "Token expiration is enabled by default for new OAuth apps.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "quote": "Expire user access tokens is enabled by default.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c7",
+      "text": "Expiring access tokens last 8 hours and refresh tokens last 6 months without use.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "quote": "The access token expires after eight hours, and the refresh token expires after six months without use.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c8",
+      "text": "Requesting offline_access scope provides expiring access and refresh tokens.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "quote": "To test and gradually roll out support for expiring tokens, you can opt in to receive an expiring token and a refresh token for an individual sign-in by requesting the offline_access scope",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c9",
+      "text": "The web application flow is used for browser-based apps.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "quote": "Used to authorize users for standard OAuth apps that run in the browser.",
+      "checkedAt": "2026-11-01T11:39:35.609Z"
+    },
+    {
+      "id": "c10",
+      "text": "Temporary authorization codes expire in 10 minutes.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "quote": "The temporary code will expire after 10 minutes.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c11",
+      "text": "State parameter is strongly recommended to protect against CSRF attacks.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "quote": "state string Strongly recommended An unguessable random string. It is used to protect against cross-site request forgery attacks.",
+      "checkedAt": "2026-11-01T11:39:35.609Z"
+    },
+    {
+      "id": "c12",
+      "text": "PKCE parameter code_challenge requires S256 method.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "quote": "Used to secure the authentication flow with PKCE (Proof Key for Code Exchange). Required if code_challenge_ method is included.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c13",
+      "text": "OAuth client secrets must never be embedded in front-end applications.",
+      "label": "sourced",
+      "url": "https://github.com/orgs/community/discussions/24796",
+      "quote": "So in closing, it is not okay to embed your client_secret in a frontend application .",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c14",
+      "text": "Requested scopes are presented directly to the user on the authorization consent screen.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps",
+      "quote": "When setting up an OAuth app on GitHub, requested scopes are displayed to the user on the authorization form.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c15",
+      "text": "Granted scopes attached to an issued token are listed in the API response.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps",
+      "quote": "Requested scopes and granted scopes The scope attribute lists scopes attached to the token that were granted by the user.",
+      "checkedAt": "2026-11-01T11:39:35.609Z"
+    },
+    {
+      "id": "c16",
+      "text": "Publisher verification (org-owned app, org 2FA, verified domain, support email) is required only for paid plans or a Marketplace badge; free listings still need org ownership and an onboarding-expert review.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization",
+      "quote": "To offer paid plans for your app or to include a marketplace badge in your app listing, you must complete the publisher verification",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review 2026-11-01; the agent originally said: If listing your app on GitHub Marketplace, transfer ownership to an organization, enable organization 2FA, verify your domain, and submit a Publisher Verification request."
+    },
+    {
+      "id": "c17",
+      "text": "Publisher verification requires submitting a verified domain.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization",
+      "quote": "Submit a verified domain and ensure that a \"Verified\" badge displays on your organization's profile page.",
+      "checkedAt": "2026-11-01T11:39:35.609Z"
+    },
+    {
+      "id": "c18",
+      "text": "Publisher verification requires organization-wide two-factor authentication.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization",
+      "quote": "Ensure that Two-factor authentication is enabled for your organization.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c19",
+      "text": "GitHub Marketplace manual reviews typically take 2 to 6 weeks.",
+      "label": "community",
+      "url": "https://devactivity.com/insights/navigating-github-marketplace-app-submissions-understanding-review-timelines-and-support-a-devactivity-insight",
+      "quote": "While some lucky developers report approval in as little as 3-7 days, the typical waiting period is: Community Reports: Roughly 2 to 6 weeks.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Not verifiable from an official source in review 2026-11-01."
+    },
+    {
+      "id": "c20",
+      "text": "OAuth app tokens are restricted to the authorizing user's 5,000 requests per hour limit.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
+      "quote": "OAuth tokens use the user's rate limit of 5,000 requests per hour.",
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
+    },
+    {
+      "id": "c21",
+      "text": "An authorized OAuth app gets access to all user resources accessible to that token.",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
+      "quote": "An authorized OAuth app has access to all of the user's or organization owner's accessible resources.",
+      "checkedAt": "2026-11-01T11:39:35.609Z"
+    },
+    {
+      "id": "r1",
+      "text": "GitHub recommends GitHub Apps over OAuth apps (fine-grained permissions, short-lived tokens, rate limits that scale). The guide only mentions this under rate limits",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
+      "note": "Added in review 2026-11-01.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "id": "r2",
+      "text": "OAuth app access restrictions are on by default for new orgs. Unapproved apps get no API access to private org resources, and members must request owner approval",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions",
+      "note": "Added in review 2026-11-01.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "id": "r3",
+      "text": "Token creation is limited to ten tokens per hour per user/app/scope combination, and device flow to 50 submissions per hour per app",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "note": "Added in review 2026-11-01.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "id": "r4",
+      "text": "Paid Marketplace listings need at least 200 users for OAuth apps (100 installations for GitHub Apps), must handle purchase events, and must support monthly and annual billing",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/github-marketplace/creating-apps-for-github-marketplace/requirements-for-listing-an-app",
+      "note": "Added in review 2026-11-01.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "id": "r5",
+      "text": "If redirect_uri is omitted, GitHub uses the first configured callback URL, and without wildcard matching the redirect must match exactly",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "note": "Added in review 2026-11-01.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "id": "r6",
+      "text": "The device flow user code must be entered within 15 minutes, and device flow needs no client_secret",
+      "label": "sourced",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "note": "Added in review 2026-11-01.",
+      "checkedAt": "2026-11-01"
+    }
+  ],
+  "gaps": [
+    "The sources do not detail enterprise-managed organization policy approval SLA for third-party OAuth apps."
+  ],
+  "sourcesConsulted": [
+    {
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.github.com/en/enterprise-server@3.18/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://github.com/orgs/community/discussions/24796",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://github.com/orgs/community/discussions/61238",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.github.com/en/apps/github-marketplace/using-the-github-marketplace-api-in-your-app/handling-new-purchases-and-free-trials",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://devactivity.com/insights/navigating-github-marketplace-app-submissions-understanding-review-timelines-and-support-a-devactivity-insight",
+      "official": false,
+      "fetched": true
+    }
+  ],
+  "reviewNote": "Numbers check out (instant self-serve registration, no provider review). But the real blocker is org owner approval under default-on access restrictions, not client_secret handling. Also, the 2-6 week Marketplace figure in the summary comes only from a community source; official docs give no timeline.",
+  "reviewAdditions": [
+    {
+      "text": "GitHub recommends GitHub Apps over OAuth apps (fine-grained permissions, short-lived tokens, rate limits that scale). The guide only mentions this under rate limits",
+      "claimIds": [
+        "r1"
+      ]
+    },
+    {
+      "text": "OAuth app access restrictions are on by default for new orgs. Unapproved apps get no API access to private org resources, and members must request owner approval",
+      "claimIds": [
+        "r2"
+      ]
+    },
+    {
+      "text": "Token creation is limited to ten tokens per hour per user/app/scope combination, and device flow to 50 submissions per hour per app",
+      "claimIds": [
+        "r3"
+      ]
+    },
+    {
+      "text": "Paid Marketplace listings need at least 200 users for OAuth apps (100 installations for GitHub Apps), must handle purchase events, and must support monthly and annual billing",
+      "claimIds": [
+        "r4"
+      ]
+    },
+    {
+      "text": "If redirect_uri is omitted, GitHub uses the first configured callback URL, and without wildcard matching the redirect must match exactly",
+      "claimIds": [
+        "r5"
+      ]
+    },
+    {
+      "text": "The device flow user code must be entered within 15 minutes, and device flow needs no client_secret",
+      "claimIds": [
+        "r6"
+      ]
+    }
+  ],
+  "reviewedAt": "2026-11-01"
+}

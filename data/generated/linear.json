@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "slug": "linear",
+  "name": "Linear",
+  "aliases": [
+    "Linear.app"
+  ],
+  "officialDomain": "linear.app",
+  "supportsOAuth": true,
+  "origin": "generated",
+  "model": "gemini-3.1-flash-lite",
+  "generatedAt": "2026-11-01T12:14:54.073Z",
+  "verdict": {
+    "difficulty": 2,
+    "activeEffortHours": {
+      "min": 1,
+      "max": 3
+    },
+    "approvalWait": {
+      "minDays": 0,
+      "maxDays": 0
+    },
+    "topBlocker": "Missing or mismatched redirect URI configuration in the Linear developer portal.",
+    "summary": "Linear provides a self-serve developer portal for creating OAuth applications, making it straightforward to integrate. No formal marketplace review is required for private or public distribution, allowing for immediate deployment.",
+    "claimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ]
+  },
+  "steps": [
+    {
+      "id": "st1",
+      "phase": "dev",
+      "title": "Create OAuth Application",
+      "detail": "Navigate to Settings > API > Applications in your Linear workspace to create a new OAuth application.",
+      "owner": "you",
+      "minutes": 15,
+      "links": [
+        "https://linear.app/settings/api/applications/new"
+      ],
+      "claimIds": [
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "id": "st2",
+      "phase": "dev",
+      "title": "Configure Redirect URIs",
+      "detail": "Register your application's callback URLs in the Linear developer settings. Ensure these match your implementation exactly.",
+      "owner": "you",
+      "minutes": 10,
+      "links": [],
+      "claimIds": [
+        "c7"
+      ]
+    },
+    {
+      "id": "st3",
+      "phase": "dev",
+      "title": "Store Credentials",
+      "detail": "Copy the Client ID and Client Secret. The secret is only displayed once; store it securely in your environment variables.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [],
+      "claimIds": [
+        "c8"
+      ]
+    },
+    {
+      "id": "st4",
+      "phase": "test",
+      "title": "Implement Authorization Flow",
+      "detail": "Redirect users to the Linear authorization URL with required parameters: client_id, redirect_uri, response_type=code, and requested scopes.",
+      "owner": "agent",
+      "minutes": 60,
+      "links": [
+        "https://linear.app/developers/oauth-2-0-authentication"
+      ],
+      "claimIds": [
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "id": "st5",
+      "phase": "test",
+      "title": "Handle Token Exchange",
+      "detail": "Exchange the authorization code for an access token and refresh token via a POST request to the token endpoint.",
+      "owner": "agent",
+      "minutes": 45,
+      "links": [
+        "https://linear.app/developers/oauth-2-0-authentication"
+      ],
+      "claimIds": [
+        "c11",
+        "c12"
+      ]
+    },
+    {
+      "id": "st6",
+      "phase": "production",
+      "title": "Set Distribution to Public",
+      "detail": "Update the application settings to 'public' if you intend for other workspaces to install your integration.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [],
+      "claimIds": [
+        "c13"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "kind": "developer_account",
+      "requiredFor": "test",
+      "note": "You must have a Linear workspace to manage the OAuth application.",
+      "claimIds": [
+        "c14"
+      ]
+    },
+    {
+      "kind": "domain",
+      "requiredFor": "production",
+      "note": "Redirect URIs must be absolute HTTP or HTTPS URLs.",
+      "claimIds": [
+        "c15"
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "scope": "read",
+      "triggersReview": false,
+      "note": "Default read access for the user's account.",
+      "claimIds": [
+        "c16"
+      ]
+    },
+    {
+      "scope": "admin",
+      "triggersReview": false,
+      "note": "Full access to admin endpoints; use only if strictly necessary.",
+      "claimIds": [
+        "c17"
+      ]
+    },
+    {
+      "scope": "app:assignable",
+      "triggersReview": false,
+      "note": "Allows the app to be assigned as a delegate on issues.",
+      "claimIds": [
+        "c18"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "symptom": "Invalid or expired OAuth state",
+      "cause": "The authorization flow was not completed within the 10-minute window.",
+      "unblock": "Restart the authorization flow.",
+      "claimIds": [
+        "c19"
+      ]
+    },
+    {
+      "symptom": "Failed to exchange code for token",
+      "cause": "Mismatched redirect URI or incorrect client secret.",
+      "unblock": "Verify the redirect URI in the developer portal matches the request exactly and ensure the secret is correct.",
+      "claimIds": [
+        "c20"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "text": "Linear supports OAuth2 authentication, which is recommended if you’re building applications to integrate with Linear.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "Linear supports OAuth2 authentication, which is recommended if you’re building applications to integrate with Linear.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c2",
+      "text": "It does not cost anything to develop agents in Linear.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/agents",
+      "quote": "It does not cost anything to develop agents in Linear.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c3",
+      "text": "To make your agent available to other workspaces, submit your agent to Linear’s integration directory.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/agents",
+      "quote": "To make your agent available to other workspaces, submit your agent to Linear’s integration directory.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c4",
+      "text": "No formal marketplace review is required for private or public distribution.",
+      "label": "uncertain",
+      "note": "Linear documentation does not mention a mandatory review process for OAuth apps. No source cited by the agent.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c5",
+      "text": "Create a new OAuth2 Application and configure the redirect callback URLs to your application.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "Create a new OAuth2 Application and configure the redirect callback URLs to your application.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c6",
+      "text": "It is highly recommended you create a workspace for the purpose of managing the OAuth2 Application, as each admin user will have access.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "It is highly recommended you create a workspace for the purpose of managing the OAuth2 Application, as each admin user will have access.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c7",
+      "text": "Once the user approves your application they will be redirected back to your application, with the OAuth authorization code in the URL params.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "Once the user approves your application they will be redirected back to your application, with the OAuth authorization code in the URL params.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c8",
+      "text": "Linear shows the client secret only once, at creation.",
+      "label": "community",
+      "url": "https://docs.serval.com/sections/integrations/linear",
+      "quote": "Linear shows the client secret only once, at creation.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c9",
+      "text": "When authorizing a user to the Linear API, redirect to an authorization URL with correct parameters and scopes",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "When authorizing a user to the Linear API, redirect to an authorization URL with correct parameters and scopes:",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c10",
+      "text": "Linear supports the PKCE flow.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "Linear supports the PKCE flow .",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c11",
+      "text": "After receiving the code , you can exchange it for a Linear API access token",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "After receiving the code , you can exchange it for a Linear API access token:",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c12",
+      "text": "After a successful request, a valid access token and refresh token will be returned in the response.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "After a successful request, a valid access token and refresh token will be returned in the response.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c13",
+      "text": "Whether the application is private to one workspace or publicly installable.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-app-manifests",
+      "quote": "Whether the application is private to one workspace or publicly installable.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c14",
+      "text": "App users are installed and managed by workspace admins.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/agents",
+      "quote": "App users are installed and managed by workspace admins.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c15",
+      "text": "Format: absolute HTTP or HTTPS URL",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-app-manifests",
+      "quote": "Format: absolute HTTP or HTTPS URL",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c16",
+      "text": "read - (Default) Read access for the user’s account. This scope will always be present.",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "read - (Default) Read access for the user’s account. This scope will always be present.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c17",
+      "text": "admin - Full access to admin level endpoints. You should never ask for this permission unless it’s absolutely needed",
+      "label": "sourced",
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "quote": "admin - Full access to admin level endpoints. You should never ask for this permission unless it’s absolutely needed",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c18",
+      "text": "app:assignable Allow the app to be assigned as a delegate on issues",
+      "label": "sourced",
+      "url": "https://linear.app/developers/agents",
+      "quote": "app:assignable Allow the app to be assigned as a delegate on issues",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c19",
+      "text": "You have 10 minutes from submitting the form - after that the attempt fails with “Invalid or expired OAuth state” and you must resubmit.",
+      "label": "community",
+      "url": "https://docs.serval.com/sections/integrations/linear",
+      "quote": "You have 10 minutes from submitting the form - after that the attempt fails with “Invalid or expired OAuth state” and you must resubmit.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "c20",
+      "text": "If Linear rejects the exchange (for example, a mismatched Callback URL or wrong secret), you’ll see “Failed to exchange code for token”.",
+      "label": "community",
+      "url": "https://docs.serval.com/sections/integrations/linear",
+      "quote": "If Linear rejects the exchange (for example, a mismatched Callback URL or wrong secret), you’ll see “Failed to exchange code for token”.",
+      "checkedAt": "2026-11-01T12:14:54.073Z"
+    },
+    {
+      "id": "t1",
+      "text": "Discovery document found at https://api.linear.app/.well-known/oauth-authorization-server: authorization endpoint https://linear.app/oauth/authorize, token endpoint https://api.linear.app/oauth/token, PKCE methods S256.",
+      "label": "tested",
+      "url": "https://api.linear.app/.well-known/oauth-authorization-server",
+      "method": "Fetched OAuth discovery document",
+      "artifact": "GET https://api.linear.app/.well-known/oauth-authorization-server → HTTP 200\n{\n \"issuer\": \"https://api.linear.app\",\n \"authorization_endpoint\": \"https://linear.app/oauth/authorize\",\n \"token_endpoint\": \"https://api.linear.app/oauth/token\",\n \"code_challenge_methods_supported\": [\n  \"S256\"\n ],\n \"grant_types_supported\": [\n  \"authorization_code\",\n  \"refresh_token\",\n  \"client_credentials\",\n  \"urn:ietf:params:oauth:grant-type:jwt-bearer\"\n ]\n}",
+      "checkedAt": "2026-11-01T12:16:15.722Z"
+    },
+    {
+      "id": "t2",
+      "text": "Authorization endpoint https://linear.app/oauth/authorize responded HTTP 200 to an unknown client_id (no explicit error shown).",
+      "label": "tested",
+      "url": "https://linear.app/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://linear.app/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 200\nBody excerpt: Linear \n Loading…",
+      "checkedAt": "2026-11-01T12:16:15.988Z"
+    }
+  ],
+  "gaps": [
+    "Exact review timelines for public listing are not documented, as Linear appears to have a self-serve model."
+  ],
+  "sourcesConsulted": [
+    {
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://linear.app/developers/agents",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://linear.app/developers/graphql",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://linear.app/developers/oauth-actor-authorization",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://linear.app/developers/advanced-usage",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://www.linear.app/developers/oauth-2-0-authentication",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://linear.app/developers/oauth-app-manifests",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://linear.app/docs/api",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://docs.serval.com/sections/integrations/linear",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://forum.figma.com/report-a-problem-6/oauth-app-review-time-59362",
+      "official": false,
+      "fetched": true
+    },
+    {
+      "url": "https://linear.app/.well-known/oauth-app-manifest.schema.json",
+      "official": true,
+      "fetched": true
+    }
+  ]
+}

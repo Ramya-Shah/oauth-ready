@@ -1,0 +1,509 @@
+{
+  "schemaVersion": 1,
+  "slug": "microsoft-entra-id",
+  "name": "Microsoft Entra ID",
+  "aliases": [
+    "Azure Active Directory",
+    "Azure AD",
+    "Microsoft Identity Platform"
+  ],
+  "officialDomain": "microsoft.com",
+  "supportsOAuth": true,
+  "origin": "curated",
+  "model": "gemini-3.6-flash",
+  "generatedAt": "2026-11-01T11:43:28.626Z",
+  "verdict": {
+    "difficulty": 3,
+    "activeEffortHours": {
+      "min": 1,
+      "max": 3
+    },
+    "approvalWait": {
+      "minDays": 1,
+      "maxDays": 5
+    },
+    "topBlocker": "Unverified publisher status blocking user consent in target customer tenants.",
+    "summary": "App registration in Microsoft Entra ID is instant and self-serve for initial development and testing. To allow end users across external organizations to consent without warnings, developers must complete Publisher Verification using a Microsoft AI Cloud Partner Program account.",
+    "claimIds": [
+      "c1",
+      "c14",
+      "c16",
+      "c17"
+    ]
+  },
+  "steps": [
+    {
+      "id": "st1",
+      "phase": "dev",
+      "title": "Create App Registration in Microsoft Entra ID",
+      "detail": "Sign in to the Microsoft Entra admin center, navigate to Identity > Applications > App registrations, and register a new application. Select whether the app will support single-tenant users, multitenant organizational accounts, or personal Microsoft accounts.",
+      "owner": "you",
+      "minutes": 10,
+      "links": [
+        "https://learn.microsoft.com/en-us/graph/auth-register-app-v2"
+      ],
+      "claimIds": [
+        "c1"
+      ]
+    },
+    {
+      "id": "st2",
+      "phase": "dev",
+      "title": "Configure Platform Redirect URIs",
+      "detail": "Add redirect URIs on the Authentication page for Web, Single-page, or Desktop/Mobile platforms. URIs must use HTTPS (except localhost) and match exact character casing.",
+      "owner": "agent",
+      "minutes": 10,
+      "links": [
+        "https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-redirect-uri"
+      ],
+      "claimIds": [
+        "c4",
+        "c5",
+        "c6"
+      ]
+    },
+    {
+      "id": "st3",
+      "phase": "dev",
+      "title": "Generate Client Credentials",
+      "detail": "Under Certificates & secrets, create a new client secret or upload a certificate for confidential client applications. Record the secret value immediately as it is not shown again.",
+      "owner": "you",
+      "minutes": 5,
+      "links": [
+        "https://learn.microsoft.com/en-us/graph/auth-register-app-v2"
+      ],
+      "claimIds": [
+        "c2",
+        "c3"
+      ]
+    },
+    {
+      "id": "st4",
+      "phase": "dev",
+      "title": "Configure Delegated Scopes & App Roles",
+      "detail": "Define the delegated permissions (such as User.Read or Mail.Read) and standard OIDC scopes like offline_access in your application manifest or API permissions tab.",
+      "owner": "agent",
+      "minutes": 10,
+      "links": [
+        "https://learn.microsoft.com/en-us/graph/auth-v2-user"
+      ],
+      "claimIds": [
+        "c7",
+        "c9",
+        "c11",
+        "c12"
+      ]
+    },
+    {
+      "id": "st5",
+      "phase": "test",
+      "title": "Execute OAuth 2.0 Auth Code & Token Requests",
+      "detail": "Test the login flow by constructing requests to the /authorize endpoint, receiving authorization codes, and exchanging them at the /token endpoint for access and refresh tokens.",
+      "owner": "agent",
+      "minutes": 15,
+      "links": [
+        "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow"
+      ],
+      "claimIds": [
+        "c8",
+        "c9",
+        "c10"
+      ]
+    },
+    {
+      "id": "st6",
+      "phase": "test",
+      "title": "Test Account Consent & Admin Consent Flow",
+      "detail": "Sign in with test work/school or personal accounts to test user consent screens. If testing admin-restricted permissions, execute administrative consent flows.",
+      "owner": "you",
+      "minutes": 15,
+      "links": [
+        "https://learn.microsoft.com/en-us/graph/auth-v2-user"
+      ],
+      "claimIds": [
+        "c7",
+        "c11"
+      ]
+    },
+    {
+      "id": "st7",
+      "phase": "production",
+      "title": "Setup Microsoft AI Cloud Partner Program Account",
+      "detail": "Obtain a Partner One ID for a valid Microsoft AI Cloud Partner Program (CPP) Partner Global Account and verify that your domain matches the publisher domain.",
+      "owner": "you",
+      "minutes": 30,
+      "links": [
+        "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview"
+      ],
+      "claimIds": [
+        "c13",
+        "c14",
+        "c15"
+      ]
+    },
+    {
+      "id": "st8",
+      "phase": "production",
+      "title": "Partner Center Identity Verification",
+      "detail": "Wait for Microsoft Partner Center to verify your organization's legal identity and partner global account status.",
+      "owner": "provider",
+      "minutes": 0,
+      "links": [
+        "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview"
+      ],
+      "claimIds": [
+        "c14"
+      ]
+    },
+    {
+      "id": "st9",
+      "phase": "production",
+      "title": "Link Partner ID for Verified Publisher Badge",
+      "detail": "In the Entra admin center app registration Branding & properties section, associate the verified MPN/PartnerID to remove risk warnings and receive the blue verified badge on consent screens.",
+      "owner": "agent",
+      "minutes": 10,
+      "links": [
+        "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview"
+      ],
+      "claimIds": [
+        "c16",
+        "c17",
+        "c18"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "kind": "developer_account",
+      "requiredFor": "test",
+      "note": "A Microsoft Entra ID tenant and a work/school or personal Microsoft account are required to register applications in the Entra admin center.",
+      "claimIds": [
+        "c1",
+        "c15"
+      ]
+    },
+    {
+      "kind": "domain",
+      "requiredFor": "production",
+      "note": "Publisher domain must be configured on the app registration and must match the domain verified under the Microsoft AI Cloud Partner Program account.",
+      "claimIds": [
+        "c13",
+        "c14"
+      ]
+    },
+    {
+      "kind": "business_verification",
+      "requiredFor": "production",
+      "note": "A verified Partner One ID from a Microsoft AI Cloud Partner Program partner global account is required for publisher verification.",
+      "claimIds": [
+        "c14",
+        "c16"
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "scope": "User.Read",
+      "triggersReview": false,
+      "note": "Standard delegated permission to read the signed-in user's profile.",
+      "claimIds": [
+        "c11"
+      ]
+    },
+    {
+      "scope": "Mail.Read",
+      "triggersReview": false,
+      "note": "Delegated permission to read user mail; subject to user or admin consent depending on tenant policies.",
+      "claimIds": [
+        "c11"
+      ]
+    },
+    {
+      "scope": "offline_access",
+      "triggersReview": false,
+      "note": "Standard OIDC scope requested to obtain a refresh token for long-lived access.",
+      "claimIds": [
+        "c9"
+      ]
+    },
+    {
+      "scope": "Directory.ReadWrite.All",
+      "triggersReview": true,
+      "note": "Admin-restricted scope requiring Global Administrator consent in target organizational tenants.",
+      "claimIds": [
+        "c7"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "symptom": "User receives a warning screen that the app is unverified and risky, or is blocked from granting consent.",
+      "cause": "The multitenant application is not Publisher Verified, and risk-based step-up consent policies in the user's tenant block consent.",
+      "unblock": "Complete Publisher Verification by associating a verified Microsoft AI Cloud Partner Program account with the app registration.",
+      "claimIds": [
+        "c14",
+        "c16",
+        "c17"
+      ]
+    },
+    {
+      "symptom": "Error AADSTS50011: The reply URL specified in the request does not match the reply URLs configured for the application.",
+      "cause": "The redirect URI sent in the authentication request does not match any redirect URI registered in the Entra admin center.",
+      "unblock": "Ensure exact scheme, host, port, and path case matching when configuring redirect URIs in Authentication settings.",
+      "claimIds": [
+        "c4",
+        "c5"
+      ]
+    },
+    {
+      "symptom": "User is shown an error stating they are not authorized to consent to the requested permissions.",
+      "cause": "The application requested high-privilege or admin-restricted permissions such as Directory.ReadWrite.All.",
+      "unblock": "Request a Global Administrator in the target tenant to grant tenant-wide consent, or revise app scopes to non-admin delegated permissions.",
+      "claimIds": [
+        "c7",
+        "c11"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "text": "App registration is initiated by selecting New registration under App registrations in Microsoft Entra admin center.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth-register-app-v2",
+      "quote": "Browse to Identity > Applications > App registrations and select New registration .",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c2",
+      "text": "Client secrets are created under Certificates & secrets in the app registration.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth-register-app-v2",
+      "quote": "Select Certificates & secrets > Client secrets > New client secret .",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c3",
+      "text": "Client secret lifetime is limited to a maximum of 24 months.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth-register-app-v2",
+      "quote": "Client secret lifetime is limited to two years (24 months) or less.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c4",
+      "text": "Redirect URIs are added on the Redirect URI configuration tab under Authentication.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-redirect-uri",
+      "quote": "On the Redirect URI configuration tab, select Add Redirect URI .",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c5",
+      "text": "Redirect URIs must begin with the HTTPS scheme, except for certain localhost URIs.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/reply-url",
+      "quote": "Redirect URIs must begin with the scheme https , with exceptions for some localhost redirect URIs.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c6",
+      "text": "Single-page application redirect URIs must be set to type spa using the application manifest editor.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
+      "quote": "Update a redirect URI : Set the redirect URI's type to spa by using the application manifest editor in the Microsoft Entra admin center.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c7",
+      "text": "Some permissions like Directory.ReadWrite.All are admin-restricted and require Global Administrator consent.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
+      "quote": "Some permissions are admin-restricted, for example, writing data to an organization's directory by using Directory.ReadWrite.All .",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c8",
+      "text": "The authorization code flow redirects the user to the Microsoft identity platform /authorize endpoint.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth-v2-user",
+      "quote": "In the flow, the app redirects the user to the Microsoft identity platform /authorize endpoint.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c9",
+      "text": "The offline_access permission is a standard OIDC scope requested to obtain a refresh token.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth-v2-user",
+      "quote": "The offline_access permission is a standard OIDC scope that's requested so that the app can get a refresh token.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c10",
+      "text": "An access token is requested by sending a POST request containing the authorization code to the /token endpoint.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth-v2-user",
+      "quote": "The app uses the authorization code received in the previous step to request an access token by sending a POST request to the /token endpoint.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c11",
+      "text": "Delegated permissions allow the application to perform operations on behalf of the signed-in user.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth/auth-concepts",
+      "quote": "Delegated permissions , also referred to as scopes : The permissions exposed by Microsoft Graph and that represent the operations that the app can perform on behalf of the signed-in user.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c12",
+      "text": "Application permissions allow the app to access data on its own without a signed-in user.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/graph/auth/auth-concepts",
+      "quote": "Application permissions : Also called app roles , allow the app to access data on its own, without a signed-in user.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c13",
+      "text": "Publisher verification informs users and admins about the authenticity of the publishing organization.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "quote": "Publisher verification gives app users and organization admins information about the authenticity of the developer's organization",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c14",
+      "text": "Publisher verification requires a valid Microsoft AI Cloud Partner Program account Partner One ID.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "quote": "The developer must have a Partner One ID for a valid Microsoft AI Cloud Partner Program account that has completed the verification process.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c15",
+      "text": "Apps eligible for publisher verification must be registered using a Microsoft Entra work or school account.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "quote": "The app that's to be publisher verified must be registered by using a Microsoft Entra work or school account.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c16",
+      "text": "Users cannot consent to most newly registered multitenant apps that are not publisher verified when risk-based step-up consent applies.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "quote": "users can't consent to most newly registered multitenant apps that aren't publisher verified.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c17",
+      "text": "A blue verified badge appears on consent prompts once publisher verification is completed.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "quote": "When the publisher of an app has been verified, a blue verified badge appears in the Microsoft Entra consent prompt",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c18",
+      "text": "Microsoft does not charge developers for publisher verification.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "quote": "Microsoft doesn't charge developers for publisher verification. No license is required to become a verified publisher.",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c19",
+      "text": "Query parameters are restricted on redirect URIs configured to sign in personal Microsoft accounts.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/reply-url",
+      "quote": "Query parameters are not allowed in redirect URIs for any app registration configured to sign in users with personal Microsoft accounts",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "c20",
+      "text": "Client credentials flow requires an Application ID URI as scope rather than a traditional redirect URI.",
+      "label": "sourced",
+      "url": "https://learn.microsoft.com/en-us/answers/questions/1502925/do-i-need-a-redirect-uri-when-using-a-windows-app",
+      "quote": "Redirect-URI is recommended but not required for client-credential flow. In order to obtain an access token, you will need to provide an Application ID URI as scope .",
+      "checkedAt": "2026-11-01T11:43:28.626Z"
+    },
+    {
+      "id": "t1",
+      "text": "Discovery document found at https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration: authorization endpoint https://login.microsoftonline.com/common/oauth2/v2.0/authorize, token endpoint https://login.microsoftonline.com/common/oauth2/v2.0/token.",
+      "label": "tested",
+      "url": "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
+      "method": "Fetched OAuth discovery document",
+      "artifact": "GET https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration → HTTP 200\n{\n \"issuer\": \"https://login.microsoftonline.com/{tenantid}/v2.0\",\n \"authorization_endpoint\": \"https://login.microsoftonline.com/common/oauth2/v2.0/authorize\",\n \"token_endpoint\": \"https://login.microsoftonline.com/common/oauth2/v2.0/token\"\n}",
+      "checkedAt": "2026-11-01T12:18:57.974Z"
+    },
+    {
+      "id": "t2",
+      "text": "Authorization endpoint https://login.microsoftonline.com/common/oauth2/v2.0/authorize responded HTTP 200 to an unknown client_id (no explicit error shown).",
+      "label": "tested",
+      "url": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
+      "method": "Sent authorization request with an unknown client_id",
+      "artifact": "GET https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 200\nBody excerpt: Sign in to your account",
+      "checkedAt": "2026-11-01T12:18:58.259Z"
+    }
+  ],
+  "gaps": [
+    "Exact processing time for Microsoft AI Cloud Partner Program (CPP) partner global account identity verification.",
+    "Specific evaluation criteria and timelines for optional Microsoft 365 App Certification."
+  ],
+  "sourcesConsulted": [
+    {
+      "url": "https://learn.microsoft.com/en-us/answers/questions/1502925/do-i-need-a-redirect-uri-when-using-a-windows-app",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-redirect-uri",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/reply-url",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/answers/questions/5855228/add-redirect-uri-for-a-web-application",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-entra-blog/oauth-consent-phishing-explained-and-prevented/4423357",
+      "official": true,
+      "fetched": false
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/graph/auth-register-app-v2",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/graph/auth-v2-user",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/graph/auth/auth-concepts",
+      "official": true,
+      "fetched": true
+    },
+    {
+      "url": "https://www.indeed.com/q-microsoft-entra-id-roles-jobs.html",
+      "official": false,
+      "fetched": false
+    }
+  ]
+}

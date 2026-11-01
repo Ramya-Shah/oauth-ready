@@ -1,0 +1,504 @@
+{
+  "summary": "A sample of library guides was checked claim-by-claim against the providers' own documentation after the agent generated them. Each finding was applied to the guide: corrected claims show what the agent originally said, and items the agent missed appear under 'Added in human review'.",
+  "method": "Three independent reviewer agents (Claude), one per guide, each read the generated JSON and checked at least 10 items against primary sources (docs.github.com, docs.slack.dev, developers.google.com / support.google.com) using web search and fetch, prioritising the verdict numbers. No accounts or apps were created; hands-on setup attempts are a planned follow-up. Reviewers were told the guide was written by a small free model and to be skeptical.",
+  "entries": [
+    {
+      "guide": "github",
+      "claimId": null,
+      "claim": "Verdict: difficulty 2, approval wait 0 days, effort 1-2h; no mandatory review for standard OAuth apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - registration is a self-serve form; the page describes no review step. \"A user or organization can own up to 100 OAuth apps.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": null,
+      "claim": "Top blocker: embedding client_secret in SPA front-ends",
+      "method": "Read docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Embedding the OAuth client secret in single-page front-end apps instead of performing code exchange on a backend server.",
+      "after": "Organization OAuth app access restrictions (on by default for new orgs): members can't grant your app access to org private resources until an org owner approves it.",
+      "evidence": "https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions - \"When you create a new organization, OAuth app access restrictions are enabled by default.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c3",
+      "claim": "An account can own up to 100 OAuth apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - \"A user or organization can own up to 100 OAuth apps.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c4",
+      "claim": "Up to 10 callback URLs",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - \"You can enter up to 10 callback URLs.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c6",
+      "claim": "Token expiration enabled by default for new OAuth apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app - \"Expire user access tokens\" is enabled by default; uncheck the box until support is added.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c7",
+      "claim": "Access token 8h, refresh token 6 months without use",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - access token lasts eight hours; refresh token expires after six months without use.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c8",
+      "claim": "offline_access scope returns expiring access + refresh tokens",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps - offline_access: \"Requests an expiring access token and a refresh token\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c10",
+      "claim": "Authorization code expires after 10 minutes",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - \"The temporary code will expire after 10 minutes.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c12",
+      "claim": "PKCE code_challenge requires S256",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - only S256 supported; \"the plain code challenge method is not supported.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c20",
+      "claim": "OAuth tokens use the user's 5,000 req/hour limit",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps - \"OAuth tokens use the user's rate limit of 5,000 requests per hour.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c14",
+      "claim": "Scopes repo/user/admin:org descriptions; scopes shown on consent form",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps - \"requested scopes are displayed to the user on the authorization form.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c16",
+      "claim": "st10: publisher verification needed if listing on Marketplace",
+      "method": "Read docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization on 2026-11-01",
+      "outcome": "corrected",
+      "before": "If listing your app on GitHub Marketplace, transfer ownership to an organization, enable organization 2FA, verify your domain, and submit a Publisher Verification request.",
+      "after": "Publisher verification (org-owned app, org 2FA, verified domain, support email) is required only for paid plans or a Marketplace badge; free listings still need org ownership and an onboarding-expert review.",
+      "evidence": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization - \"To offer paid plans for your app or to include a marketplace badge in your app listing, you must complete the publisher verification\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c18",
+      "claim": "Publisher verification requires org 2FA and verified domain",
+      "method": "Read docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization - \"that you've enabled two-factor authentication for your organization\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c19",
+      "claim": "Marketplace review typically takes 2-6 weeks (community source)",
+      "method": "Read docs.github.com/en/apps/github-marketplace/listing-an-app-on-github-marketplace/submitting-your-listing-for-publication on 2026-11-01",
+      "outcome": "unverifiable",
+      "evidence": "https://docs.github.com/en/apps/github-marketplace/listing-an-app-on-github-marketplace/submitting-your-listing-for-publication - official docs give no timeline: \"An onboarding expert will reach out to you with additional information.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "github",
+      "claimId": "c13",
+      "claim": "client_secret must not be embedded in front-end apps",
+      "method": "Read docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps - web flow token exchange requires client_secret; \"The client_secret is not needed for the device flow.\"",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": null,
+      "claim": "Verdict difficulty 4 / approval wait 14-84 days / topBlocker = 10-workspace Marketplace prerequisite",
+      "method": "Read docs.slack.dev/app-management/distribution and docs.slack.dev/slack-marketplace/slack-marketplace-review-guide on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Difficulty 4, wait 14-84 days, top blocker is the 10-active-workspace Marketplace prerequisite",
+      "after": "OAuth install across other workspaces is self-serve via 'Activate Public Distribution' with no Slack review (difficulty 2, no wait). Marketplace listing is optional. Its review takes up to 10 business days plus up to 10 weeks, after a 10-workspace/28-day prerequisite. The practical blocker for unlisted commercial apps is the 2025 rate limit: conversations.history/replies at 1 req/min",
+      "evidence": "https://docs.slack.dev/app-management/distribution - 'Ensure all items in the supplied checklist are completed' then click Activate Public Distribution; review is described only for Marketplace-listed apps",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c3",
+      "claim": "New apps can only be installed in their development workspace at first",
+      "method": "Read docs.slack.dev/tools/java-slack-sdk/guides/app-distribution on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/tools/java-slack-sdk/guides/app-distribution - 'A newly created Slack app can only be installed in its development workspace in the beginning.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c4",
+      "claim": "Setting a redirect URL and enabling App Distribution allows installs in other workspaces",
+      "method": "Read Java SDK app-distribution guide and docs.slack.dev/app-management/distribution on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/tools/java-slack-sdk/guides/app-distribution - 'By setting an OAuth Redirect URL and enabling App Distribution, the app becomes to be ready for installation in other workspaces.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c5",
+      "claim": "Users are sent to slack.com/oauth/v2/authorize",
+      "method": "Read docs.slack.dev/authentication/installing-with-oauth on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/authentication/installing-with-oauth - 'redirect Slack users to https://slack.com/oauth/v2/authorize'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c16",
+      "claim": "redirect_uri must match or be a subdirectory of a configured Redirect URL (guide also says HTTPS)",
+      "method": "Read docs.slack.dev/authentication/installing-with-oauth on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/authentication/installing-with-oauth - 'The redirect_uri must use HTTPS.' / 'must match or be a subdirectory of a Redirect URL configured under App Management'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c7",
+      "claim": "Marketplace submission requires 10+ active workspaces (used in past 28 days)",
+      "method": "Read docs.slack.dev/slack-marketplace/slack-marketplace-review-guide on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide - 'An active workspace is a workspace that has been used in the past 28 days.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c8",
+      "claim": "Preliminary Marketplace review takes up to 10 business days",
+      "method": "Read Marketplace review guide on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide - 'the preliminary part of the review takes up to 10 business days to receive feedback'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c9",
+      "claim": "Functional review takes up to 10 weeks for new submissions",
+      "method": "Read Marketplace review guide on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide - 'up to 10 weeks for new submissions and 6 weeks for published apps resubmitting changes'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c10",
+      "claim": "Resubmitting resets queue place (guide applies it to preliminary review)",
+      "method": "Read Marketplace review guide on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide - preliminary: 'your place in the queue is reset each time you resubmit'; functional: 'not reset when you resubmit with changes'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c11",
+      "claim": "Demo video is 'strongly recommended'",
+      "method": "Read Marketplace review guide on 2026-11-01",
+      "outcome": "corrected",
+      "before": "A demo video is strongly recommended to help functional review",
+      "after": "For new submissions the video is expected. It must show the full installation and OAuth flow, setup, end-to-end use and uninstallation",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide - 'it should include a video showing the full installation and OAuth flow'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c12",
+      "claim": "Must provide test account credentials for reviewers",
+      "method": "Read Marketplace review guide on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide - 'provide us with test account credentials needed to access your service'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c13",
+      "claim": "(community) *:history, files:read, canvases:read, admin.* trigger enhanced review",
+      "method": "Read docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements - 'your submission will be subject to an enhanced review' for search:read.*, *:history, files:read, canvases:read (+ some user-token write scopes)",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c14",
+      "claim": "Restricted scopes include admin.*, identity.*, search:read, workflow.steps:execute, triggers:*",
+      "method": "Read Marketplace app guidelines on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements - '(e.g. admin.*, identity.*, search:read, workflow.steps:execute, triggers:*)'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c18",
+      "claim": "(community) Support requests answered within 2 business days",
+      "method": "Read Marketplace app guidelines on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements - 'We expect support requests to receive a response within 2 business days.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": null,
+      "claim": "Privacy policy required for Marketplace (guide cites c8, the review-timing claim)",
+      "method": "Read Marketplace app guidelines on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Privacy policy requirement cited to c8 (preliminary review timing)",
+      "after": "Requirement is real but its source is the app guidelines page. The policy must cover data collected, use, retention, and access/deletion, and give a contact method",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements - 'All Slack Marketplace apps must include a clear privacy policy that details how third-party data is handled.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": "c17",
+      "claim": "Step st5 tests 'refresh token rotation logic' as if standard",
+      "method": "Read docs.slack.dev/authentication/using-token-rotation on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Token refresh/rotation treated as a standard part of the flow",
+      "after": "Token rotation is optional and must be turned on; once on it cannot be turned off. Access tokens then expire every 12 hours",
+      "evidence": "https://docs.slack.dev/authentication/using-token-rotation - 'Token rotation may not be turned off once it's turned on.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": null,
+      "claim": "bad_redirect_uri caused by redirect_uri not matching the registered URL",
+      "method": "Read docs.slack.dev/authentication/installing-with-oauth on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://docs.slack.dev/authentication/installing-with-oauth - 'Occurs when there are multiple redirect_url parameter values configured and they do not match.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": null,
+      "claim": "st6: installing on 10 self-created test workspaces satisfies the prerequisite",
+      "method": "Read Marketplace review guide on 2026-11-01",
+      "outcome": "unverifiable",
+      "evidence": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide - only says 'installed on 10 or more active workspaces and the service has been tested'; nothing on whether the developer's own test workspaces count",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "slack",
+      "claimId": null,
+      "claim": "Gap: no Marketplace fees",
+      "method": "Read Marketplace review guide and app guidelines on 2026-11-01",
+      "outcome": "unverifiable",
+      "evidence": "Neither page mentions a listing fee; the Slack Marketplace Agreement was not reviewed",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c8",
+      "claim": "Scope table: gmail.readonly is a 'Sensitive scope' that triggers OAuth verification",
+      "method": "Read developers.google.com/workspace/gmail/api/auth/scopes on 2026-11-01",
+      "outcome": "corrected",
+      "before": "gmail.readonly: Sensitive scope; triggers OAuth verification.",
+      "after": "gmail.readonly is RESTRICTED: requires restricted-scope verification plus annual CASA security assessment. gmail.modify, gmail.compose, gmail.insert, gmail.metadata, gmail.settings.* and https://mail.google.com/ are also restricted.",
+      "evidence": "https://developers.google.com/workspace/gmail/api/auth/scopes - Restricted: mail.google.com, gmail.readonly, gmail.compose, gmail.insert, gmail.modify, gmail.metadata",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c8",
+      "claim": "gmail.send is a sensitive scope that triggers OAuth verification",
+      "method": "Read developers.google.com/workspace/gmail/api/auth/scopes on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://developers.google.com/workspace/gmail/api/auth/scopes - Sensitive: gmail.addons.current.message.metadata, gmail.addons.current.message.readonly, gmail.send",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c10",
+      "claim": "https://mail.google.com/ is restricted and triggers verification plus security assessment",
+      "method": "Read developers.google.com/workspace/gmail/api/auth/scopes and .../production-readiness/restricted-scope-verification on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://developers.google.com/workspace/gmail/api/auth/scopes - 'Read, compose, send, and permanently delete all your email from Gmail.' listed under Restricted",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c10",
+      "claim": "Restricted scopes 'might also need' a security assessment / 'potentially undergo' one",
+      "method": "Read support.google.com/cloud/answer/13465431 and developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Restricted-scope apps may/potentially need a security assessment.",
+      "after": "Restricted-scope apps (unless exempt, e.g. internal/personal use) must pass an annual CASA assessment by an independent Google-approved third-party assessor, revalidated every 12 months; developer pays the assessor.",
+      "evidence": "https://support.google.com/cloud/answer/13465431 - 'applications requesting access to restricted scopes must undergo an annual security assessment'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c16",
+      "claim": "Restricted scope verification + security assessment take 1 to 4+ weeks (uncertain, unsourced)",
+      "method": "Read support.google.com/cloud/answer/13463817 (FAQ) and restricted-scope-verification page on 2026-11-01",
+      "outcome": "corrected",
+      "before": "1 to 4+ weeks",
+      "after": "Google estimates ~6 weeks for restricted scope verification ('several weeks'), not guaranteed; CASA is the final step and can add time. Sensitive: ~10 business days; brand: 2-3 business days.",
+      "evidence": "https://support.google.com/cloud/answer/13463817 - Brand Verification '2-3 Business days', Sensitive '10 Business days', Restricted '6 weeks'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c14",
+      "claim": "Reviews 'typically take several days' (cited from Workspace Marketplace app review page)",
+      "method": "Compared against support.google.com/cloud/answer/13463817 on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Google Marketplace and platform reviews typically take several days (used as OAuth review timing).",
+      "after": "The quote is about Workspace Marketplace listing review, a separate process. OAuth verification timing: brand 2-3 business days, sensitive ~10 business days, restricted ~6 weeks.",
+      "evidence": "https://support.google.com/cloud/answer/13463817 - Sensitive Scope Verification '10 Business days'; Restricted Scope Verification '6 weeks'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c6",
+      "claim": "Requirement: authorized domains must be verified in Search Console BEFORE configuring redirect URIs",
+      "method": "Read support.google.com/cloud/answer/10311615 and developers.google.com/identity/protocols/oauth2/production-readiness/brand-verification on 2026-11-01",
+      "outcome": "corrected",
+      "before": "Authorized domains must be verified in Google Search Console before configuring redirect URIs or branding links.",
+      "after": "Authorized domains must be ADDED before redirect URIs/homepage/privacy links; Search Console ownership verification is required for brand verification (production), not to configure redirect URIs.",
+      "evidence": "https://developers.google.com/identity/protocols/oauth2/production-readiness/brand-verification - 'Verify the ownership of your authorized domains using the Google Search Console'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c6",
+      "claim": "Authorized domains must be added before redirect URIs, homepage, privacy policy links",
+      "method": "Read support.google.com/cloud/answer/10311615 on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://support.google.com/cloud/answer/10311615 - 'Add your Authorized Domains before you add your redirect or origin URIs'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c11",
+      "claim": "Privacy policy on homepage and consent screen must match; hosted on verified domain",
+      "method": "Read support.google.com/cloud/answer/10311615 and brand-verification page on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://support.google.com/cloud/answer/10311615 - 'The Privacy Policy linked on your homepage and the one linked on the app's OAuth consent screen should be same'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c9",
+      "claim": "OAuth verification requires a demo video explaining scope usage",
+      "method": "Read developers.google.com/workspace/marketplace/configure-oauth-consent-screen and sensitive-scope-verification on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://developers.google.com/identity/protocols/oauth2/production-readiness/sensitive-scope-verification - 'Upload the video to YouTube Studio and set its Visibility as Unlisted.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c5",
+      "claim": "Redirect URIs must use HTTPS, localhost exempt",
+      "method": "Read support.google.com/cloud/answer/15549257 on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://support.google.com/cloud/answer/15549257 - 'Redirect URIs must use the HTTPS scheme, not plain HTTP.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c12",
+      "claim": "Client secret not visible again after creation",
+      "method": "Read support.google.com/cloud/answer/15549257 on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://support.google.com/cloud/answer/15549257 - 'it will not be visible or accessible again.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c13",
+      "claim": "Redirect URI mismatch yields redirect_uri_mismatch",
+      "method": "Read support.google.com/cloud/answer/15549257 on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://support.google.com/cloud/answer/15549257 - 'you will receive a redirect_uri_mismatch error.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c15",
+      "claim": "Brand verification started via Verify Branding button on Branding page",
+      "method": "Read support.google.com/cloud/answer/10311615 on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://support.google.com/cloud/answer/10311615 - 'you will see a Verify Branding button in the Branding page.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c8",
+      "claim": "Sensitive/restricted scopes must undergo OAuth verification review",
+      "method": "Read developers.google.com/workspace/marketplace/configure-oauth-consent-screen on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://developers.google.com/workspace/marketplace/configure-oauth-consent-screen - 'If your app uses sensitive or restricted scopes, then it must undergo an OAuth verification review process.'",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": null,
+      "claim": "Requirement: ToS required for external production apps",
+      "method": "Read support.google.com/cloud/answer/10311615 on 2026-11-01",
+      "outcome": "unverifiable",
+      "evidence": "https://support.google.com/cloud/answer/10311615 - 'These links are required for all external production apps.' (does not single out the ToS link explicitly)",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": null,
+      "claim": "Step st1: billing must be enabled for the project",
+      "method": "Searched Google OAuth/Gmail API setup docs on 2026-11-01",
+      "outcome": "unverifiable",
+      "evidence": "No primary source found requiring billing for Gmail API or OAuth client creation; Gmail API quickstarts only require enabling the API.",
+      "checkedAt": "2026-11-01"
+    },
+    {
+      "guide": "gmail",
+      "claimId": "c2",
+      "claim": "Auth endpoint accounts.google.com/o/oauth2/v2/auth, token endpoint oauth2.googleapis.com/token, PKCE S256",
+      "method": "Accepted guide's tested artifact (OIDC discovery doc); consistent with developers.google.com/identity/protocols/oauth2 on 2026-11-01",
+      "outcome": "confirmed",
+      "evidence": "https://accounts.google.com/.well-known/openid-configuration - \"code_challenge_methods_supported\": [\"plain\", \"S256\"]",
+      "checkedAt": "2026-11-01"
+    }
+  ],
+  "lessons": [
+    "The facts were mostly right; the verdicts were where the agent went wrong. Of 52 checked items, 36 were confirmed. But the GitHub and Slack verdicts named the wrong top blocker, and the Gmail wait was understated by about 2x. The verdict is the most-read part of a guide, so it is what we now review first.",
+    "The agent conflates optional and mandatory paths. Slack Marketplace review was presented as required, when public distribution needs no review. The product fix: guides now show both paths, and the 2025 rate limits explain why message-reading agents still end up on the Marketplace path.",
+    "Fine-grained classifications are easy to get wrong. The agent called gmail.readonly 'sensitive' and the CASA assessment optional; both are restricted/mandatory. Scope tables are now a review checkpoint.",
+    "Quote checking catches invented sources but not misapplied ones. A real Google quote about Workspace Marketplace review ('several days') was used as the OAuth verification timeline. It passed the verbatim check, so labels show where a quote came from, not whether the page answers the question.",
+    "Timelines are almost never in official docs. Google is the exception (its FAQ gives estimates). GitHub publishes none, and the agent's 2–6 weeks came from a community post and was presented as fact. Guides now label such figures as community-sourced.",
+    "Free-tier limits shaped the design: each Gemini model allows 20 requests per day. The pipeline rotates through models, uses a light model for identification, and records which model drafted each guide."
+  ]
+}
