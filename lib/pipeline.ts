@@ -208,7 +208,7 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
     if (p) rawProbes.push(p);
   }
   const probes: Probe[] = rawProbes.filter((p, i) => rawProbes.findIndex((q) => q.url === p.url) === i).map((p, i) => ({ ...p, id: `P${i + 1}` }));
-  for (const p of probes) yield { type: "stage", stage: "probe", status: "progress", detail: `${p.ok ? "✓" : "✗"} ${p.summary}` };
+  for (const p of probes) yield { type: "stage", stage: "probe", status: "progress", detail: `${p.ok ? "Passed" : "Failed"}: ${p.summary}` };
   yield { type: "stage", stage: "probe", status: "done", detail: probes.length ? `${probes.filter((p) => p.ok).length}/${probes.length} probes succeeded` : "No discovery document or authorize URL found" };
 
   // 5. Write

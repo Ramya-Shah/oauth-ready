@@ -80,7 +80,7 @@ export default function Generator({ initial }: { initial: string }) {
     let s = stages.find((x) => x.stage === e.stage);
     if (!s) { s = { stage: e.stage, status: e.status, detail: e.detail, progress: [] }; stages.push(s); }
     if (e.status === "progress") s.progress.push(e.detail);
-    else { s.status = e.status === "error" && s.status === "done" ? "done" : e.status; if (e.status !== "error") s.detail = e.detail; else s.progress.push("⚠ " + e.detail); }
+    else { s.status = e.status === "error" && s.status === "done" ? "done" : e.status; if (e.status !== "error") s.detail = e.detail; else s.progress.push("Problem: " + e.detail); }
   }
 
   return (

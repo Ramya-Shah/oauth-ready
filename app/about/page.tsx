@@ -6,6 +6,7 @@ export const metadata = { title: "How it works · OAuth Ready" };
 export default function About() {
   return (
     <article style={{ maxWidth: 760 }}>
+      <section className="sheet page-sheet">
       <h1>How it works</h1>
       <p>
         To let users connect Gmail, Slack or HubSpot to your agent, you first register an <b>OAuth app</b> with that provider — your
@@ -13,12 +14,13 @@ export default function About() {
         that one app. Creating the app is often minutes; getting it approved so <i>any</i> customer can connect can take weeks. That
         gap is what this tool is about.
       </p>
+      </section>
 
       <h2>What every guide answers first</h2>
       <ul>
         <li><b>Difficulty</b> on a fixed 1–5 rubric.</li>
         <li><b>Hands-on effort</b> (your team's hours) separately from <b>approval wait</b> (calendar days you can only wait on).</li>
-        <li><b>The most likely blocker</b>, then steps split into <i>create → test with your own account → production</i>.</li>
+        <li><b>The most likely blocker</b>, then steps split into <i>create the app, test with your own account, then go to production</i>.</li>
         <li><b>Who does each step</b>: an agent, you, or the provider.</li>
       </ul>
       <table>
@@ -50,8 +52,8 @@ export default function About() {
       <p>
         An agent can research, draft copy (privacy policy, listing text, scope justifications), fill setup forms once <i>you</i> are signed
         in, configure redirect URIs and scopes, and run test OAuth flows. It can't sign up or sign in as you, accept legal terms, pay for a
-        security assessment, or speed up a provider's review queue — those steps are marked <span className="pill you">🧑 You</span> or{" "}
-        <span className="pill provider">⌛ Provider</span>.
+        security assessment, or speed up a provider's review queue — those steps are marked <span className="pill you">You</span> or{" "}
+        <span className="pill provider">Provider wait</span>.
       </p>
 
       <h2>Limits</h2>

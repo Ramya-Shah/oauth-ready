@@ -19,8 +19,8 @@ export default async function Home() {
   });
   return (
     <>
-      <section className="hero">
-        <h1 className="hero-h">An hour, or six weeks?</h1>
+      <section className="hero sheet">
+        <h1 className="hero-h">An hour, or <mark>six weeks?</mark></h1>
         <p className="hero-p">
           Before your users can connect an app to your agent, you register an OAuth app with the provider and often wait for
           their review. Each guide shows how much of that is your work, how much is waiting, and what is most likely to stop you.

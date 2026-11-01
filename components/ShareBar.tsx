@@ -9,14 +9,14 @@ export default function ShareBar({ markdown }: { markdown: string }) {
   };
   return (
     <div className="row">
-      <button className="btn" onClick={() => copy(window.location.href, "Link copied")}>🔗 Copy link</button>
-      <button className="btn" onClick={() => copy(markdown, "Markdown copied")}>⧉ Copy as Markdown</button>
+      <button className="btn" onClick={() => copy(window.location.href, "Link copied")}>Copy link</button>
+      <button className="btn" onClick={() => copy(markdown, "Markdown copied")}>Copy as Markdown</button>
       <button className="btn" onClick={() => {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(new Blob([markdown], { type: "text/markdown" }));
         a.download = `${location.pathname.split("/").pop()}-oauth-guide.md`;
         a.click();
-      }}>⤓ .md</button>
+      }}>Download .md</button>
       {msg && <span className="small muted">{msg}</span>}
     </div>
   );

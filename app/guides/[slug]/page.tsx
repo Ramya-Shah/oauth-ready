@@ -1,12 +1,15 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getGuide } from "@/lib/store";
-import { DIFFICULTY_RUBRIC, formatWait, labelCounts, type Guide } from "@/lib/schema";
+import { DIFFICULTY_RUBRIC, formatWait, labelCounts, type DayRange, type Guide } from "@/lib/schema";
 import { toMarkdown } from "@/lib/markdown";
-import { Difficulty, EvidenceBar, Refs, LABEL_TEXT, LABEL_HELP } from "@/components/bits";
+import { Refs, LABEL_TEXT, LABEL_HELP } from "@/components/bits";
 import ShareBar from "@/components/ShareBar";
 import OpenEvidenceOnLink from "@/components/OpenEvidenceOnLink";
-import RouteBar, { hoursText, waitText } from "@/components/RouteBar";
+import CurrentStep from "@/components/CurrentStep";
+import { hoursText, waitText } from "@/components/RouteBar";
+import "./print.css";
 
 export const dynamic = "force-dynamic";
 
@@ -15,208 +18,272 @@ type P = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: P): Promise<Metadata> {
   const g = await getGuide((await params).slug);
   return g
-    ? { title: `${g.name} OAuth app guide · OAuth Ready`, description: `${DIFFICULTY_RUBRIC[g.verdict.difficulty]} · wait ${formatWait(g.verdict.approvalWait)} · ${g.verdict.topBlocker}` }
+    ? { title: `${g.name} OAuth app guide | OAuth Ready`, description: `${DIFFICULTY_RUBRIC[g.verdict.difficulty]}. Wait: ${formatWait(g.verdict.approvalWait)}. ${g.verdict.topBlocker}` }
     : { title: "Guide not found" };
 }
 
 const PHASES = [
-  { k: "dev", t: "Create the app", d: "Register the OAuth app and get credentials." },
-  { k: "test", t: "Test with your own account", d: "Connect yourself or test users before any review." },
-  { k: "production", t: "Go to production", d: "Let any customer connect — review, verification, listing." },
+  { k: "dev", t: "Create the app" },
+  { k: "test", t: "Test with your own account" },
+  { k: "production", t: "Go to production" },
 ] as const;
 
-const OWNER = { agent: "An agent can do this", you: "You", provider: "Wait on the provider" } as const;
+const OWNER = { agent: "Agent can do this", you: "You", provider: "Provider wait" } as const;
+
+// Same square-root scale as the library: 0 to 90 days, hands-on hours at 6 per working day.
+const MAX_DAYS = 90;
+const x = (days: number) => Math.min(100, Math.sqrt(Math.max(0, days) / MAX_DAYS) * 100);
+const TICKS = [
+  { d: 0, t: "Start" },
+  { d: 1, t: "1 day" },
+  { d: 7, t: "1 week" },
+  { d: 30, t: "1 month" },
+  { d: 90, t: "3 months" },
+];
+
+function Schedule({ effort, wait }: { effort: { min: number; max: number }; wait: DayRange }) {
+  const workEnd = Math.max(x(effort.max / 6), 0.8);
+  const known = wait !== "unknown";
+  const none = known && wait.maxDays === 0;
+  const minEnd = known ? x(effort.max / 6 + wait.minDays) : workEnd;
+  const maxEnd = known ? x(effort.max / 6 + wait.maxDays) : 100;
+  return (
+    <figure className="cp-axis" aria-label={`${hoursText(effort)} of hands-on work, ${waitText(wait)}`}>
+      <div className="cp-axis-ticks" aria-hidden>
+        {TICKS.map((t) => (
+          <span key={t.d} style={{ left: `${x(t.d)}%` }}>{t.t}</span>
+        ))}
+      </div>
+      <div className="cp-axis-field" aria-hidden>
+        {TICKS.map((t) => <i key={t.d} style={{ left: `${x(t.d)}%` }} />)}
+        <div className="cp-lane">
+          <span className="cp-work" style={{ width: `${workEnd}%` }} />
+        </div>
+        <div className="cp-lane">
+          {none ? (
+            <span className="cp-none" style={{ left: `${workEnd}%`, right: 0 }}>No provider review before any user can connect</span>
+          ) : known ? (
+            <>
+              {wait.minDays > 0 && <span className="cp-wait" style={{ left: `${workEnd}%`, width: `${minEnd - workEnd}%` }} />}
+              <span className="cp-maybe" style={{ left: `${minEnd}%`, width: `${maxEnd - minEnd}%` }} />
+            </>
+          ) : (
+            <span className="cp-unknown" style={{ left: `${workEnd}%`, right: 0 }}>Review time not published</span>
+          )}
+        </div>
+      </div>
+      <figcaption>
+        <span><i className="cp-key cp-key-work" />Your work, {hoursText(effort)}</span>
+        {!none && known && <span><i className="cp-key cp-key-wait" />Provider wait, {formatWait(wait)}</span>}
+      </figcaption>
+    </figure>
+  );
+}
 
 export default async function GuidePage({ params }: P) {
   const g = await getGuide((await params).slug);
   if (!g) notFound();
   const v = g.verdict;
   const counts = labelCounts(g);
+  const checked = counts.tested + counts.sourced;
   const owners = { agent: 0, you: 0, provider: 0 };
-  const ownerMin = { agent: 0, you: 0, provider: 0 };
-  for (const s of g.steps) { owners[s.owner]++; ownerMin[s.owner] += s.minutes ?? 0; }
+  for (const s of g.steps) owners[s.owner]++;
+  let n = 0;
 
   return (
-    <article>
-      <div className="spread">
-        <div className="g-meta">
-          <span>{g.origin === "curated" ? (g.reviewedAt ? `Reviewed ${g.reviewedAt.slice(0, 10)}` : "Library guide, not yet reviewed") : "Generated by the agent"}</span>
-          <span>{g.officialDomain}</span>
-          {g.model && <span>Drafted by {g.model}</span>}
+    <article className="cp">
+      <div className="cp-sheet">
+        <header className="cp-strip">
+          <Link href="/" className="cp-brand">OAuth Ready</Link>
+          <nav aria-label="Site">
+            <Link href="/">Library</Link>
+            <Link href="/generate">Generate</Link>
+            <Link href="/verification">Verification</Link>
+            <Link href="/about">How it works</Link>
+          </nav>
+          <div className="cp-share"><ShareBar markdown={toMarkdown(g)} /></div>
+        </header>
+
+        <div className="cp-head">
+          <h1 className="cp-title">
+            {g.name}: {hoursText(v.activeEffortHours)} of work, <mark>{waitText(v.approvalWait)}.</mark>
+          </h1>
+          <p className="cp-lede">{v.summary}<Refs ids={v.claimIds} claims={g.claims} /></p>
         </div>
-        <ShareBar markdown={toMarkdown(g)} />
+
+        <Schedule effort={v.activeEffortHours} wait={v.approvalWait} />
+
+        <div className="cp-foot">
+          <section className="cp-stop" aria-labelledby="cp-stop-h">
+            <h2 id="cp-stop-h">Most likely to stop you</h2>
+            <p>{v.topBlocker}</p>
+          </section>
+            <dl className="cp-block" aria-label="Sheet details">
+            <div className="cp-block-name"><dt>Sheet</dt><dd>{g.name} OAuth app</dd></div>
+            <div><dt>Difficulty</dt><dd>{v.difficulty} of 5</dd></div>
+            <div><dt>Facts checked</dt><dd>{checked} of {g.claims.length}</dd></div>
+            <div><dt>Agent can do</dt><dd>{owners.agent} of {g.steps.length} steps</dd></div>
+            <div><dt>Checked</dt><dd>{g.reviewedAt ? g.reviewedAt.slice(0, 10) : g.origin === "curated" ? "Not yet" : "Agent only"}</dd></div>
+            <div className="cp-block-wide"><dt>Scale</dt><dd>{DIFFICULTY_RUBRIC[v.difficulty]}</dd></div>
+            </dl>
+        </div>
+
+        {(g.supportsOAuth === false || g.origin === "generated") && (
+          <p className="cp-note">
+            {g.supportsOAuth === false
+              ? "The agent found no OAuth 2.0 support for third-party apps. Check the evidence before relying on this."
+              : "Written live by an agent. It tests endpoints itself; timelines and costs come from what it read. Check the evidence before you commit to a launch date."}
+          </p>
+        )}
       </div>
 
-      <h1 className="g-name">{g.name} OAuth app</h1>
-      <p className="g-verdict">
-        {hoursText(v.activeEffortHours)} of work,{" "}
-        <span className={v.approvalWait !== "unknown" && v.approvalWait.maxDays === 0 ? "z" : "w"}>{waitText(v.approvalWait)}.</span>
-      </p>
-      <p className="g-lede">{v.summary}<Refs ids={v.claimIds} claims={g.claims} /></p>
-
-      <RouteBar effort={v.activeEffortHours} wait={v.approvalWait} />
-      <div className="route-legend">
-        <span><i style={{ background: "var(--ink)" }} />Your team's hands-on work</span>
-        {v.approvalWait !== "unknown" && v.approvalWait.minDays > 0 && <span><i style={{ background: "var(--wait)" }} />Minimum wait on the provider</span>}
-        {v.approvalWait !== "unknown" && v.approvalWait.maxDays > v.approvalWait.minDays && <span><i style={{ border: "1.5px dashed var(--wait)", background: "color-mix(in srgb, var(--wait) 28%, transparent)" }} />Could stretch to</span>}
-        {v.approvalWait === "unknown" && <span><i style={{ border: "1.5px dashed var(--uncertain)", background: "var(--uncertain-bg)" }} />Review time not published</span>}
-      </div>
-
-      <dl className="g-facts">
-        <div><dt>Difficulty</dt><dd className="row"><Difficulty n={v.difficulty} /> {DIFFICULTY_RUBRIC[v.difficulty]}</dd></div>
-        <div><dt>How we know</dt><dd><EvidenceBar counts={counts} /></dd></div>
-        <div><dt>Steps an agent can take</dt><dd>{owners.agent} of {g.steps.length}</dd></div>
-      </dl>
-
-      <section className="g-blocker">
-        <h2>Most likely to stop you</h2>
-        <p>{v.topBlocker}</p>
+      <section className="cp-schedule" aria-labelledby="cp-steps-h">
+        <div className="cp-schedule-head">
+          <h2 id="cp-steps-h">Schedule</h2>
+          <ul className="cp-legend">
+            {(["agent", "you", "provider"] as const).map((o) => (
+              <li key={o}><i className={`cp-mk cp-mk-${o}`} aria-hidden />{OWNER[o]} ({owners[o]})</li>
+            ))}
+          </ul>
+        </div>
+        {PHASES.map((p) => {
+          const steps = g.steps.filter((s) => s.phase === p.k);
+          if (!steps.length) return null;
+          return (
+            <div key={p.k} className="cp-phase">
+              <h3>{p.t}</h3>
+              <ol>
+                {steps.map((s) => {
+                  n++;
+                  return (
+                    <li key={s.id} id={`step-${n}`} className={`cp-row cp-row-${s.owner}${s.owner === "provider" && !/^\((optional|marketplace path)\)/i.test(s.title) ? " cp-row-required" : ""}`}>
+                      <span className="cp-num">{n}</span>
+                      <div className="cp-task">
+                        <b>{s.title}</b>
+                        <p>{s.detail}<Refs ids={s.claimIds} claims={g.claims} /></p>
+                        {s.links.length > 0 && (
+                          <p className="cp-links">{s.links.map((l) => <a key={l} href={l} target="_blank" rel="noreferrer">{l.replace(/^https:\/\//, "")}</a>)}</p>
+                        )}
+                      </div>
+                      <span className="cp-owner"><i className={`cp-mk cp-mk-${s.owner}`} aria-hidden />{OWNER[s.owner]}</span>
+                      <span className="cp-dur">{s.minutes ? `${s.minutes} min` : ""}</span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          );
+        })}
+        <CurrentStep />
       </section>
 
-      {g.supportsOAuth === false && <p className="notice" style={{ marginTop: 16 }}>The agent found no OAuth 2.0 support for third-party apps. Check the evidence below before relying on this.</p>}
-      {g.origin === "generated" && (
-        <p className="notice" style={{ marginTop: 16 }}>
-          Written live by an agent. It can test endpoints automatically, but timelines and costs come from what it read. Check the evidence before you commit to a launch date.
-        </p>
-      )}
-
-      {g.reviewNote && <p className="small muted" style={{ marginTop: 10 }}><b>Review note:</b> {g.reviewNote} <a href="/verification">See the verification log</a></p>}
-
-      <h2>Who does what</h2>
-      <div className="owners">
-        {(["agent", "you", "provider"] as const).map((o) => (
-          <div key={o} className={o}>
-            <span className={`pill ${o}`}>{OWNER[o]}</span>
-            <b>{owners[o]} step{owners[o] === 1 ? "" : "s"}{ownerMin[o] && o !== "provider" ? <span className="small muted" style={{ fontWeight: 400 }}> about {Math.round(ownerMin[o] / 6) / 10} h</span> : null}</b>
-            <span className="small muted">
-              {o === "agent" && "Drafting copy, filling forms once you're signed in, setting redirect URIs and scopes, running test sign-ins."}
-              {o === "you" && "Anything that needs your identity, company, payment, sign-in or judgment."}
-              {o === "provider" && "Review queues and verification you can only wait on."}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <h2>Steps</h2>
-      {PHASES.map((p) => {
-        const steps = g.steps.filter((s) => s.phase === p.k);
-        if (!steps.length) return null;
-        return (
-          <section key={p.k} className="phase">
-            <div className="phase-h"><h3>{p.t}</h3><span className="small muted">{p.d}</span></div>
-            <ol className="steps">
-              {steps.map((s) => (
-                <li key={s.id}>
-                  <div className="spread">
-                    <b>{s.title}</b>
-                    <span className="row small"><span className={`pill ${s.owner}`}>{OWNER[s.owner]}</span>{s.minutes ? <span className="muted">~{s.minutes} min</span> : null}</span>
-                  </div>
-                  <div style={{ marginTop: 4 }}>{s.detail}<Refs ids={s.claimIds} claims={g.claims} /></div>
-                  {s.links.length > 0 && <div className="small" style={{ marginTop: 4 }}>{s.links.map((l) => <a key={l} href={l} target="_blank" rel="noreferrer" style={{ marginRight: 12, wordBreak: "break-all" }}>{l.replace(/^https:\/\//, "")}</a>)}</div>}
-                </li>
-              ))}
-            </ol>
+      <div className="cp-ref">
+        {g.reviewNote && (
+          <section className="cp-col">
+            <h2>Review note</h2>
+            <p className="cp-review">{g.reviewNote} <Link href="/verification">See the verification log</Link></p>
           </section>
-        );
-      })}
+        )}
+        {g.requirements.length > 0 && (
+          <section>
+            <h2>Requirements</h2>
+            <table>
+              <thead><tr><th>Requirement</th><th>Needed for</th><th>Details</th></tr></thead>
+              <tbody>
+                {g.requirements.map((r, i) => (
+                  <tr key={i}><td><b>{r.kind.replace(/_/g, " ")}</b></td><td>{r.requiredFor}</td><td>{r.note}<Refs ids={r.claimIds} claims={g.claims} /></td></tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
 
-      {g.requirements.length > 0 && (
-        <>
-          <h2>Requirements</h2>
-          <table>
-            <thead><tr><th>Requirement</th><th>Needed for</th><th>Details</th></tr></thead>
-            <tbody>
-              {g.requirements.map((r, i) => (
-                <tr key={i}><td><b>{r.kind.replace(/_/g, " ")}</b></td><td>{r.requiredFor}</td><td>{r.note}<Refs ids={r.claimIds} claims={g.claims} /></td></tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
+        {g.scopes.length > 0 && (
+          <section>
+            <h2>Scopes that change your path</h2>
+            <table>
+              <thead><tr><th>Scope</th><th>Triggers review</th><th>Notes</th></tr></thead>
+              <tbody>
+                {g.scopes.map((s, i) => (
+                  <tr key={i}>
+                    <td><code>{s.scope}</code></td>
+                    <td><span className={`cp-yn cp-yn-${s.triggersReview === "unknown" ? "unknown" : s.triggersReview ? "yes" : "no"}`}>{s.triggersReview === "unknown" ? "Unknown" : s.triggersReview ? "Yes" : "No"}</span></td>
+                    <td>{s.note}<Refs ids={s.claimIds} claims={g.claims} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
 
-      {g.scopes.length > 0 && (
-        <>
-          <h2>Scopes that change your path</h2>
-          <table>
-            <thead><tr><th>Scope</th><th>Triggers review?</th><th>Notes</th></tr></thead>
-            <tbody>
-              {g.scopes.map((s, i) => (
-                <tr key={i}><td><code>{s.scope}</code></td><td>{s.triggersReview === "unknown" ? <span className="pill uncertain">unknown</span> : s.triggersReview ? <span className="pill you">yes</span> : <span className="pill tested">no</span>}</td><td>{s.note}<Refs ids={s.claimIds} claims={g.claims} /></td></tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
+        {g.blockers.length > 0 && (
+          <section>
+            <h2>When you get stuck</h2>
+            <table>
+              <thead><tr><th>What you see</th><th>Why</th><th>How to unblock</th></tr></thead>
+              <tbody>
+                {g.blockers.map((b, i) => (
+                  <tr key={i}><td><b>{b.symptom}</b></td><td>{b.cause}</td><td>{b.unblock}<Refs ids={b.claimIds} claims={g.claims} /></td></tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
 
-      {g.blockers.length > 0 && (
-        <>
-          <h2>When you get stuck</h2>
-          <table>
-            <thead><tr><th>Symptom</th><th>Why</th><th>How to unblock</th></tr></thead>
-            <tbody>
-              {g.blockers.map((b, i) => (
-                <tr key={i}><td><b>{b.symptom}</b></td><td>{b.cause}</td><td>{b.unblock}<Refs ids={b.claimIds} claims={g.claims} /></td></tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
+        {g.reviewAdditions.length > 0 && (
+          <section className="cp-col">
+            <h2>Added in human review</h2>
+            <p className="cp-quiet">Things the agent missed that a reviewer found in the provider&apos;s documentation.</p>
+            <ul>{g.reviewAdditions.map((a, i) => <li key={i}>{a.text}<Refs ids={a.claimIds} claims={g.claims} /></li>)}</ul>
+          </section>
+        )}
 
-      {g.reviewAdditions.length > 0 && (
-        <>
-          <h2>Added in human review</h2>
-          <p className="small muted">Things the agent missed that a reviewer found in the provider's documentation.</p>
-          <ul>{g.reviewAdditions.map((a, i) => <li key={i}>{a.text}<Refs ids={a.claimIds} claims={g.claims} /></li>)}</ul>
-        </>
-      )}
+        {g.gaps.length > 0 && (
+          <section className="cp-col">
+            <h2>What we couldn&apos;t determine</h2>
+            <ul>{g.gaps.map((gap, i) => <li key={i}>{gap}</li>)}</ul>
+          </section>
+        )}
 
-      {g.gaps.length > 0 && (
-        <>
-          <h2>What we couldn't determine</h2>
-          <ul>{g.gaps.map((x, i) => <li key={i}>{x}</li>)}</ul>
-        </>
-      )}
-
-      <Evidence g={g} />
+        <Evidence g={g} />
+      </div>
     </article>
   );
 }
 
 function Evidence({ g }: { g: Guide }) {
   return (
-    <>
+    <section className="cp-col">
       <h2>Evidence</h2>
-      <p className="small muted">
-        Labels are assigned by code, not the model: <b>tested</b> requires a probe or setup attempt run by us; <b>official source</b> requires the quote to appear verbatim on a fetched page on the provider's domain.
+      <p className="cp-quiet">
+        Code assigns every label, not the model. <b>Tested</b> means we ran a probe or setup attempt. <b>Official source</b> means the quote appears word for word on a fetched page on the provider&apos;s domain.
       </p>
-      <details id="evidence" className="evidence">
-        <summary>
-          Show all {g.claims.length} facts and where each came from
-        </summary>
-      <div className="panel" style={{ padding: 0, marginTop: 10 }}>
-        {g.claims.map((c) => (
-          <div key={c.id} id={c.id} className="claim">
-            <div className="row">
-              <span className="mono small muted">{c.id}</span>
-              <span className={`pill ${c.label}`} title={LABEL_HELP[c.label]}>{LABEL_TEXT[c.label]}</span>
-              <span>{c.text}</span>
+      <details id="evidence" className="cp-evidence">
+        <summary>Show all {g.claims.length} facts and where each came from</summary>
+        <div className="cp-claims">
+          {g.claims.map((c) => (
+            <div key={c.id} id={c.id} className="cp-claim">
+              <div className="cp-claim-head">
+                <span className="cp-cid">{c.id}</span>
+                <span className={`cp-label cp-label-${c.label}`} title={LABEL_HELP[c.label]}>{LABEL_TEXT[c.label]}</span>
+              </div>
+              <p>{c.text}</p>
+              {c.quote && <blockquote>&ldquo;{c.quote}&rdquo;</blockquote>}
+              {c.method && <p className="cp-quiet">{c.method}, {c.checkedAt.slice(0, 16).replace("T", " ")} UTC</p>}
+              {c.artifact && <pre>{c.artifact}</pre>}
+              {c.note && <p className="cp-quiet">{c.note}</p>}
+              {c.url && <p className="cp-url"><a href={c.url} target="_blank" rel="noreferrer">{c.url}</a></p>}
             </div>
-            {c.quote && <blockquote>“{c.quote}”</blockquote>}
-            {c.method && <div className="small muted" style={{ marginTop: 4 }}>{c.method}, {c.checkedAt.slice(0, 16).replace("T", " ")} UTC</div>}
-            {c.artifact && <pre>{c.artifact}</pre>}
-            {c.note && <div className="small muted" style={{ marginTop: 4 }}>{c.note}</div>}
-            {c.url && <div className="small" style={{ marginTop: 4, wordBreak: "break-all" }}><a href={c.url} target="_blank" rel="noreferrer">{c.url}</a></div>}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
       </details>
       <OpenEvidenceOnLink />
       {g.sourcesConsulted.length > 0 && (
-        <details style={{ marginTop: 12 }}>
-          <summary className="small muted">Pages the agent read ({g.sourcesConsulted.length})</summary>
-          <ul className="small">{g.sourcesConsulted.map((s) => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.url}</a> ({s.official ? "official" : "community"}{s.fetched ? "" : ", read from the search engine's copy"})</li>)}</ul>
+        <details className="cp-pages">
+          <summary>Pages the agent read ({g.sourcesConsulted.length})</summary>
+          <ul>{g.sourcesConsulted.map((s) => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.url}</a> ({s.official ? "official" : "community"}{s.fetched ? "" : ", read from the search engine's copy"})</li>)}</ul>
         </details>
       )}
-    </>
+    </section>
   );
 }
