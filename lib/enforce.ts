@@ -141,6 +141,8 @@ export function enforce(
     blockers: draft.blockers.map((b) => ({ ...b, claimIds: ids(b.claimIds) })),
     claims,
     gaps: draft.gaps,
+    optionalPaths: draft.optionalPaths.map((o) => ({ ...o, claimIds: ids(o.claimIds) })),
+    limits: draft.limits.map((l) => ({ ...l, claimIds: ids(l.claimIds) })),
     reviewAdditions: [],
     sourcesConsulted: ctx.sources.map((s) => ({ url: s.url, official: s.official, fetched: s.via === "fetch" })),
   };

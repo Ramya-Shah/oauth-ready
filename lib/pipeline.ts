@@ -70,7 +70,12 @@ The developer wants to know: how hard it is, active effort vs. approval waiting 
 
 Difficulty rubric: 1 instant self-serve · 2 self-serve + app config · 3 light review (<1 week) · 4 formal review (1–4 weeks) · 5 security assessment / multi-week + cost.
 Step owner: "agent" = an automated agent can do it (drafting copy, filling forms after the human is signed in, configuring redirect URIs/scopes via API, running test flows, generating a privacy-policy draft); "you" = needs the developer's identity, legal entity, payment, judgment, or signing in; "provider" = waiting on the provider.
-Phases: "dev" (create the app, credentials), "test" (connect your own/test accounts), "production" (let any customer connect: review, verification, listing).
+Phases: "dev" (create the app, credentials), "test" (connect your own/test accounts), "production" (what is REQUIRED before any customer outside your own account or workspace can connect through OAuth: e.g. app verification, publisher verification, security review, enabling public distribution).
+
+Keep three things apart; mixing them is the most common error:
+1. REQUIRED for OAuth to work for any customer: goes in production steps and in verdict.approvalWait. If customers can connect with no provider review, approvalWait is {"minDays":0,"maxDays":0} even when an optional listing review exists.
+2. OPTIONAL listings (app marketplaces, app directories, partner or certification programs, featured listings): never in approvalWait and never production steps; put them in "optionalPaths" with their own wait. If an optional listing becomes practically necessary (e.g. it lifts a rate limit), say so in "why", still keep it out of approvalWait, and name it in topBlocker if it is the main risk.
+3. LIMITS after users connect (API rate limits, caps on connected accounts or installs for unapproved apps, admin consent in the customer's org, token lifetimes): put them in "limits", not in approvalWait.
 
 Return JSON exactly in this shape:
 {
@@ -83,9 +88,11 @@ Return JSON exactly in this shape:
   "scopes": [ { "scope": string, "triggersReview": true|false|"unknown", "note": string, "claimIds": string[] } ],
   "blockers": [ { "symptom": string, "cause": string, "unblock": string, "claimIds": string[] } ],
   "claims": [ { "id": "c1", "text": string, "sourceRef": "S#" | null, "quote": string | null, "probeRef": "P#" | null, "note": string | null } ],
-  "gaps": string[] (what you could not determine from the sources)
+  "gaps": string[] (what you could not determine from the sources),
+  "optionalPaths": [ { "name": string, "wait": {"minDays": number, "maxDays": number} | "unknown", "why": string (who needs it and why), "claimIds": string[] } ],
+  "limits": [ { "limit": string, "impact": string (what it means for an AI agent product), "claimIds": string[] } ]
 }
-Aim for 7-12 concrete steps (at least 2 per phase that applies), 12-25 claims, 3-5 blockers. Every review, verification or approval queue the developer must wait on gets its own step with owner "provider". Split work an agent can do (e.g. drafting the privacy policy or listing copy, configuring redirect URIs and scopes, running the test OAuth flow) into separate "agent" steps rather than folding it into "you" steps. If approval wait for production is 0 (no review), use {"minDays":0,"maxDays":0}.
+Aim for 7-12 concrete steps (at least 2 per phase that applies), 12-25 claims, 3-5 blockers. Every REQUIRED review or verification queue gets its own production step with owner "provider"; optional listing reviews go only in optionalPaths. Split work an agent can do (e.g. drafting the privacy policy or listing copy, configuring redirect URIs and scopes, running the test OAuth flow) into separate "agent" steps rather than folding it into "you" steps. If approval wait for production is 0 (no review), use {"minDays":0,"maxDays":0}.
 
 PROBES (run by our code just now — cite with probeRef to mark a claim as tested):
 ${pr}

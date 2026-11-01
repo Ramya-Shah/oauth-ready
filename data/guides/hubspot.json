@@ -11,17 +11,17 @@
   "model": "gemini-3.5-flash-lite",
   "generatedAt": "2026-11-01T12:01:04.675Z",
   "verdict": {
-    "difficulty": 4,
+    "difficulty": 2,
     "activeEffortHours": {
-      "min": 4,
-      "max": 8
+      "min": 2,
+      "max": 5
     },
     "approvalWait": {
-      "minDays": 1,
-      "maxDays": 10
+      "minDays": 0,
+      "maxDays": 0
     },
-    "topBlocker": "Manual developer account creation and dashboard app registration with no Dynamic Client Registration or API-based provisioning.",
-    "summary": "HubSpot requires manual app creation in the developer console and a formal review process by the Ecosystem Quality team for marketplace listings, taking up to 10 business days for initial review. Once configured, standard OAuth authorization code flows handle multi-tenant token issuance and 30-minute access token rotation using long-lived refresh tokens.",
+    "topBlocker": "Unlisted public OAuth apps are capped at 25 installed accounts, so beyond a pilot you need the Marketplace listing, and that requires 3 active installs plus Ecosystem Quality review.",
+    "summary": "No HubSpot review is needed before outside customers can connect: create a Projects-based app with distribution set to marketplace, configure OAuth and sign the AUP, and up to 25 accounts can install right away (they see an unverified-app confirmation). Marketplace listing (about 10 business days initial review, up to 60 days total) and later certification are optional and only lift the 25-install cap or add trust; after install, each account gets 110 requests per 10 seconds, 30-minute access tokens and non-expiring refresh tokens.",
     "claimIds": [
       "c1",
       "c2",
@@ -33,8 +33,8 @@
     {
       "id": "st1",
       "phase": "dev",
-      "title": "Create Developer Account and App",
-      "detail": "Log in to your HubSpot developer account, navigate to Development > Projects or Apps, and create a new public app to obtain your client ID and client secret.",
+      "title": "Create a Projects-based app with the HubSpot CLI",
+      "detail": "Install HubSpot CLI v7.6.0+, run hs account auth, then hs project create (choose App, OAuth auth, distribution 'marketplace'), then hs project upload. Copy the client ID and secret from the app's Auth tab. Legacy UI app creation was disabled in May-June 2026.",
       "owner": "you",
       "minutes": 15,
       "links": [
@@ -48,8 +48,8 @@
     {
       "id": "st2",
       "phase": "dev",
-      "title": "Configure OAuth Settings and Redirect URIs",
-      "detail": "Configure your app schema or auth settings with required scopes and redirect URLs (using https in production and http://localhost for local testing).",
+      "title": "Configure scopes and redirect URLs in app-hsmeta.json",
+      "detail": "Set auth.requiredScopes / optionalScopes and auth.redirectUrls in app-hsmeta.json (https in production; http only for localhost; no IP addresses), then run hs project upload. Put non-essential scopes in optional scopes so installs don't fail on lower-tier accounts.",
       "owner": "agent",
       "minutes": 20,
       "links": [
@@ -76,8 +76,8 @@
     {
       "id": "st4",
       "phase": "test",
-      "title": "Exchange Authorization Code for Tokens",
-      "detail": "Implement a URL-form encoded POST request to exchange the temporary authorization code for an initial access token and long-lived refresh token.",
+      "title": "Exchange authorization code for tokens (v3)",
+      "detail": "POST URL-form-encoded to https://api.hubapi.com/oauth/v3/token with grant_type=authorization_code, client_id, client_secret, redirect_uri and code in the body. Access tokens expire in 30 minutes; refresh with grant_type=refresh_token.",
       "owner": "agent",
       "minutes": 45,
       "links": [
@@ -105,8 +105,8 @@
     {
       "id": "st6",
       "phase": "production",
-      "title": "Sign Acceptable Use Policy and Begin Publishing",
-      "detail": "Navigate to the distribution settings of your app and sign the Acceptable Use Policy (AUP) to unlock publishing and review submission.",
+      "title": "Sign the AUP to allow installs in customer accounts",
+      "detail": "In Development > Projects > your app > Distribution, sign the Acceptable Use Policy. The app can then be installed by up to 25 non-test accounts with no HubSpot review; users see an unverified-app confirmation step.",
       "owner": "you",
       "minutes": 15,
       "links": [
@@ -119,7 +119,7 @@
     {
       "id": "st7",
       "phase": "production",
-      "title": "Submit Marketplace Listing and Documentation",
+      "title": "(Optional) Submit Marketplace Listing and Documentation",
       "detail": "Complete your marketplace listing details, pricing information, setup documentation links, Terms of Service, and Privacy Policy URLs.",
       "owner": "agent",
       "minutes": 60,
@@ -134,7 +134,7 @@
     {
       "id": "st8",
       "phase": "production",
-      "title": "Ecosystem Quality Team Review",
+      "title": "(Optional) Ecosystem Quality Team Review",
       "detail": "Wait for the HubSpot Ecosystem Quality team to review your app listing and compliance criteria, which takes up to 10 business days for initial review.",
       "owner": "provider",
       "minutes": 0,
@@ -237,11 +237,12 @@
   "claims": [
     {
       "id": "c1",
-      "text": "There is no API to create an app. None. If you want a public app, you go to your Developer Account, click into Apps, click Create app, and HubSpot hands you a client_id and a client_secret.",
-      "label": "community",
-      "url": "https://apievangelist.com/2026/08/25/hubspot-oauth-but-create-the-app-by-hand",
-      "quote": "There is no API to create an app. None. If you want a public app, you go to your Developer Account, click into Apps, click Create app, and HubSpot hands you a client_id and a client_secret",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "text": "Creating legacy public apps in the UI was turned off on May 26, 2026 (new accounts) and June 23, 2026 (existing accounts). New apps are Projects created with the HubSpot CLI (hs project create / hs project upload). That is scriptable, but there is still no Dynamic Client Registration",
+      "label": "sourced",
+      "url": "https://developers.hubspot.com/changelog/legacy-public-app-creation-sunset",
+      "quote": "Legacy public app creation is disabled as of June 23, 2026.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Apps are created by hand in the developer dashboard (Apps > Create app)"
     },
     {
       "id": "c2",
@@ -249,7 +250,8 @@
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
       "quote": "Create a new app . After creating the app, you’ll be able to find the app’s client ID and client secret on the Auth page of your app settings",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c3",
@@ -257,7 +259,8 @@
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
       "quote": "You can update these URLs by updating the redirectUrls field in your app’s top-level app-hsmeta.json file , then running hs project upload",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c4",
@@ -273,7 +276,8 @@
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide",
       "quote": "After your app receives an authorization code from the OAuth 2.0 server, it can exchange that code for an access and refresh token by sending a URL-form encoded POST request to https://api.hubapi.com/oauth/v3/token",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c6",
@@ -281,7 +285,8 @@
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide",
       "quote": "You must be a Super Admin to install an app in a HubSpot account.",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c7",
@@ -297,7 +302,8 @@
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
       "quote": "Review and sign the Acceptable Use Policy (AUP). Until the AUP is signed, you won’t be able to install your app in accounts other than developer test accounts.",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c9",
@@ -309,35 +315,39 @@
     },
     {
       "id": "c10",
-      "text": "URLs for your app’s Terms of Service and Privacy Policy must be live and up-to-date.",
+      "text": "Live ToS and Privacy Policy URLs are a listing requirement (optional path). They are not needed for unlisted OAuth installs",
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
-      "quote": "URLs for your app’s Terms of Service and Privacy Policy must be live and up-to-date.",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "quote": "URLs for your app's Terms of Service and Privacy Policy must be live and up-to-date.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Privacy policy listed as a production requirement"
     },
     {
       "id": "c11",
-      "text": "Once you submit your listing, the HubSpot Ecosystem Quality team will complete an initial review within 10 business days.",
+      "text": "Confirmed as 10 business days for the initial review, but only for the optional Marketplace listing. The full feedback cycle can take up to 60 days, the app needs at least 3 active installs first, and only one app can be under review at a time",
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
-      "quote": "Once you submit your listing, the HubSpot Ecosystem Quality team will complete an initial review within 10 business days.",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "quote": "your app must have at least three active, unique installs",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Presented as a required production step and the source of approvalWait"
     },
     {
       "id": "c12",
-      "text": "Before you can start using OAuth with HubSpot, you’ll need to have: A developer account, An app associated with your developer account",
+      "text": "Still true, but on the current platform the app is a Project created with HubSpot CLI v7.6.0 or later (hs project create), and distribution is set on the Distribution tab",
       "label": "sourced",
-      "url": "https://developers.hubspot.com/docs/apps/legacy-apps/authentication/oauth-quickstart-guide",
-      "quote": "Before you can start using OAuth with HubSpot, you’ll need to have: \n\nA developer account \nAn app associated with your developer account",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/create-an-app",
+      "quote": "Make sure you're using v7.6.0 of the HubSpot CLI before proceeding.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Cited from legacy-apps quickstart"
     },
     {
       "id": "c13",
-      "text": "Terms: you must review and agree to the terms in HubSpot’s Technology Partner Program Agreement.",
+      "text": "The Partner Program Agreement is a Marketplace listing requirement only. The AUP is what unlocks installs in other accounts",
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
-      "quote": "Terms: you must review and agree to the terms in HubSpot’s Technology Partner Program Agreement .",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "quote": "you must review and agree to the terms in HubSpot's Technology Partner Program Agreement",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Partner Program Agreement listed as a production requirement for OAuth"
     },
     {
       "id": "c14",
@@ -345,7 +355,8 @@
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
       "quote": "Users installing apps in their HubSpot account must either be a Super Admin or have HubSpot Marketplace Access permissions.",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c15",
@@ -353,7 +364,8 @@
       "label": "sourced",
       "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/overview",
       "quote": "For example, if your app required access to create contacts, you’d need to include the crm.objects.contacts.write .",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c16",
@@ -361,7 +373,8 @@
       "label": "community",
       "url": "https://apievangelist.com/2026/08/25/hubspot-oauth-but-create-the-app-by-hand",
       "quote": "Minimal default scope. `oauth` is implied; override with --scope for real apps.",
-      "checkedAt": "2026-11-01T12:01:04.675Z"
+      "checkedAt": "2026-11-01T12:01:04.675Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c17",
@@ -378,7 +391,8 @@
       "url": "https://api.hubspot.com/.well-known/oauth-authorization-server",
       "method": "Fetched OAuth discovery document",
       "artifact": "GET https://api.hubspot.com/.well-known/oauth-authorization-server → HTTP 200\n{\n \"issuer\": \"https://mcp.hubspot.com\",\n \"authorization_endpoint\": \"https://mcp.hubspot.com/oauth/authorize/user\",\n \"token_endpoint\": \"https://mcp.hubspot.com/oauth/v3/token\",\n \"scopes_supported\": [],\n \"code_challenge_methods_supported\": [\n  \"S256\"\n ],\n \"grant_types_supported\": [\n  \"authorization_code\",\n  \"refresh_token\",\n  \"client_credentials\",\n  \"urn:ietf:params:oauth:grant-type:jwt-bearer\"\n ]\n}",
-      "checkedAt": "2026-11-01T12:16:04.813Z"
+      "checkedAt": "2026-11-01T12:16:04.813Z",
+      "note": "Not verifiable from an official source in review round 2, 2026-11-01."
     },
     {
       "id": "t2",
@@ -388,6 +402,151 @@
       "method": "Sent authorization request with an unknown client_id",
       "artifact": "GET https://mcp.hubspot.com/oauth/authorize/user?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 200\nBody excerpt: HubSpot OAuth",
       "checkedAt": "2026-11-01T12:16:06.643Z"
+    },
+    {
+      "id": "o1",
+      "text": "HubSpot App Marketplace listing: Any AI agent product expecting more than 25 customer accounts needs it to remove the install cap and the unverified-app warning. It requires 3 active installs, a setup guide, ToS/privacy URLs and the Partner Program Agreement. The wait is 10 business days (about 14 calendar days) for initial review and up to 60 days for the full feedback cycle.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
+      "label": "sourced",
+      "quote": "will complete an initial review within 10 business days"
+    },
+    {
+      "id": "o2",
+      "text": "HubSpot Certified App: Only for vendors wanting a badge and more Marketplace visibility; not needed for OAuth or scale. It requires 6 months listed and 60 active unaffiliated installs, then about 10 business days for the response and up to 60 days of feedback.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/apply-for-certification/certification-requirements",
+      "label": "sourced",
+      "quote": "must be listed in the HubSpot Marketplace for at least six months"
+    },
+    {
+      "id": "o3",
+      "text": "Verified domain: Optional for unlisted apps: it shows your domain on the install screen instead of an 'unverified' banner, which builds trust during the 25-install phase. A DNS TXT record usually verifies within an hour, up to 48 hours.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
+      "label": "sourced",
+      "quote": "up to 48 hours for the new DNS information to propagate"
+    },
+    {
+      "id": "l1",
+      "text": "Unlisted marketplace-distributed OAuth apps: max 25 installed accounts (developer test accounts excluded); privately distributed apps: 10 allowlisted accounts: An AI agent product can launch to 25 customer HubSpot accounts without review, but needs the Marketplace listing to grow beyond that, so a listing is practically required at scale.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
+      "label": "sourced",
+      "quote": "can be installed in up to 25 accounts (not including developer test accounts)"
+    },
+    {
+      "id": "l2",
+      "text": "API rate limit for publicly distributed OAuth apps: 110 requests per 10 seconds per installing account (CRM Search API excluded and limited separately); the limit-increase add-on does not apply: Agent tool calls must be throttled per customer account, and bursty multi-step agent runs can hit 429s.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/developer-tooling/platform/usage-guidelines",
+      "label": "sourced",
+      "quote": "each HubSpot account that installs your app is limited to 110 requests every 10 seconds"
+    },
+    {
+      "id": "l3",
+      "text": "Access tokens last 30 minutes; refresh tokens do not currently expire unless the app is uninstalled or the token is revoked: The agent backend must refresh tokens about every 30 minutes and store refresh tokens securely per tenant.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/blog/oauth-token-management-hubspot-integrations",
+      "label": "sourced",
+      "quote": "The access token is good for 30 minutes"
+    },
+    {
+      "id": "l4",
+      "text": "Required scopes block install if the account's tier lacks the feature; many scopes are tier-gated (for example custom objects and sensitive data scopes are Enterprise only): Put non-essential scopes in optional_scope so customers on lower tiers can still connect the agent.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/scopes",
+      "label": "sourced",
+      "quote": "must be authorized by the user only if they're present"
+    },
+    {
+      "id": "l5",
+      "text": "Installer must be a Super Admin or have Marketplace Access permission: Ordinary end users at a customer often cannot connect the agent themselves and need an admin to install it.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
+      "label": "sourced",
+      "quote": "must either be a Super Admin or have HubSpot Marketplace Access permissions"
+    },
+    {
+      "id": "l6",
+      "text": "Marketplace-listed apps must keep the API error rate under 5% for certification: Only matters if you pursue certification; noisy agent retries count against it.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/developer-tooling/platform/usage-guidelines",
+      "label": "sourced",
+      "quote": "must stay under this 5% limit to be certified"
+    },
+    {
+      "id": "m1",
+      "text": "Unlisted marketplace OAuth apps are capped at 25 installed accounts until listed; privately distributed apps at 10 allowlisted accounts.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/manage-apps-in-hubspot",
+      "label": "sourced"
+    },
+    {
+      "id": "m2",
+      "text": "Listing requires at least three active, unique installs before submission, and only one app can be under review at a time.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements",
+      "label": "sourced"
+    },
+    {
+      "id": "m3",
+      "text": "Legacy public app creation in the UI was disabled May 26, 2026 (new accounts) and June 23, 2026 (existing accounts); new apps must use CLI/Projects.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/changelog/legacy-public-app-creation-sunset",
+      "label": "sourced"
+    },
+    {
+      "id": "m4",
+      "text": "Rate limit for public OAuth apps is 110 requests per 10 seconds per installing account.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/developer-tooling/platform/usage-guidelines",
+      "label": "sourced"
+    },
+    {
+      "id": "m5",
+      "text": "Unlisted/unverified app installs show an extra user confirmation step; a verified domain (DNS TXT) reduces the warning.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/changelog/new-confirmation-step-for-unverified-third-party-app-installs",
+      "label": "sourced"
+    },
+    {
+      "id": "m6",
+      "text": "Refresh tokens currently do not expire unless the app is uninstalled or the token is revoked; v1 OAuth endpoints are deprecated (v3 recommended).",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/blog/oauth-token-management-hubspot-integrations",
+      "label": "sourced"
+    },
+    {
+      "id": "m7",
+      "text": "OAuth v1 API retires February 16, 2027.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/api-reference/legacy/authentication/oauth-tokens/v1/guide",
+      "label": "sourced"
+    },
+    {
+      "id": "m8",
+      "text": "Redirect URLs cannot be IP addresses; a domain is required.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/working-with-oauth",
+      "label": "sourced"
     }
   ],
   "gaps": [
@@ -449,5 +608,136 @@
       "official": false,
       "fetched": true
     }
-  ]
+  ],
+  "reviewNote": "The guide treated the optional Marketplace listing review as the approval wait. HubSpot docs show OAuth installs work without review once the AUP is signed, capped at 25 accounts. App creation also moved from the dashboard to the CLI/Projects model in May-June 2026.",
+  "optionalPaths": [
+    {
+      "name": "HubSpot App Marketplace listing",
+      "wait": {
+        "minDays": 10,
+        "maxDays": 60
+      },
+      "why": "Any AI agent product expecting more than 25 customer accounts needs it to remove the install cap and the unverified-app warning. It requires 3 active installs, a setup guide, ToS/privacy URLs and the Partner Program Agreement. The wait is 10 business days (about 14 calendar days) for initial review and up to 60 days for the full feedback cycle.",
+      "claimIds": [
+        "o1"
+      ]
+    },
+    {
+      "name": "HubSpot Certified App",
+      "wait": {
+        "minDays": 180,
+        "maxDays": 240
+      },
+      "why": "Only for vendors wanting a badge and more Marketplace visibility; not needed for OAuth or scale. It requires 6 months listed and 60 active unaffiliated installs, then about 10 business days for the response and up to 60 days of feedback.",
+      "claimIds": [
+        "o2"
+      ]
+    },
+    {
+      "name": "Verified domain",
+      "wait": {
+        "minDays": 0,
+        "maxDays": 2
+      },
+      "why": "Optional for unlisted apps: it shows your domain on the install screen instead of an 'unverified' banner, which builds trust during the 25-install phase. A DNS TXT record usually verifies within an hour, up to 48 hours.",
+      "claimIds": [
+        "o3"
+      ]
+    }
+  ],
+  "limits": [
+    {
+      "limit": "Unlisted marketplace-distributed OAuth apps: max 25 installed accounts (developer test accounts excluded); privately distributed apps: 10 allowlisted accounts",
+      "impact": "An AI agent product can launch to 25 customer HubSpot accounts without review, but needs the Marketplace listing to grow beyond that, so a listing is practically required at scale.",
+      "claimIds": [
+        "l1"
+      ]
+    },
+    {
+      "limit": "API rate limit for publicly distributed OAuth apps: 110 requests per 10 seconds per installing account (CRM Search API excluded and limited separately); the limit-increase add-on does not apply",
+      "impact": "Agent tool calls must be throttled per customer account, and bursty multi-step agent runs can hit 429s.",
+      "claimIds": [
+        "l2"
+      ]
+    },
+    {
+      "limit": "Access tokens last 30 minutes; refresh tokens do not currently expire unless the app is uninstalled or the token is revoked",
+      "impact": "The agent backend must refresh tokens about every 30 minutes and store refresh tokens securely per tenant.",
+      "claimIds": [
+        "l3"
+      ]
+    },
+    {
+      "limit": "Required scopes block install if the account's tier lacks the feature; many scopes are tier-gated (for example custom objects and sensitive data scopes are Enterprise only)",
+      "impact": "Put non-essential scopes in optional_scope so customers on lower tiers can still connect the agent.",
+      "claimIds": [
+        "l4"
+      ]
+    },
+    {
+      "limit": "Installer must be a Super Admin or have Marketplace Access permission",
+      "impact": "Ordinary end users at a customer often cannot connect the agent themselves and need an admin to install it.",
+      "claimIds": [
+        "l5"
+      ]
+    },
+    {
+      "limit": "Marketplace-listed apps must keep the API error rate under 5% for certification",
+      "impact": "Only matters if you pursue certification; noisy agent retries count against it.",
+      "claimIds": [
+        "l6"
+      ]
+    }
+  ],
+  "reviewAdditions": [
+    {
+      "text": "Unlisted marketplace OAuth apps are capped at 25 installed accounts until listed; privately distributed apps at 10 allowlisted accounts.",
+      "claimIds": [
+        "m1"
+      ]
+    },
+    {
+      "text": "Listing requires at least three active, unique installs before submission, and only one app can be under review at a time.",
+      "claimIds": [
+        "m2"
+      ]
+    },
+    {
+      "text": "Legacy public app creation in the UI was disabled May 26, 2026 (new accounts) and June 23, 2026 (existing accounts); new apps must use CLI/Projects.",
+      "claimIds": [
+        "m3"
+      ]
+    },
+    {
+      "text": "Rate limit for public OAuth apps is 110 requests per 10 seconds per installing account.",
+      "claimIds": [
+        "m4"
+      ]
+    },
+    {
+      "text": "Unlisted/unverified app installs show an extra user confirmation step; a verified domain (DNS TXT) reduces the warning.",
+      "claimIds": [
+        "m5"
+      ]
+    },
+    {
+      "text": "Refresh tokens currently do not expire unless the app is uninstalled or the token is revoked; v1 OAuth endpoints are deprecated (v3 recommended).",
+      "claimIds": [
+        "m6"
+      ]
+    },
+    {
+      "text": "OAuth v1 API retires February 16, 2027.",
+      "claimIds": [
+        "m7"
+      ]
+    },
+    {
+      "text": "Redirect URLs cannot be IP addresses; a domain is required.",
+      "claimIds": [
+        "m8"
+      ]
+    }
+  ],
+  "reviewedAt": "2026-11-01"
 }

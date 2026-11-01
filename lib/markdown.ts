@@ -18,6 +18,14 @@ export function toMarkdown(g: Guide, url?: string): string {
     out.push(`\n## ${{ dev: "1. Create the app", test: "2. Test with your own account", production: "3. Go to production" }[phase]}`);
     steps.forEach((s) => out.push(`- [ ] **${s.title}** _(${s.owner === "agent" ? "agent can do" : s.owner === "you" ? "you" : "provider"}${s.minutes ? `, ~${s.minutes} min` : ""})_ — ${s.detail}${refs(s.claimIds)}${s.links.length ? `\n  ${s.links.join(" ")}` : ""}`));
   }
+  if (g.optionalPaths.length) {
+    out.push(`\n## Optional listings (not needed for users to connect)`);
+    g.optionalPaths.forEach((o) => out.push(`- **${o.name}** (wait: ${formatWait(o.wait)}): ${o.why}${refs(o.claimIds)}`));
+  }
+  if (g.limits.length) {
+    out.push(`\n## Limits after users connect`);
+    g.limits.forEach((l) => out.push(`- **${l.limit}**: ${l.impact}${refs(l.claimIds)}`));
+  }
   if (g.requirements.length) {
     out.push(`\n## Requirements`);
     g.requirements.forEach((r) => out.push(`- **${r.kind.replace(/_/g, " ")}** (for ${r.requiredFor}): ${r.note}${refs(r.claimIds)}`));

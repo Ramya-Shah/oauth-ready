@@ -12,17 +12,17 @@
   "model": "gemini-3.6-flash",
   "generatedAt": "2026-11-01T11:41:11.645Z",
   "verdict": {
-    "difficulty": 4,
+    "difficulty": 2,
     "activeEffortHours": {
-      "min": 4,
-      "max": 24
+      "min": 2,
+      "max": 8
     },
     "approvalWait": {
       "minDays": 0,
-      "maxDays": 84
+      "maxDays": 0
     },
-    "topBlocker": "Unlisted apps can read message history only once a minute, so message-reading agents effectively need Marketplace approval (10+ active workspaces, then up to ~12 weeks of review).",
-    "summary": "Two paths. Letting other workspaces install your app needs no Slack review: you activate public distribution and use HTTPS redirect URLs (0 days of waiting). But since 29 May 2025, unlisted commercial apps are limited to 1 request/min on conversations.history and conversations.replies, so an agent that reads messages realistically needs Marketplace approval: 10+ active workspaces first, then up to 10 business days of preliminary review and up to 10 weeks of functional review.",
+    "topBlocker": "Unlisted (non-Marketplace) apps get only 1 request/min and 15 messages per call on conversations.history and conversations.replies for new installs, so an agent that reads message history needs Marketplace approval (10+ active workspaces, then up to about 12 weeks of review) or an events-based design.",
+    "summary": "No Slack approval is required: once you activate public distribution with HTTPS URLs, any workspace can install the app through OAuth, but a customer's admin may require app approval first. Marketplace listing is optional, with up to 10 business days of preliminary review plus up to 10 weeks of functional review after 10+ active workspaces. In practice a history-reading agent needs it, because unlisted apps get Tier 1 limits (1 req/min, 15 objects) on conversations.history and conversations.replies.",
     "claimIds": [
       "c3",
       "c4",
@@ -66,7 +66,7 @@
       "id": "st3",
       "phase": "dev",
       "title": "Implement OAuth Authorization Code Flow and State Validation",
-      "detail": "Implement the OAuth initiate endpoint with CSRF state generation and construct the authorization link pointing to https://slack.com/oauth/v2/authorize. Create the callback handler to exchange codes via oauth.v2.access.",
+      "detail": "Redirect users to https://slack.com/oauth/v2/authorize with bot scopes in scope= and user scopes in user_scope=, plus a random state. In the callback, reject a state mismatch as forgery, then exchange the code (valid 10 minutes) via oauth.v2.access, sending the same redirect_uri in both steps.",
       "owner": "agent",
       "minutes": 30,
       "links": [
@@ -96,8 +96,8 @@
     {
       "id": "st5",
       "phase": "test",
-      "title": "Run Automated OAuth Flow and Token Refresh Verification",
-      "detail": "Run test authorization flows to confirm state verification, access token exchange, and refresh token rotation logic.",
+      "title": "Test OAuth flow and token handling",
+      "detail": "Test state verification, the code exchange, and multi-workspace token storage. If you opt in to token rotation (irreversible), also test the 12-hour expiry and single-use refresh token handling.",
       "owner": "agent",
       "minutes": 15,
       "links": [
@@ -111,7 +111,7 @@
     {
       "id": "st6",
       "phase": "test",
-      "title": "(Marketplace path) Reach 10+ active workspaces",
+      "title": "(Optional) Reach 10+ active workspaces",
       "detail": "Marketplace submission requires the app to be installed and active on at least 10 workspaces within the last 28 days. Slack doesn't say whether your own test workspaces count; real customer installs are the safe assumption.",
       "owner": "you",
       "minutes": 120,
@@ -125,7 +125,7 @@
     {
       "id": "st7",
       "phase": "production",
-      "title": "(Marketplace path) Draft Listing Information and Record Demo Video",
+      "title": "(Optional) Draft Listing Information and Record Demo Video",
       "detail": "Draft short/long app descriptions, collect support contact links, and record a walkthrough video showing installation, scope prompts, feature usage, and uninstallation.",
       "owner": "agent",
       "minutes": 60,
@@ -139,7 +139,7 @@
     {
       "id": "st8",
       "phase": "production",
-      "title": "(Marketplace path) Submit App to Slack Marketplace with Test Credentials",
+      "title": "(Optional) Submit App to Slack Marketplace with Test Credentials",
       "detail": "Open 'Submit to the Slack Marketplace' in app settings, enter app details, provide test account logins for testing, and submit for review.",
       "owner": "you",
       "minutes": 30,
@@ -153,8 +153,8 @@
     {
       "id": "st9",
       "phase": "production",
-      "title": "(Marketplace path) Wait for Slack Preliminary Review",
-      "detail": "Slack Marketplace reviewers conduct a preliminary check on listing completeness, links, and scope justifications. Resubmissions during this phase reset queue placement.",
+      "title": "(Optional, Marketplace path) Wait for Slack Preliminary Review",
+      "detail": "Up to 10 business days (about 14 calendar days). Each resubmission at this stage resets your place in the queue.",
       "owner": "provider",
       "minutes": 14400,
       "links": [
@@ -168,7 +168,7 @@
     {
       "id": "st10",
       "phase": "production",
-      "title": "(Marketplace path) Wait for Slack Functional Review",
+      "title": "(Optional) Wait for Slack Functional Review",
       "detail": "An assigned reviewer performs end-to-end testing of app features, OAuth flows, and restricted scope compliance. New submissions take up to 10 weeks.",
       "owner": "provider",
       "minutes": 100800,
@@ -182,7 +182,7 @@
     {
       "id": "st11",
       "phase": "production",
-      "title": "(Marketplace path) Publish App on Slack Marketplace",
+      "title": "(Optional) Publish App on Slack Marketplace",
       "detail": "Once approved, publish the app live on the Slack Marketplace for public customer discovery and installation.",
       "owner": "you",
       "minutes": 5,
@@ -418,7 +418,7 @@
       "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide",
       "quote": "it should include a video showing the full installation and OAuth flow",
       "checkedAt": "2026-11-01",
-      "note": "Corrected in review 2026-11-01; the agent originally said: A demo video is strongly recommended to help functional review"
+      "note": "Corrected in review 2026-11-01; the agent originally said: A demo video is strongly recommended to help functional review Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c12",
@@ -431,12 +431,12 @@
     },
     {
       "id": "c13",
-      "text": "Higher-risk scopes like message history, canvases, files, and admin trigger enhanced review.",
-      "label": "community",
-      "url": "https://workos.com/blog/oauth-app-approval-slack-microsoft-atlassian",
-      "quote": "A set of higher-risk scopes, including *:history , files:read , canvases:read , and admin.* , now triggers an enhanced review.",
-      "checkedAt": "2026-11-01T11:41:11.645Z",
-      "note": "Confirmed against primary source in review 2026-11-01."
+      "text": "label sourced (Slack Marketplace guidelines). Enhanced Marketplace review covers search:read.*, *:history, files:read, canvases:read, plus user-token groups:write, groups:write.invites, mpim:write, conversations.connect:write and admin.*. It applies only to Marketplace submissions.",
+      "label": "sourced",
+      "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements",
+      "quote": "your submission will be subject to an enhanced review",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: label community, source workos.com; list limited to 4 scopes"
     },
     {
       "id": "c14",
@@ -449,11 +449,12 @@
     },
     {
       "id": "c15",
-      "text": "The OAuth state parameter is essential for CSRF protection in production apps.",
-      "label": "community",
-      "url": "https://www.resumelens.org/blog/slack/slack-oauth-and-app-distribution",
-      "quote": "The state parameter in step one is not optional for production apps. It is a CSRF protection mechanism",
-      "checkedAt": "2026-11-01T11:41:11.645Z"
+      "text": "label sourced, Slack OAuth docs: check state and treat a mismatch as forgery",
+      "label": "sourced",
+      "url": "https://docs.slack.dev/authentication/installing-with-oauth",
+      "quote": "If it doesn't match what you sent, consider the authorization a forgery.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: label community, source resumelens.org"
     },
     {
       "id": "c16",
@@ -471,39 +472,40 @@
       "url": "https://docs.slack.dev/authentication/using-token-rotation",
       "quote": "Token rotation may not be turned off once it",
       "checkedAt": "2026-11-01",
-      "note": "Corrected in review 2026-11-01; the agent originally said: Token refresh/rotation treated as a standard part of the flow"
+      "note": "Corrected in review 2026-11-01; the agent originally said: Token refresh/rotation treated as a standard part of the flow Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c18",
-      "text": "App developers are expected to maintain support SLAs within 2 business days.",
-      "label": "community",
-      "url": "https://workos.com/blog/oauth-app-approval-slack-microsoft-atlassian",
-      "quote": "Support requests are expected to get a response within 2 business days.",
-      "checkedAt": "2026-11-01T11:41:11.645Z",
-      "note": "Confirmed against primary source in review 2026-11-01."
+      "text": "label sourced, Slack Marketplace guidelines; Marketplace apps only",
+      "label": "sourced",
+      "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements",
+      "quote": "We expect support requests to receive a response within 2 business days.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: label community, source workos.com"
     },
     {
       "id": "r1",
       "text": "Public distribution (unlisted) needs no Slack review: 'Activate Public Distribution' after the checklist; apps open to other workspaces must use SSL for redirect, interactivity, options-load and Events URLs",
       "label": "sourced",
       "url": "https://docs.slack.dev/app-management/distribution",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
     },
     {
       "id": "r2",
-      "text": "2025 rate limits for unlisted commercially distributed apps: conversations.history/replies go from Tier 3 to Tier 1 (1 req/min, limit 15). New apps from 29 May 2025, older apps' ToS from 30 Jun 2025. Internal customer-built apps exempt",
+      "text": "Applies to new unlisted apps and to new installations of existing unlisted apps since 29 May 2025. The current changelog says existing installations are not affected. Internal customer-built apps and Marketplace-approved apps are exempt.",
       "label": "sourced",
-      "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps",
-      "note": "Added in review 2026-11-01.",
-      "checkedAt": "2026-11-01"
+      "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps/",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Throttled in customer workspaces (implies all installs)",
+      "checkedAt": "2026-11-01",
+      "quote": "These rate limits will not impact existing installations of these apps."
     },
     {
       "id": "r3",
       "text": "Workspace admin app approval: workspaces can require admin approval, so users request installs and Owners/App Managers approve or restrict them. This is a per-customer wait outside Slack's control",
       "label": "sourced",
       "url": "https://slack.com/help/articles/360024269514",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
     },
     {
@@ -511,7 +513,7 @@
       "text": "Bot scopes go in the scope= parameter and user scopes in user_scope=. The authorization code expires after ten minutes",
       "label": "sourced",
       "url": "https://docs.slack.dev/authentication/installing-with-oauth",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
     },
     {
@@ -535,7 +537,7 @@
       "text": "Marketplace requires TLS 1.2+ for all traffic, and the direct-install URL must 302 to slack.com/oauth/v2/authorize",
       "label": "sourced",
       "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
     },
     {
@@ -543,7 +545,7 @@
       "text": "Disabling distribution uninstalls the app from every workspace except the original one. Once listed on the Marketplace, distribution cannot be disabled this way",
       "label": "sourced",
       "url": "https://docs.slack.dev/app-management/distribution",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
     },
     {
@@ -563,6 +565,166 @@
       "method": "Sent authorization request with an unknown client_id",
       "artifact": "GET https://slack.com/oauth/v2/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 200\nBody excerpt: ",
       "checkedAt": "2026-11-01T12:16:15.129Z"
+    },
+    {
+      "id": "o1",
+      "text": "Slack Marketplace listing: Needed by any agent that reads channel or thread history at scale, because only Marketplace-approved apps escape the Tier 1 limit on conversations.history and conversations.replies; it also gives discoverability. Slack states only maximums (10 business days preliminary plus 10 weeks functional), after the 10-active-workspace prerequisite, which has no stated duration.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide",
+      "label": "sourced",
+      "quote": "up to 10 weeks for new submissions and 6 weeks for published apps resubmitting changes"
+    },
+    {
+      "id": "o2",
+      "text": "Discovery API (security/compliance partners): Only for approved security and compliance vendors that need bulk export or are exempt from the 10-workspace Marketplace rule; not relevant to most AI agents.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://slack.com/terms-of-service/api",
+      "label": "sourced",
+      "quote": "except where expressly allowed by an additional agreement"
+    },
+    {
+      "id": "o3",
+      "text": "Real-time Search API (limited beta): Slack points to it as the alternative for third-party apps that need channel data; access is limited to select partners and general availability is not announced.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps/",
+      "label": "sourced"
+    },
+    {
+      "id": "l1",
+      "text": "Unlisted commercially distributed apps: conversations.history and conversations.replies at Tier 1 (1 request/min, max 15 objects) for new apps and new installs since 29 May 2025; internal and Marketplace apps exempt; current changelog says existing installs are not affected: A history-reading agent is effectively unusable without Marketplace approval, so the optional listing becomes practically necessary for that use case.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps/",
+      "label": "sourced",
+      "quote": "will be updated to allow 1 request per minute and will return a maximum of 15 objects per request"
+    },
+    {
+      "id": "l2",
+      "text": "Web API rate limits are per method, per workspace, per app (Tier 1 1+/min to Tier 4 100+/min); chat.postMessage about 1 message per second per channel: Agents that post heavily into one channel must queue messages; limits scale per customer workspace, not globally.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/apis/web-api/rate-limits",
+      "label": "sourced",
+      "quote": "apps may post no more than one message per second per channel"
+    },
+    {
+      "id": "l3",
+      "text": "Workspace or org admin app approval (off by default; can be set to pre-approved apps only; scope changes may need re-approval): Enterprise customers may take an unpredictable amount of time to approve the agent, and adding scopes later can force re-approval.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://slack.com/help/articles/222386767-Manage-app-approval-for-your-workspace",
+      "label": "sourced",
+      "quote": "Only allow pre-approved apps"
+    },
+    {
+      "id": "l4",
+      "text": "Token lifetime: access tokens never expire unless rotation is enabled; with rotation they last 12 hours and refresh tokens are single-use; rotation cannot be turned off: Decide on rotation before launch; if enabled, the agent must persist each new refresh token atomically or lose access.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/authentication/using-token-rotation",
+      "label": "sourced",
+      "quote": "Without token rotation, the access token never expires."
+    },
+    {
+      "id": "l5",
+      "text": "API Terms for apps used outside your org: no LLM training on API data, minimal retention, no bulk export, no persistent copies of Data Access/RTS API data: An AI agent cannot build a long-term index or training set from customer Slack data, whether or not it is listed.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://slack.com/terms-of-service/api",
+      "label": "sourced",
+      "quote": "limit your use, processing and retention of API Data from others outside your organisation to the minimum necessary"
+    },
+    {
+      "id": "l6",
+      "text": "Some AI app features (Agents & AI Apps, assistant:write) require a paid Slack plan: Customers on free workspaces may not get the agent's AI-app entry points.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/ai/developing-ai-apps",
+      "label": "sourced",
+      "quote": "Developing and using some AI features require a paid plan"
+    },
+    {
+      "id": "m1",
+      "text": "The non-Marketplace Tier 1 limit applies to new apps and new installations; the current changelog says existing installations are not affected (a community report claims they moved on 3 Mar 2026, which the official page does not reflect).",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps/",
+      "label": "sourced"
+    },
+    {
+      "id": "m2",
+      "text": "The privacy_policy, tos, demo_video and 10-workspace requirements are Marketplace-only; they are not needed for public distribution.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements",
+      "label": "sourced"
+    },
+    {
+      "id": "m3",
+      "text": "Marketplace AI rules: agent/assistant apps must not store Slack data (store metadata and fetch in real time), must not train LLMs on it, must disclose the model, retention, tenancy and residency, and must carry an inaccuracy disclaimer.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements",
+      "label": "sourced"
+    },
+    {
+      "id": "m4",
+      "text": "API Terms for any app offered outside your org forbid LLM training on API data, bulk export and persistent copies of Data Access/RTS API data, and require minimal retention.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://slack.com/terms-of-service/api",
+      "label": "sourced"
+    },
+    {
+      "id": "m5",
+      "text": "Without token rotation, Slack access tokens never expire; rotation is opt-in and irreversible.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/authentication/using-token-rotation",
+      "label": "sourced"
+    },
+    {
+      "id": "m6",
+      "text": "chat.postMessage is limited to about 1 message per second per channel, and rate limits are per method, per workspace, per app.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/apis/web-api/rate-limits",
+      "label": "sourced"
+    },
+    {
+      "id": "m7",
+      "text": "Admin app approval is off by default, but admins can allow only pre-approved apps, and added scopes may need re-approval.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://slack.com/help/articles/222386767-Manage-app-approval-for-your-workspace",
+      "label": "sourced"
+    },
+    {
+      "id": "m8",
+      "text": "Some AI app features (assistant:write, the agent entry point) require a paid Slack plan; a free Developer Program sandbox is available for development.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/ai/developing-ai-apps",
+      "label": "sourced"
+    },
+    {
+      "id": "m9",
+      "text": "Marketplace review cannot be skipped or expedited for a launch date.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide",
+      "label": "sourced"
+    },
+    {
+      "id": "m10",
+      "text": "Blocker r2 lists claimId r2 twice (data bug), and the scope note for search:read should say Slack lists it as unsuitable for Marketplace apps, not just as needing justification.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-app-guidelines-and-requirements",
+      "label": "sourced"
     }
   ],
   "gaps": [
@@ -625,7 +787,7 @@
       "fetched": true
     }
   ],
-  "reviewNote": "Review corrected the agent's verdict, which treated the Marketplace as mandatory (difficulty 4, wait 14–84 days). Public distribution needs no review. We kept difficulty 4 with a 0–84 day range because the 2025 rate limits make Marketplace approval effectively required for message-reading AI agents; apps that only post messages can stop at public distribution (difficulty 2, no wait).",
+  "reviewNote": "The earlier review put the optional Marketplace wait (0-84 days) into approvalWait and kept difficulty 4. Slack's distribution docs show that the path for third-party installs is self-serve with no review, so approvalWait is 0 and difficulty is 2. The Marketplace wait moves to optionalPaths and the rate limit to limits. activeEffortHours now covers only the required path (create the app, add the manifest and scopes, write the OAuth code and callback, activate distribution); add roughly 4-16 hours for Marketplace listing work.",
   "reviewAdditions": [
     {
       "text": "Public distribution (unlisted) needs no Slack review: 'Activate Public Distribution' after the checklist; apps open to other workspaces must use SSL for redirect, interactivity, options-load and Events URLs",
@@ -674,7 +836,140 @@
       "claimIds": [
         "r8"
       ]
+    },
+    {
+      "text": "The non-Marketplace Tier 1 limit applies to new apps and new installations; the current changelog says existing installations are not affected (a community report claims they moved on 3 Mar 2026, which the official page does not reflect).",
+      "claimIds": [
+        "m1"
+      ]
+    },
+    {
+      "text": "The privacy_policy, tos, demo_video and 10-workspace requirements are Marketplace-only; they are not needed for public distribution.",
+      "claimIds": [
+        "m2"
+      ]
+    },
+    {
+      "text": "Marketplace AI rules: agent/assistant apps must not store Slack data (store metadata and fetch in real time), must not train LLMs on it, must disclose the model, retention, tenancy and residency, and must carry an inaccuracy disclaimer.",
+      "claimIds": [
+        "m3"
+      ]
+    },
+    {
+      "text": "API Terms for any app offered outside your org forbid LLM training on API data, bulk export and persistent copies of Data Access/RTS API data, and require minimal retention.",
+      "claimIds": [
+        "m4"
+      ]
+    },
+    {
+      "text": "Without token rotation, Slack access tokens never expire; rotation is opt-in and irreversible.",
+      "claimIds": [
+        "m5"
+      ]
+    },
+    {
+      "text": "chat.postMessage is limited to about 1 message per second per channel, and rate limits are per method, per workspace, per app.",
+      "claimIds": [
+        "m6"
+      ]
+    },
+    {
+      "text": "Admin app approval is off by default, but admins can allow only pre-approved apps, and added scopes may need re-approval.",
+      "claimIds": [
+        "m7"
+      ]
+    },
+    {
+      "text": "Some AI app features (assistant:write, the agent entry point) require a paid Slack plan; a free Developer Program sandbox is available for development.",
+      "claimIds": [
+        "m8"
+      ]
+    },
+    {
+      "text": "Marketplace review cannot be skipped or expedited for a launch date.",
+      "claimIds": [
+        "m9"
+      ]
+    },
+    {
+      "text": "Blocker r2 lists claimId r2 twice (data bug), and the scope note for search:read should say Slack lists it as unsuitable for Marketplace apps, not just as needing justification.",
+      "claimIds": [
+        "m10"
+      ]
     }
   ],
-  "reviewedAt": "2026-11-01"
+  "reviewedAt": "2026-11-01",
+  "optionalPaths": [
+    {
+      "name": "Slack Marketplace listing",
+      "wait": {
+        "minDays": 0,
+        "maxDays": 84
+      },
+      "why": "Needed by any agent that reads channel or thread history at scale, because only Marketplace-approved apps escape the Tier 1 limit on conversations.history and conversations.replies; it also gives discoverability. Slack states only maximums (10 business days preliminary plus 10 weeks functional), after the 10-active-workspace prerequisite, which has no stated duration.",
+      "claimIds": [
+        "o1"
+      ]
+    },
+    {
+      "name": "Discovery API (security/compliance partners)",
+      "wait": "unknown",
+      "why": "Only for approved security and compliance vendors that need bulk export or are exempt from the 10-workspace Marketplace rule; not relevant to most AI agents.",
+      "claimIds": [
+        "o2"
+      ]
+    },
+    {
+      "name": "Real-time Search API (limited beta)",
+      "wait": "unknown",
+      "why": "Slack points to it as the alternative for third-party apps that need channel data; access is limited to select partners and general availability is not announced.",
+      "claimIds": [
+        "o3"
+      ]
+    }
+  ],
+  "limits": [
+    {
+      "limit": "Unlisted commercially distributed apps: conversations.history and conversations.replies at Tier 1 (1 request/min, max 15 objects) for new apps and new installs since 29 May 2025; internal and Marketplace apps exempt; current changelog says existing installs are not affected",
+      "impact": "A history-reading agent is effectively unusable without Marketplace approval, so the optional listing becomes practically necessary for that use case.",
+      "claimIds": [
+        "l1"
+      ]
+    },
+    {
+      "limit": "Web API rate limits are per method, per workspace, per app (Tier 1 1+/min to Tier 4 100+/min); chat.postMessage about 1 message per second per channel",
+      "impact": "Agents that post heavily into one channel must queue messages; limits scale per customer workspace, not globally.",
+      "claimIds": [
+        "l2"
+      ]
+    },
+    {
+      "limit": "Workspace or org admin app approval (off by default; can be set to pre-approved apps only; scope changes may need re-approval)",
+      "impact": "Enterprise customers may take an unpredictable amount of time to approve the agent, and adding scopes later can force re-approval.",
+      "claimIds": [
+        "l3"
+      ]
+    },
+    {
+      "limit": "Token lifetime: access tokens never expire unless rotation is enabled; with rotation they last 12 hours and refresh tokens are single-use; rotation cannot be turned off",
+      "impact": "Decide on rotation before launch; if enabled, the agent must persist each new refresh token atomically or lose access.",
+      "claimIds": [
+        "l4"
+      ]
+    },
+    {
+      "limit": "API Terms for apps used outside your org: no LLM training on API data, minimal retention, no bulk export, no persistent copies of Data Access/RTS API data",
+      "impact": "An AI agent cannot build a long-term index or training set from customer Slack data, whether or not it is listed.",
+      "claimIds": [
+        "l5"
+      ]
+    },
+    {
+      "limit": "Some AI app features (Agents & AI Apps, assistant:write) require a paid Slack plan",
+      "impact": "Customers on free workspaces may not get the agent's AI-app entry points.",
+      "claimIds": [
+        "l6"
+      ]
+    }
+  ]
 }

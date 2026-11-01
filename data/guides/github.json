@@ -21,8 +21,8 @@
       "minDays": 0,
       "maxDays": 0
     },
-    "topBlocker": "Customer organizations block third-party OAuth apps by default; an org owner must approve your app before it can reach private org data.",
-    "summary": "Registering an OAuth app is instant and self-serve, with no provider review before any GitHub user can connect. The friction is on the customer side: organizations restrict third-party OAuth apps by default, so an org owner must approve your app before it can reach the org's private repos. Marketplace listing is optional; GitHub publishes no review timeline (community reports say 2–6 weeks).",
+    "topBlocker": "Customer organizations have OAuth app access restrictions on by default, so an org owner must approve your app before the agent can reach that org's private repositories; this is customer-side, not a GitHub review.",
+    "summary": "Required wait: none; any GitHub user can authorize a registered OAuth app immediately, with no GitHub review, verification or distribution switch. Optional: Marketplace listing and publisher verification (needed only for paid plans or a badge; no official timeline). Limits: each customer org owner must approve the app for private org data, tokens share the user's 5,000 req/hour budget (15,000 for Enterprise Cloud orgs), and 10 tokens per user/app/scope.",
     "claimIds": [
       "c2",
       "c13",
@@ -77,7 +77,7 @@
       "id": "st4",
       "phase": "dev",
       "title": "Generate and Secure Client Secret",
-      "detail": "Generate a new client secret on GitHub. Store the secret securely in your backend environment variables; never embed `client_secret` in client-side code.",
+      "detail": "Generate a client secret on the app's settings page and keep it only in your backend (environment variable or secret store). Never ship it in browser or mobile code; do the code exchange server-side.",
       "owner": "you",
       "minutes": 5,
       "links": [
@@ -91,7 +91,7 @@
       "id": "st5",
       "phase": "test",
       "title": "Construct Authorization Request URL",
-      "detail": "Build the authorization redirect URL pointing to `https://github.com/login/oauth/authorize` including `client_id`, `redirect_uri`, `scope`, CSRF `state`, and PKCE parameters (`code_challenge` and `code_challenge_method=S256`).",
+      "detail": "Redirect to https://github.com/login/oauth/authorize with client_id, redirect_uri (must exactly match a registered callback unless wildcard matching is enabled), scope and an unguessable state. PKCE is optional but recommended: send code_challenge (43-char SHA-256) with code_challenge_method=S256; plain is not supported.",
       "owner": "agent",
       "minutes": 5,
       "links": [
@@ -150,7 +150,7 @@
       "id": "st9",
       "phase": "production",
       "title": "Deploy OAuth App to Production",
-      "detail": "Update your production configuration with the Client ID and backend Client Secret. End users can now connect their GitHub accounts directly without waiting for platform approval.",
+      "detail": "Put the Client ID and server-side Client Secret in production config. Any GitHub user can connect immediately with no GitHub review, but for customer organizations with OAuth app access restrictions (default on) an org owner must approve the app before the agent can reach private org repositories.",
       "owner": "you",
       "minutes": 10,
       "links": [
@@ -163,8 +163,8 @@
     {
       "id": "st10",
       "phase": "production",
-      "title": "(Optional) Complete Publisher Verification for GitHub Marketplace",
-      "detail": "If listing your app on GitHub Marketplace, transfer ownership to an organization, enable organization 2FA, verify your domain, and submit a Publisher Verification request.",
+      "title": "(Optional) Publisher Verification for paid Marketplace plans or badge",
+      "detail": "Only needed to offer paid Marketplace plans or show a Marketplace badge. Transfer the app to an organization, enable org 2FA, verify a domain, set a support email, then request verification. GitHub states no timeline.",
       "owner": "you",
       "minutes": 30,
       "links": [
@@ -296,7 +296,8 @@
       "url": "https://github.com/login/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe",
       "method": "Sent authorization request with an unknown client_id",
       "artifact": "GET https://github.com/login/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe (no redirects followed) → HTTP 302\nLocation: https://github.com/login?client_id=oauthready-probe-invalid-client&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3Doauthready-probe-invalid-client%26redirect_uri%3Dhttps%253A%252F%252Fexample.com%252Fcallback%26response_type%3Dcode%26state%3Dprobe\nBody excerpt: ",
-      "checkedAt": "2026-11-01T11:38:45.988Z"
+      "checkedAt": "2026-11-01T11:38:45.988Z",
+      "note": "Not verifiable from an official source in review round 2, 2026-11-01."
     },
     {
       "id": "c2",
@@ -304,7 +305,8 @@
       "label": "sourced",
       "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
       "quote": "You can create and register an OAuth app under your personal account or under any organization you have administrative access to.",
-      "checkedAt": "2026-11-01T11:39:35.609Z"
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c3",
@@ -386,21 +388,21 @@
     },
     {
       "id": "c12",
-      "text": "PKCE parameter code_challenge requires S256 method.",
+      "text": "PKCE is optional but recommended; if used, code_challenge_method must be S256 (plain is not supported) and code_challenge must be a 43-character SHA-256 hash",
       "label": "sourced",
       "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
-      "quote": "Used to secure the authentication flow with PKCE (Proof Key for Code Exchange). Required if code_challenge_ method is included.",
-      "checkedAt": "2026-11-01T11:39:35.609Z",
-      "note": "Confirmed against primary source in review 2026-11-01."
+      "quote": "Must be S256 - the plain code challenge method is not supported.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: PKCE parameters listed alongside required params; quote attached describes code_challenge, not the method"
     },
     {
       "id": "c13",
-      "text": "OAuth client secrets must never be embedded in front-end applications.",
+      "text": "label: community. The quote is from a community member (alukach) who accepted his own answer, not GitHub docs; the advice itself is sound",
       "label": "sourced",
       "url": "https://github.com/orgs/community/discussions/24796",
-      "quote": "So in closing, it is not okay to embed your client_secret in a frontend application .",
-      "checkedAt": "2026-11-01T11:39:35.609Z",
-      "note": "Confirmed against primary source in review 2026-11-01."
+      "quote": "it is not okay to embed your client_secret in a frontend application",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: label: sourced; sourcesConsulted marks the discussion official: true"
     },
     {
       "id": "c14",
@@ -426,7 +428,7 @@
       "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization",
       "quote": "To offer paid plans for your app or to include a marketplace badge in your app listing, you must complete the publisher verification",
       "checkedAt": "2026-11-01",
-      "note": "Corrected in review 2026-11-01; the agent originally said: If listing your app on GitHub Marketplace, transfer ownership to an organization, enable organization 2FA, verify your domain, and submit a Publisher Verification request."
+      "note": "Corrected in review 2026-11-01; the agent originally said: If listing your app on GitHub Marketplace, transfer ownership to an organization, enable organization 2FA, verify your domain, and submit a Publisher Verification request. Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c17",
@@ -434,7 +436,8 @@
       "label": "sourced",
       "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization",
       "quote": "Submit a verified domain and ensure that a \"Verified\" badge displays on your organization's profile page.",
-      "checkedAt": "2026-11-01T11:39:35.609Z"
+      "checkedAt": "2026-11-01T11:39:35.609Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c18",
@@ -452,16 +455,16 @@
       "url": "https://devactivity.com/insights/navigating-github-marketplace-app-submissions-understanding-review-timelines-and-support-a-devactivity-insight",
       "quote": "While some lucky developers report approval in as little as 3-7 days, the typical waiting period is: Community Reports: Roughly 2 to 6 weeks.",
       "checkedAt": "2026-11-01T11:39:35.609Z",
-      "note": "Not verifiable from an official source in review 2026-11-01."
+      "note": "Not verifiable from an official source in review 2026-11-01. Not verifiable from an official source in review round 2, 2026-11-01."
     },
     {
       "id": "c20",
-      "text": "OAuth app tokens are restricted to the authorizing user's 5,000 requests per hour limit.",
+      "text": "5,000/hour per user, shared with the user's PATs and every other app they authorized; 15,000/hour when the app is owned or approved by a GitHub Enterprise Cloud org the user belongs to; secondary rate limits also apply",
       "label": "sourced",
-      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
-      "quote": "OAuth tokens use the user's rate limit of 5,000 requests per hour.",
-      "checkedAt": "2026-11-01T11:39:35.609Z",
-      "note": "Confirmed against primary source in review 2026-11-01."
+      "url": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      "quote": "owned or approved by a GitHub Enterprise Cloud organization have a higher rate limit of 15,000 requests per hour",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Flat 5,000 requests/hour per user"
     },
     {
       "id": "c21",
@@ -476,7 +479,7 @@
       "text": "GitHub recommends GitHub Apps over OAuth apps (fine-grained permissions, short-lived tokens, rate limits that scale). The guide only mentions this under rate limits",
       "label": "sourced",
       "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
     },
     {
@@ -484,24 +487,26 @@
       "text": "OAuth app access restrictions are on by default for new orgs. Unapproved apps get no API access to private org resources, and members must request owner approval",
       "label": "sourced",
       "url": "https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
     },
     {
       "id": "r3",
-      "text": "Token creation is limited to ten tokens per hour per user/app/scope combination, and device flow to 50 submissions per hour per app",
+      "text": "Two separate limits: at most ten live tokens per user/app/scope (creating an 11th revokes an older one), and a rate limit of ten tokens created per hour; device flow code submission is 50/hour per app",
       "label": "sourced",
       "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
-      "note": "Added in review 2026-11-01.",
-      "checkedAt": "2026-11-01"
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Token creation is limited to ten tokens per hour per user/app/scope combination",
+      "checkedAt": "2026-11-01",
+      "quote": "There is a limit of ten tokens that are issued per user/application/scope combination"
     },
     {
       "id": "r4",
-      "text": "Paid Marketplace listings need at least 200 users for OAuth apps (100 installations for GitHub Apps), must handle purchase events, and must support monthly and annual billing",
+      "text": "should have a minimum of 200 users (guideline wording 'should', not a hard 'must'); paid also requires verified-publisher org, purchase-event handling, monthly and annual billing",
       "label": "sourced",
       "url": "https://docs.github.com/en/apps/github-marketplace/creating-apps-for-github-marketplace/requirements-for-listing-an-app",
-      "note": "Added in review 2026-11-01.",
-      "checkedAt": "2026-11-01"
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: need at least 200 users",
+      "checkedAt": "2026-11-01",
+      "quote": "OAuth apps should have a minimum of 200 users."
     },
     {
       "id": "r5",
@@ -516,8 +521,137 @@
       "text": "The device flow user code must be entered within 15 minutes, and device flow needs no client_secret",
       "label": "sourced",
       "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
-      "note": "Added in review 2026-11-01.",
+      "note": "Added in review 2026-11-01. Confirmed against primary source in review 2026-11-01.",
       "checkedAt": "2026-11-01"
+    },
+    {
+      "id": "o1",
+      "text": "GitHub Marketplace free listing (onboarding-expert review): For vendors wanting discovery inside GitHub; not needed for OAuth to work. Official docs give no timeline; a community source (devactivity.com) reports roughly 2-6 weeks.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/github-marketplace/listing-an-app-on-github-marketplace/submitting-your-listing-for-publication",
+      "label": "sourced",
+      "quote": "you can request a review by an onboarding expert"
+    },
+    {
+      "id": "o2",
+      "text": "Publisher verification for the owning organization: Only for vendors who want paid Marketplace plans or a Marketplace badge; requires org-owned app, org 2FA, verified domain and support email.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/github-marketplace/github-marketplace-overview/applying-for-publisher-verification-for-your-organization",
+      "label": "sourced",
+      "quote": "To offer paid plans for your app or to include a marketplace badge"
+    },
+    {
+      "id": "o3",
+      "text": "Paid GitHub Marketplace listing: Only for vendors billing through GitHub; needs verified publisher, purchase-event handling, monthly and annual billing, and should have 200+ users for an OAuth app.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/github-marketplace/creating-apps-for-github-marketplace/requirements-for-listing-an-app",
+      "label": "sourced",
+      "quote": "OAuth apps should have a minimum of 200 users."
+    },
+    {
+      "id": "l1",
+      "text": "Org OAuth app access restrictions (on by default for new orgs): The agent sees only public data and the user's own repos until each customer org owner grants access, so onboarding org customers needs an admin step per org; a Marketplace listing does not bypass this.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions",
+      "label": "sourced",
+      "quote": "API access to private organization resources is not available for unapproved OAuth apps."
+    },
+    {
+      "id": "l2",
+      "text": "User rate limit 5,000 requests/hour (15,000 for Enterprise Cloud orgs), shared with the user's other apps and PATs, plus secondary limits: A busy agent can exhaust a user's hourly budget and break the user's other tools; heavy workloads point toward a GitHub App, not toward a listing.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      "label": "sourced",
+      "quote": "All of these requests count towards your personal rate limit of 5,000 requests per hour."
+    },
+    {
+      "id": "l3",
+      "text": "Ten tokens per user/application/scope; ten token creations per hour: An agent that mints a fresh token per session or worker will silently revoke older tokens, so store and reuse one token per user/scope set.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "label": "sourced",
+      "quote": "There is a limit of ten tokens that are issued per user/application/scope combination"
+    },
+    {
+      "id": "l4",
+      "text": "Expiring tokens: 8-hour access token, refresh token valid 6 months without use (on by default): Long-running agents must implement refresh, and a user idle for 6 months must reconnect.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "label": "sourced",
+      "quote": "The access token expires after eight hours, and the refresh token expires after six months without use."
+    },
+    {
+      "id": "l5",
+      "text": "Device flow: 50 code submissions/hour per app; user code valid 15 minutes: Headless/CLI agent sign-ins across many users can hit the per-app hourly cap; use web flow for scale.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "label": "sourced",
+      "quote": "there is a rate limit of 50 submissions in an hour per application"
+    },
+    {
+      "id": "l6",
+      "text": "No connected-user or install cap for unlisted OAuth apps: Nothing in the docs caps users of an unlisted app, so no limit makes a Marketplace listing practically necessary for an AI agent.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "label": "sourced",
+      "quote": "A user or organization can own up to 100 OAuth apps."
+    },
+    {
+      "id": "m1",
+      "text": "Requests from apps owned or approved by a GitHub Enterprise Cloud org get 15,000 requests/hour, and the 5,000/hour user limit is shared with the user's PATs and other authorized apps.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      "label": "sourced"
+    },
+    {
+      "id": "m2",
+      "text": "Creating more than ten tokens for the same user/app/scope revokes an existing token, so per-session token minting breaks earlier sessions.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "label": "sourced"
+    },
+    {
+      "id": "m3",
+      "text": "Orgs using SAML SSO require the user to have an active SSO session so a credential authorization is attached to the token for that org; otherwise org resources are unreachable.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/using-github-apps/saml-and-github-apps",
+      "label": "sourced"
+    },
+    {
+      "id": "m4",
+      "text": "OAuth app scopes are coarse (repo grants full read/write to all public and private repos); GitHub Apps offer fine-grained, per-repository permissions and are GitHub's general recommendation.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
+      "label": "sourced"
+    },
+    {
+      "id": "m5",
+      "text": "Secondary rate limits (e.g. max 100 concurrent requests, content-creation limits) apply and can change without notice.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      "label": "sourced"
+    },
+    {
+      "id": "m6",
+      "text": "sourcesConsulted marks github.com/orgs/community discussions as official: true; they are community content.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://github.com/orgs/community/discussions/24796",
+      "label": "sourced"
     }
   ],
   "gaps": [
@@ -580,7 +714,7 @@
       "fetched": true
     }
   ],
-  "reviewNote": "Numbers check out (instant self-serve registration, no provider review). But the real blocker is org owner approval under default-on access restrictions, not client_secret handling. Also, the 2-6 week Marketplace figure in the summary comes only from a community source; official docs give no timeline.",
+  "reviewNote": "Numeric verdict confirmed (no provider gate, so 0-0 days and difficulty 2 stand). Summary reworded to keep the community 2-6 week Marketplace figure out of the verdict and to separate required wait, optional listings and post-connect limits; rate-limit claim corrected to include the 15,000/hour Enterprise Cloud tier.",
   "reviewAdditions": [
     {
       "text": "GitHub recommends GitHub Apps over OAuth apps (fine-grained permissions, short-lived tokens, rate limits that scale). The guide only mentions this under rate limits",
@@ -617,7 +751,113 @@
       "claimIds": [
         "r6"
       ]
+    },
+    {
+      "text": "Requests from apps owned or approved by a GitHub Enterprise Cloud org get 15,000 requests/hour, and the 5,000/hour user limit is shared with the user's PATs and other authorized apps.",
+      "claimIds": [
+        "m1"
+      ]
+    },
+    {
+      "text": "Creating more than ten tokens for the same user/app/scope revokes an existing token, so per-session token minting breaks earlier sessions.",
+      "claimIds": [
+        "m2"
+      ]
+    },
+    {
+      "text": "Orgs using SAML SSO require the user to have an active SSO session so a credential authorization is attached to the token for that org; otherwise org resources are unreachable.",
+      "claimIds": [
+        "m3"
+      ]
+    },
+    {
+      "text": "OAuth app scopes are coarse (repo grants full read/write to all public and private repos); GitHub Apps offer fine-grained, per-repository permissions and are GitHub's general recommendation.",
+      "claimIds": [
+        "m4"
+      ]
+    },
+    {
+      "text": "Secondary rate limits (e.g. max 100 concurrent requests, content-creation limits) apply and can change without notice.",
+      "claimIds": [
+        "m5"
+      ]
+    },
+    {
+      "text": "sourcesConsulted marks github.com/orgs/community discussions as official: true; they are community content.",
+      "claimIds": [
+        "m6"
+      ]
     }
   ],
-  "reviewedAt": "2026-11-01"
+  "reviewedAt": "2026-11-01",
+  "optionalPaths": [
+    {
+      "name": "GitHub Marketplace free listing (onboarding-expert review)",
+      "wait": "unknown",
+      "why": "For vendors wanting discovery inside GitHub; not needed for OAuth to work. Official docs give no timeline; a community source (devactivity.com) reports roughly 2-6 weeks.",
+      "claimIds": [
+        "o1"
+      ]
+    },
+    {
+      "name": "Publisher verification for the owning organization",
+      "wait": "unknown",
+      "why": "Only for vendors who want paid Marketplace plans or a Marketplace badge; requires org-owned app, org 2FA, verified domain and support email.",
+      "claimIds": [
+        "o2"
+      ]
+    },
+    {
+      "name": "Paid GitHub Marketplace listing",
+      "wait": "unknown",
+      "why": "Only for vendors billing through GitHub; needs verified publisher, purchase-event handling, monthly and annual billing, and should have 200+ users for an OAuth app.",
+      "claimIds": [
+        "o3"
+      ]
+    }
+  ],
+  "limits": [
+    {
+      "limit": "Org OAuth app access restrictions (on by default for new orgs)",
+      "impact": "The agent sees only public data and the user's own repos until each customer org owner grants access, so onboarding org customers needs an admin step per org; a Marketplace listing does not bypass this.",
+      "claimIds": [
+        "l1"
+      ]
+    },
+    {
+      "limit": "User rate limit 5,000 requests/hour (15,000 for Enterprise Cloud orgs), shared with the user's other apps and PATs, plus secondary limits",
+      "impact": "A busy agent can exhaust a user's hourly budget and break the user's other tools; heavy workloads point toward a GitHub App, not toward a listing.",
+      "claimIds": [
+        "l2"
+      ]
+    },
+    {
+      "limit": "Ten tokens per user/application/scope; ten token creations per hour",
+      "impact": "An agent that mints a fresh token per session or worker will silently revoke older tokens, so store and reuse one token per user/scope set.",
+      "claimIds": [
+        "l3"
+      ]
+    },
+    {
+      "limit": "Expiring tokens: 8-hour access token, refresh token valid 6 months without use (on by default)",
+      "impact": "Long-running agents must implement refresh, and a user idle for 6 months must reconnect.",
+      "claimIds": [
+        "l4"
+      ]
+    },
+    {
+      "limit": "Device flow: 50 code submissions/hour per app; user code valid 15 minutes",
+      "impact": "Headless/CLI agent sign-ins across many users can hit the per-app hourly cap; use web flow for scale.",
+      "claimIds": [
+        "l5"
+      ]
+    },
+    {
+      "limit": "No connected-user or install cap for unlisted OAuth apps",
+      "impact": "Nothing in the docs caps users of an unlisted app, so no limit makes a Marketplace listing practically necessary for an AI agent.",
+      "claimIds": [
+        "l6"
+      ]
+    }
+  ]
 }

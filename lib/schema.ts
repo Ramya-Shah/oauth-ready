@@ -72,6 +72,21 @@ export const Blocker = z.object({
   claimIds,
 });
 
+// Optional listings (marketplaces, directories, partner programs): not needed for users to connect via OAuth.
+export const OptionalPath = z.object({
+  name: z.string(),
+  wait: DayRange,
+  why: z.string(),
+  claimIds,
+});
+
+// Limits that apply after users connect (rate limits, connection caps, admin consent in the customer's org).
+export const Limit = z.object({
+  limit: z.string(),
+  impact: z.string(),
+  claimIds,
+});
+
 export const Verdict = z.object({
   difficulty: z.number().int().min(1).max(5),
   activeEffortHours: z.object({ min: z.number(), max: z.number() }),
@@ -100,6 +115,8 @@ export const Guide = z.object({
   blockers: z.array(Blocker),
   claims: z.array(Claim),
   gaps: z.array(z.string()).default([]),
+  optionalPaths: z.array(OptionalPath).default([]),
+  limits: z.array(Limit).default([]),
   reviewAdditions: z.array(z.object({ text: z.string(), claimIds })).default([]),
   sourcesConsulted: z
     .array(z.object({ url: z.string(), official: z.boolean(), fetched: z.boolean() }))
@@ -130,6 +147,8 @@ export const Draft = z.object({
   blockers: z.array(Blocker).default([]),
   claims: z.array(DraftClaim),
   gaps: z.array(z.string()).default([]),
+  optionalPaths: z.array(OptionalPath).default([]),
+  limits: z.array(Limit).default([]),
 });
 export type Draft = z.infer<typeof Draft>;
 

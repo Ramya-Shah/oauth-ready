@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 type Entry = {
   guide: string; claimId?: string; claim: string; method: string;
-  outcome: "confirmed" | "corrected" | "unverifiable"; before?: string; after?: string; evidence: string; checkedAt: string;
+  outcome: "confirmed" | "corrected" | "unverifiable"; before?: string; after?: string; evidence: string; checkedAt: string; round?: number;
 };
 type Log = { summary: string; method: string; lessons?: string[]; entries: Entry[] };
 
@@ -46,7 +46,7 @@ export default async function Verification() {
             <tbody>
               {log.entries.filter((e) => e.guide === gname).map((e, i) => (
                 <tr key={i}>
-                  <td>{e.claimId && <span className="mono small muted">{e.claimId} </span>}{e.claim}<div className="small muted">{e.method}</div></td>
+                  <td>{e.claimId && <span className="mono small muted">{e.claimId} </span>}{e.claim}<div className="small muted">{e.round === 2 ? "Second review: " : ""}{e.method}</div></td>
                   <td><span className={`pill ${OUT[e.outcome]}`}>{e.outcome}</span></td>
                   <td>
                     {e.before && <div className="small"><b>Before:</b> {e.before}</div>}

@@ -37,7 +37,7 @@ describe("evidence enforcement", () => {
   const base = { name: "GitHub", aliases: [], supportsOAuth: true as const,
     verdict: { difficulty: 1, activeEffortHours: { min: 0.5, max: 1 }, approvalWait: { minDays: 0, maxDays: 0 }, topBlocker: "x", summary: "y", claimIds: ["c1", "ghost"] },
     steps: [{ id: "s1", phase: "dev" as const, title: "t", detail: "d", owner: "you" as const, links: ["https://docs.github.com/a", "https://evil.example/phish"], claimIds: ["c2"] }],
-    requirements: [], scopes: [], blockers: [], gaps: [] };
+    requirements: [], scopes: [], blockers: [], gaps: [], optionalPaths: [], limits: [] };
   const draft: Draft = { ...base, claims: [
     { id: "c1", text: "Endpoint live", probeRef: "P1" },
     { id: "c2", text: "No review", sourceRef: "S1", quote: "OAuth apps can be created by any user without review" },

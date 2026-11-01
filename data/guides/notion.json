@@ -12,17 +12,17 @@
   "model": "gemini-3.5-flash-lite",
   "generatedAt": "2026-11-01T12:06:09.778Z",
   "verdict": {
-    "difficulty": 3,
+    "difficulty": 2,
     "activeEffortHours": {
       "min": 2,
-      "max": 6
+      "max": 4
     },
     "approvalWait": {
-      "minDays": 1,
-      "maxDays": 7
+      "minDays": 0,
+      "maxDays": 0
     },
-    "topBlocker": "Public connections must undergo a Notion security review before being listed on the Marketplace.",
-    "summary": "Registering an OAuth app with Notion requires setting up a public connection in the Developer portal, implementing the OAuth 2.0 authorization code grant flow, and submitting for marketplace review if listing publicly.",
+    "topBlocker": "Installation scope (Any workspace vs Selected workspaces only) is fixed at creation, so picking the wrong one means recreating the connection and re-issuing credentials.",
+    "summary": "A public connection with Any workspace scope works over OAuth for any Notion user immediately with no required review. Marketplace listing (5-10 business days, security review) is optional; after install, the agent only sees pages each user shares, Enterprise admins can block or allowlist connections, and rate limits are about 3 requests/second.",
     "claimIds": [
       "c1",
       "c2",
@@ -34,8 +34,8 @@
     {
       "id": "st1",
       "phase": "dev",
-      "title": "Create a new public connection in the Developer portal",
-      "detail": "Navigate to the Developer portal and create a new public connection, choosing your installation scope (Any workspace or Selected workspaces only).",
+      "title": "Create a public connection with 'Any workspace' scope",
+      "detail": "In https://app.notion.com/developers/connections create a public connection; set name, development workspace, redirect URI(s), capabilities and installation scope. Choose 'Any workspace' for a multi-customer product: scope cannot be changed later.",
       "owner": "you",
       "minutes": 15,
       "links": [
@@ -49,8 +49,8 @@
     {
       "id": "st2",
       "phase": "dev",
-      "title": "Configure OAuth redirect URIs and scopes",
-      "detail": "Fill out connection details including your redirect URI(s) under the OAuth configuration section. This cannot be changed after creation.",
+      "title": "Configure redirect URIs and capabilities",
+      "detail": "Add redirect URI(s) and choose capabilities (read/update/insert content, user info). Notion has no OAuth scopes beyond these capabilities. Copy client ID/secret from the Configuration tab.",
       "owner": "agent",
       "minutes": 15,
       "links": [
@@ -64,7 +64,7 @@
     {
       "id": "st3",
       "phase": "dev",
-      "title": "Draft privacy policy and terms of service",
+      "title": "(Optional) Draft privacy policy and terms of service",
       "detail": "Prepare standard legal compliance documents required for public application distribution.",
       "owner": "agent",
       "minutes": 30,
@@ -76,8 +76,8 @@
     {
       "id": "st4",
       "phase": "test",
-      "title": "Implement OAuth authorization code flow and page picker",
-      "detail": "Construct the authorization URL pointing to https://api.notion.com/v1/oauth/authorize with client_id, redirect_uri, and response_type=code.",
+      "title": "Implement OAuth authorization request and page picker",
+      "detail": "Send users to https://api.notion.com/v1/oauth/authorize?client_id=...&redirect_uri=...&response_type=code&owner=user&state=...; users pick pages to share.",
       "owner": "agent",
       "minutes": 60,
       "links": [
@@ -91,8 +91,8 @@
     {
       "id": "st5",
       "phase": "test",
-      "title": "Exchange temporary authorization code for an access token",
-      "detail": "Make a POST request to exchange the temporary code returned by Notion for an access token and store it securely.",
+      "title": "Exchange code for tokens and handle refresh",
+      "detail": "POST https://api.notion.com/v1/oauth/token with Basic auth base64(client_id:client_secret), grant_type=authorization_code, code, redirect_uri. Store access_token and refresh_token; refresh with grant_type=refresh_token and save the new refresh token.",
       "owner": "agent",
       "minutes": 45,
       "links": [
@@ -106,7 +106,7 @@
     {
       "id": "st6",
       "phase": "production",
-      "title": "Submit public connection for security review and marketplace listing",
+      "title": "(Optional) Submit public connection for security review and marketplace listing",
       "detail": "Manage marketplace listing details via the Listings section and submit the public connection for Notion security review.",
       "owner": "you",
       "minutes": 30,
@@ -121,7 +121,7 @@
     {
       "id": "st7",
       "phase": "production",
-      "title": "Await Notion marketplace and security review",
+      "title": "(Optional) Await Notion marketplace and security review",
       "detail": "Wait for Notion's team to complete the security review and approve the public application for the Marketplace.",
       "owner": "provider",
       "minutes": 0,
@@ -205,7 +205,8 @@
       "url": "https://api.notion.com/v1/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid",
       "method": "Sent authorization request with an unknown client_id",
       "artifact": "GET https://api.notion.com/v1/oauth/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 302\nLocation: https://app.notion.com/install-integration?response_type=code&client_id=oauthready-probe-invalid-client&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe\nExcerpt: Redirecting to https://app",
-      "checkedAt": "2026-11-01T12:01:20.554Z"
+      "checkedAt": "2026-11-01T12:01:20.554Z",
+      "note": "Not verifiable from an official source in review round 2, 2026-11-01."
     },
     {
       "id": "c2",
@@ -213,7 +214,8 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "public connections follow the OAuth 2.0 protocol to authorize a connection to interact with a workspace.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c3",
@@ -221,7 +223,8 @@
       "label": "sourced",
       "url": "https://developers.notion.com/guides/get-started/overview",
       "quote": "Public connections must undergo a Notion security review before being listed on the Marketplace.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c4",
@@ -229,15 +232,17 @@
       "label": "sourced",
       "url": "https://developers.notion.com/guides/get-started/overview",
       "quote": "You can create and use a public connection without listing it.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c5",
-      "text": "Navigate to the Developer portal and create a new public connection.",
+      "text": "Any Notion account works; you pick a development workspace when creating the connection (no separate developer account)",
       "label": "sourced",
-      "url": "https://developers.notion.com/docs/authorization",
-      "quote": "Navigate to the Developer portal and create a new public connection.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "url": "https://developers.notion.com/guides/get-started/public-connections.md",
+      "quote": "Connection name and development workspace",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: A Notion developer account is required"
     },
     {
       "id": "c6",
@@ -245,15 +250,17 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "A public connection can be installed in any Notion workspace within its installation scope — either any workspace, or a specific set chosen at creation time.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c7",
-      "text": "Fill out the form with your connection details, including your redirect URI(s) under the OAuth configuration section and the connection’s installation scope — either Any workspace or Selected workspaces only . This can’t be changed after creation.",
+      "text": "It is the installation scope that cannot be changed after creation; docs say nothing about redirect URIs being locked",
       "label": "sourced",
-      "url": "https://developers.notion.com/docs/authorization",
-      "quote": "Fill out the form with your connection details, including your redirect URI(s) under the OAuth configuration section and the connection’s installation scope — either Any workspace or Selected workspaces only . This can’t be changed after creation.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "url": "https://developers.notion.com/guides/get-started/public-connections.md",
+      "quote": "Installation scope is set once, at creation time, and can't be changed afterward.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Redirect URI cannot be changed after creation"
     },
     {
       "id": "c8",
@@ -265,18 +272,21 @@
     },
     {
       "id": "c9",
-      "text": "Privacy policy and terms of service requirements for public app distribution.",
-      "label": "uncertain",
-      "note": "Standard industry requirement for public OAuth integrations not explicitly detailed in API docs. No source cited by the agent.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "text": "Not listed as required for creating a public connection or for a listing; required fields are name, development workspace, redirect URIs, installation scope, capabilities",
+      "label": "sourced",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Privacy policy/ToS required for production",
+      "checkedAt": "2026-11-01",
+      "url": "https://developers.notion.com/guides/get-started/public-connections.md",
+      "quote": "Connection name and development workspace"
     },
     {
       "id": "c10",
-      "text": "The URL begins with https://api.notion.com/v1/oauth/authorize and has the following parameters: client_id, redirect_uri, response_type.",
+      "text": "client_id, redirect_uri, response_type=code, owner=user (always), optional state",
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
-      "quote": "The URL begins with https://api.notion.com/v1/oauth/authorize and has the following parameters:",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "quote": "Always use user.",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: client_id, redirect_uri, response_type"
     },
     {
       "id": "c11",
@@ -284,7 +294,8 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "Users can select which pages to give the connection access to, including both private and public pages available to them.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c12",
@@ -292,7 +303,8 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "Make a POST request to create an access token , which exchanges the temporary code for an access token.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c13",
@@ -300,7 +312,8 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "The Notion API responds with an access token and some additional information.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c14",
@@ -308,14 +321,17 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "Marketplace listing details (such as descriptions, categories, and images) are managed separately through the Listings section.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c15",
-      "text": "Review timelines are not explicitly published by Notion and typically vary between 1 to 7 days.",
-      "label": "uncertain",
-      "note": "Estimated based on standard SaaS developer ecosystem review cycles. No source cited by the agent.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "text": "Published for Marketplace listing only: 5-10 business days (about 7-14 calendar days)",
+      "label": "sourced",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Not published; 1-7 days",
+      "checkedAt": "2026-11-01",
+      "url": "https://developers.notion.com/guides/get-started/marketplace-listing.md",
+      "quote": "expect to hear back from our team within 5-10 business days via email."
     },
     {
       "id": "c16",
@@ -323,7 +339,8 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "The Authorization URL field populates after a public connection is submitted for review",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c17",
@@ -339,7 +356,8 @@
       "label": "sourced",
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "If the user presses Cancel , they will be redirected to the redirect URI with and error query param added.",
-      "checkedAt": "2026-11-01T12:06:09.778Z"
+      "checkedAt": "2026-11-01T12:06:09.778Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c19",
@@ -348,6 +366,134 @@
       "url": "https://developers.notion.com/docs/authorization",
       "quote": "User authorization failures can happen. If a user chooses to Cancel the request, then a failure is triggered. Build your connection to handle these cases gracefully, as needed.",
       "checkedAt": "2026-11-01T12:06:09.778Z"
+    },
+    {
+      "id": "o1",
+      "text": "Notion Marketplace listing (includes Notion security review): Products wanting discovery and trust signals in Notion's Marketplace; only Any-workspace public connections are eligible; docs state 5-10 business days for a response.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/guides/get-started/marketplace-listing.md",
+      "label": "sourced",
+      "quote": "Listing on the Marketplace is optional and helps your connection reach a wider audience"
+    },
+    {
+      "id": "o2",
+      "text": "Approval on Enterprise customers' approved connections list: Enterprise customers whose owners restrict installs must allowlist the connection themselves; timing depends on each customer's admin, not Notion.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://www.notion.com/help/add-and-manage-connections-with-the-api",
+      "label": "sourced",
+      "quote": "approved connections list."
+    },
+    {
+      "id": "l1",
+      "text": "Per-user page sharing at install: The agent can only read/write pages and databases the user picks (with full access) in the page picker or later via Add connections; nothing else in the workspace is visible.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/docs/authorization",
+      "label": "sourced",
+      "quote": "The page picker only displays pages or databases to which a user has full access"
+    },
+    {
+      "id": "l2",
+      "text": "Each member authorizes individually: One user's install does not grant access for teammates; each user in a workspace must run OAuth themselves.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/guides/get-started/public-connections.md",
+      "label": "sourced",
+      "quote": "each user needs to complete the authorization flow individually."
+    },
+    {
+      "id": "l3",
+      "text": "Enterprise admin restrictions: Enterprise workspace owners can restrict installs to owners or to an approved connections list, blocking members until an admin approves; a Marketplace listing is not stated as a bypass.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://www.notion.com/help/add-and-manage-connections-with-the-api",
+      "label": "sourced",
+      "quote": "The ability to add connections"
+    },
+    {
+      "id": "l4",
+      "text": "Rate limits: 180 requests/minute (avg 3/s) per connection on most plans, 600/min on Business/Enterprise; agents must honour 429 Retry-After with backoff.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/reference/request-limits",
+      "label": "sourced",
+      "quote": "180 requests per minute (an average of 3 per second)"
+    },
+    {
+      "id": "l5",
+      "text": "Refresh token rotation: Each refresh returns a new access token and a new refresh token, so the agent must persist the newest refresh token atomically.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/reference/refresh-a-token.md",
+      "label": "sourced",
+      "quote": "generating a new access token and new refresh token"
+    },
+    {
+      "id": "l6",
+      "text": "Installation scope fixed at creation: Selected workspaces only cannot serve arbitrary customers and cannot be listed; use Any workspace for a multi-customer agent.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/guides/get-started/public-connections.md",
+      "label": "sourced",
+      "quote": "can't be changed afterward."
+    },
+    {
+      "id": "m1",
+      "text": "owner=user is a required authorize parameter.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/docs/authorization",
+      "label": "sourced"
+    },
+    {
+      "id": "m2",
+      "text": "Token endpoint uses HTTP Basic auth and returns a refresh_token; refresh rotates both tokens.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/reference/refresh-a-token.md",
+      "label": "sourced"
+    },
+    {
+      "id": "m3",
+      "text": "Only 'Any workspace' public connections are Marketplace-eligible; scope cannot be changed after creation.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/guides/get-started/public-connections.md",
+      "label": "sourced"
+    },
+    {
+      "id": "m4",
+      "text": "Marketplace review response time is published: 5-10 business days.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/guides/get-started/marketplace-listing.md",
+      "label": "sourced"
+    },
+    {
+      "id": "m5",
+      "text": "Rate limit 180 req/min per connection (600/min Business/Enterprise); handle 429/529 with Retry-After.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/reference/request-limits",
+      "label": "sourced"
+    },
+    {
+      "id": "m6",
+      "text": "Enterprise owners can restrict connection installs to an approved connections list.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://www.notion.com/help/add-and-manage-connections-with-the-api",
+      "label": "sourced"
+    },
+    {
+      "id": "m7",
+      "text": "Each workspace member must authorize individually; access is limited to pages they share.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://developers.notion.com/guides/get-started/public-connections.md",
+      "label": "sourced"
     }
   ],
   "gaps": [
@@ -410,5 +556,116 @@
       "official": true,
       "fetched": true
     }
-  ]
+  ],
+  "reviewNote": "Guide put the optional Marketplace review into approvalWait and the topBlocker; Notion docs state public connections work via OAuth without listing, so required wait is 0 and difficulty drops to 2 (self-serve + app config). Also fixed misattributed 'cannot change' (scope, not redirect URI), missing owner=user, and unsupported privacy-policy requirement.",
+  "optionalPaths": [
+    {
+      "name": "Notion Marketplace listing (includes Notion security review)",
+      "wait": {
+        "minDays": 7,
+        "maxDays": 14
+      },
+      "why": "Products wanting discovery and trust signals in Notion's Marketplace; only Any-workspace public connections are eligible; docs state 5-10 business days for a response.",
+      "claimIds": [
+        "o1"
+      ]
+    },
+    {
+      "name": "Approval on Enterprise customers' approved connections list",
+      "wait": "unknown",
+      "why": "Enterprise customers whose owners restrict installs must allowlist the connection themselves; timing depends on each customer's admin, not Notion.",
+      "claimIds": [
+        "o2"
+      ]
+    }
+  ],
+  "limits": [
+    {
+      "limit": "Per-user page sharing at install",
+      "impact": "The agent can only read/write pages and databases the user picks (with full access) in the page picker or later via Add connections; nothing else in the workspace is visible.",
+      "claimIds": [
+        "l1"
+      ]
+    },
+    {
+      "limit": "Each member authorizes individually",
+      "impact": "One user's install does not grant access for teammates; each user in a workspace must run OAuth themselves.",
+      "claimIds": [
+        "l2"
+      ]
+    },
+    {
+      "limit": "Enterprise admin restrictions",
+      "impact": "Enterprise workspace owners can restrict installs to owners or to an approved connections list, blocking members until an admin approves; a Marketplace listing is not stated as a bypass.",
+      "claimIds": [
+        "l3"
+      ]
+    },
+    {
+      "limit": "Rate limits",
+      "impact": "180 requests/minute (avg 3/s) per connection on most plans, 600/min on Business/Enterprise; agents must honour 429 Retry-After with backoff.",
+      "claimIds": [
+        "l4"
+      ]
+    },
+    {
+      "limit": "Refresh token rotation",
+      "impact": "Each refresh returns a new access token and a new refresh token, so the agent must persist the newest refresh token atomically.",
+      "claimIds": [
+        "l5"
+      ]
+    },
+    {
+      "limit": "Installation scope fixed at creation",
+      "impact": "Selected workspaces only cannot serve arbitrary customers and cannot be listed; use Any workspace for a multi-customer agent.",
+      "claimIds": [
+        "l6"
+      ]
+    }
+  ],
+  "reviewAdditions": [
+    {
+      "text": "owner=user is a required authorize parameter.",
+      "claimIds": [
+        "m1"
+      ]
+    },
+    {
+      "text": "Token endpoint uses HTTP Basic auth and returns a refresh_token; refresh rotates both tokens.",
+      "claimIds": [
+        "m2"
+      ]
+    },
+    {
+      "text": "Only 'Any workspace' public connections are Marketplace-eligible; scope cannot be changed after creation.",
+      "claimIds": [
+        "m3"
+      ]
+    },
+    {
+      "text": "Marketplace review response time is published: 5-10 business days.",
+      "claimIds": [
+        "m4"
+      ]
+    },
+    {
+      "text": "Rate limit 180 req/min per connection (600/min Business/Enterprise); handle 429/529 with Retry-After.",
+      "claimIds": [
+        "m5"
+      ]
+    },
+    {
+      "text": "Enterprise owners can restrict connection installs to an approved connections list.",
+      "claimIds": [
+        "m6"
+      ]
+    },
+    {
+      "text": "Each workspace member must authorize individually; access is limited to pages they share.",
+      "claimIds": [
+        "m7"
+      ]
+    }
+  ],
+  "reviewedAt": "2026-11-01"
 }

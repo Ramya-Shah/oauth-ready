@@ -2,7 +2,7 @@
 
 **How long until your users can connect?** Setup and approval guides for provider OAuth apps, with every claim labelled by how we know it.
 
-- **Library:** varied, human-reviewed guides (GitHub, Slack, Google/Gmail, Microsoft Graph, HubSpot, Notion).
+- **Library:** six varied guides, each reviewed against official docs (GitHub, Slack, Google/Gmail, Microsoft Entra ID, HubSpot, Notion).
 - **Live generation:** type any app name or website, and an agent researches it, probes its live OAuth endpoints, and produces a shareable guide in about 30–90 seconds.
 - **Verification log:** a sample of guide claims checked against primary sources, showing what was confirmed, what was corrected and what couldn't be verified (`/verification`).
 
@@ -39,27 +39,29 @@ The library and guide pages work without any keys. Only `/generate` needs them.
 
 ## What's in the demo
 
-| App | Why it's here | Difficulty | Wait |
+"Wait" is only what blocks any customer from connecting through OAuth. Optional listings (marketplaces, directories, certification) and limits after users connect are shown separately on each guide.
+
+| App | Why it's here | Difficulty | Required wait |
 |---|---|---|---|
 | GitHub | Instant self-serve; the friction is customer orgs approving your app | 2 | none |
-| Notion | Public integration, light review | 3* | 1–7 days* |
-| HubSpot | Developer account + optional marketplace listing | 4* | 1–10 days* |
-| Microsoft Entra ID | Publisher verification + tenant admin consent | 3* | 1–5 days* |
-| Slack | Two paths: no-review distribution vs. Marketplace (forced by 2025 rate limits) | 4 | 0–84 days |
-| Google (Gmail) | Restricted scopes → ~6-week review + annual paid CASA assessment | 5 | 14–70 days |
+| Notion | Public connection, no review; Marketplace listing is optional | 2 | none |
+| HubSpot | Created with the HubSpot CLI; unlisted apps capped at 25 installs | 2 | none |
+| Slack | No review to distribute; rate limits push message-reading agents to the optional Marketplace | 2 | none |
+| Microsoft Entra ID | Partner verification for publisher verification; customer admin consent is the real blocker | 3 | 3–7 days |
+| Google (Gmail) | Restricted scopes: brand plus restricted-scope verification with a paid yearly CASA assessment | 5 | 42–70 days |
 | Xero, Linear, Calendly | Generated live by the agent (not in the library) | — | — |
 
-\* Agent verdict, not yet human-reviewed. GitHub, Slack and Gmail were reviewed claim by claim. HubSpot, Notion and Microsoft are agent output that hasn't been reviewed, and they're labelled that way.
+All six library guides were reviewed claim by claim against official docs. The three live-generated guides were not.
 
 ## What we tested, sourced, and couldn't verify
 
 - **Tested (we ran it):** OAuth discovery documents and authorize-endpoint probes with an invalid `client_id` for every guide. Example: Xero's `login.xero.com/identity/connect/authorize` redirects unknown clients to its error page, and Calendly runs two authorization servers. Probes never need an account.
-- **Checked against sources:** reviewer agents checked 52 claims across GitHub, Slack and Gmail against docs.github.com, docs.slack.dev and Google's verification FAQ. 36 were confirmed, 11 corrected and 5 couldn't be verified. All of it is at `/verification`.
+- **Checked against sources:** two rounds of reviewer agents checked 172 items against the providers' own docs. Round 1 covered GitHub, Slack and Gmail (52 items: 36 confirmed, 11 corrected, 5 unverifiable). Round 2 covered all six library guides (120 items: 74 confirmed, 39 corrected, 7 unverifiable). All of it is at `/verification`.
 - **Biggest corrections:**
-  - The agent said Slack Marketplace review was mandatory. It isn't; public distribution needs no review. But the 2025 rate limits push message-reading agents toward the Marketplace anyway.
-  - The agent called `gmail.readonly` sensitive and the CASA assessment optional. The scope is restricted and the assessment is mandatory.
-  - The agent understated the Gmail wait by about 2x.
-  - The agent named the wrong top blocker for GitHub. The real one is that customer organizations restrict OAuth apps by default.
+  - Three guides (Slack, HubSpot, Notion) counted an optional marketplace review as the OAuth approval wait. None of them needs a provider review before customers can connect. The schema and the agent prompt now keep required waits, optional listings and post-connection limits apart.
+  - Gmail's real required wait is 42–70 days. The scopes an agent needs (readonly, modify, compose) are restricted, so they need restricted-scope verification plus a mandatory, paid, yearly CASA assessment.
+  - HubSpot's setup steps were outdated. New public apps are created with the HubSpot CLI, not the dashboard.
+  - Microsoft's real blocker is customer admin consent. By default, end users can't consent to mail, calendar or files access.
 - **Couldn't verify:** most review timelines and assessment costs. Official docs rarely publish them; Google's FAQ is the exception. The guides list these under "What we couldn't determine".
 - **Not done:** hands-on app registration with real accounts, and completed provider approvals.
 

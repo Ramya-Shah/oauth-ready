@@ -15,15 +15,15 @@
   "verdict": {
     "difficulty": 3,
     "activeEffortHours": {
-      "min": 1,
-      "max": 3
+      "min": 2,
+      "max": 5
     },
     "approvalWait": {
-      "minDays": 1,
-      "maxDays": 5
+      "minDays": 3,
+      "maxDays": 7
     },
-    "topBlocker": "Unverified publisher status blocking user consent in target customer tenants.",
-    "summary": "App registration in Microsoft Entra ID is instant and self-serve for initial development and testing. To allow end users across external organizations to consent without warnings, developers must complete Publisher Verification using a Microsoft AI Cloud Partner Program account.",
+    "topBlocker": "Customer tenants on Microsoft's default consent policy block end-user consent for mail, calendar, files and chat scopes, so a tenant admin must grant consent even after publisher verification.",
+    "summary": "The only wait is Partner Center verification of your AI Cloud Partner Program account (usually 3-5 business days); after that, publisher verification takes minutes and lets users in other tenants consent without the risky-app step-up. Marketplace/AppSource, the Entra app gallery and Microsoft 365 App Compliance are optional; the real limit is that customer-tenant consent policies often require an admin to approve agent-style scopes such as Mail.Read.",
     "claimIds": [
       "c1",
       "c14",
@@ -35,8 +35,8 @@
     {
       "id": "st1",
       "phase": "dev",
-      "title": "Create App Registration in Microsoft Entra ID",
-      "detail": "Sign in to the Microsoft Entra admin center, navigate to Identity > Applications > App registrations, and register a new application. Select whether the app will support single-tenant users, multitenant organizational accounts, or personal Microsoft accounts.",
+      "title": "Create a multitenant App Registration from a work/school account",
+      "detail": "In the Microsoft Entra admin center (Identity > Applications > App registrations > New registration), choose 'Accounts in any organizational directory' (optionally plus personal Microsoft accounts) so that other companies' users can connect. Register it from a work or school (Entra) account, because apps registered with a personal Microsoft account can't be publisher verified.",
       "owner": "you",
       "minutes": 10,
       "links": [
@@ -65,8 +65,8 @@
     {
       "id": "st3",
       "phase": "dev",
-      "title": "Generate Client Credentials",
-      "detail": "Under Certificates & secrets, create a new client secret or upload a certificate for confidential client applications. Record the secret value immediately as it is not shown again.",
+      "title": "Generate client credentials (prefer a certificate)",
+      "detail": "Under Certificates & secrets, upload a certificate (recommended for production) or create a client secret. Secrets last at most 24 months and Microsoft recommends under 12, so plan rotation. Copy the secret value right away; it isn't shown again.",
       "owner": "you",
       "minutes": 5,
       "links": [
@@ -80,8 +80,8 @@
     {
       "id": "st4",
       "phase": "dev",
-      "title": "Configure Delegated Scopes & App Roles",
-      "detail": "Define the delegated permissions (such as User.Read or Mail.Read) and standard OIDC scopes like offline_access in your application manifest or API permissions tab.",
+      "title": "Configure least-privilege delegated permissions",
+      "detail": "Add the Microsoft Graph delegated permissions under API permissions, plus openid, profile and offline_access. Note that Mail.*, Calendars.*, Files.Read.All, Sites.Read.All and Chat.* can't be user-consented in tenants on the Microsoft-managed default policy, so a tenant admin must consent. Avoid Directory.ReadWrite.All and application permissions unless they are truly needed.",
       "owner": "agent",
       "minutes": 10,
       "links": [
@@ -113,8 +113,8 @@
     {
       "id": "st6",
       "phase": "test",
-      "title": "Test Account Consent & Admin Consent Flow",
-      "detail": "Sign in with test work/school or personal accounts to test user consent screens. If testing admin-restricted permissions, execute administrative consent flows.",
+      "title": "Test cross-tenant user consent and admin consent",
+      "detail": "Sign in from a second Entra tenant (not your home tenant) to see the real consent experience, including risk-based step-up. Test the admin consent URL https://login.microsoftonline.com/{tenant}/adminconsent?client_id={client-id} and the customer's admin consent workflow request path.",
       "owner": "you",
       "minutes": 15,
       "links": [
@@ -128,8 +128,8 @@
     {
       "id": "st7",
       "phase": "production",
-      "title": "Setup Microsoft AI Cloud Partner Program Account",
-      "detail": "Obtain a Partner One ID for a valid Microsoft AI Cloud Partner Program (CPP) Partner Global Account and verify that your domain matches the publisher domain.",
+      "title": "Enroll in Microsoft AI Cloud Partner Program (partner global account)",
+      "detail": "Enroll in the Microsoft AI Cloud Partner Program in Partner Center as the partner global account (PGA), not a location account. Use a business email whose domain matches a DNS-verified custom domain on your Entra tenant, and associate the tenant with the PGA. Have business registration documents and domain registrar documents ready, and complete identity verification.",
       "owner": "you",
       "minutes": 30,
       "links": [
@@ -144,8 +144,8 @@
     {
       "id": "st8",
       "phase": "production",
-      "title": "Partner Center Identity Verification",
-      "detail": "Wait for Microsoft Partner Center to verify your organization's legal identity and partner global account status.",
+      "title": "Wait for Partner Center account verification (usually 3-5 business days)",
+      "detail": "Microsoft checks the email, identity, employment (domain documentation) and business registration. Watch Account settings > Legal info > Verification Summary and answer any document requests quickly. Only the primary contact receives the emails.",
       "owner": "provider",
       "minutes": 0,
       "links": [
@@ -158,8 +158,8 @@
     {
       "id": "st9",
       "phase": "production",
-      "title": "Link Partner ID for Verified Publisher Badge",
-      "detail": "In the Entra admin center app registration Branding & properties section, associate the verified MPN/PartnerID to remove risk warnings and receive the blue verified badge on consent screens.",
+      "title": "Mark the app as publisher verified",
+      "detail": "Sign in with MFA as an Application Admin or Cloud Application Admin who is also a CPP Partner Admin or Account Admin. Set a non-onmicrosoft.com publisher domain, open Branding & properties, choose Add Partner ID to verify publisher, and enter the PGA Partner One ID. This takes minutes; then check the blue badge using prompt=consent.",
       "owner": "agent",
       "minutes": 10,
       "links": [
@@ -272,7 +272,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/graph/auth-register-app-v2",
       "quote": "Browse to Identity > Applications > App registrations and select New registration .",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c2",
@@ -288,7 +289,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/graph/auth-register-app-v2",
       "quote": "Client secret lifetime is limited to two years (24 months) or less.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c4",
@@ -296,31 +298,35 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-redirect-uri",
       "quote": "On the Redirect URI configuration tab, select Add Redirect URI .",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c5",
       "text": "Redirect URIs must begin with the HTTPS scheme, except for certain localhost URIs.",
-      "label": "sourced",
+      "label": "uncertain",
       "url": "https://learn.microsoft.com/en-us/entra/identity-platform/reply-url",
       "quote": "Redirect URIs must begin with the scheme https , with exceptions for some localhost redirect URIs.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Not verifiable from an official source in review round 2, 2026-11-01."
     },
     {
       "id": "c6",
-      "text": "Single-page application redirect URIs must be set to type spa using the application manifest editor.",
+      "text": "New SPA redirect URIs are added by choosing the Single-page application platform on the Authentication page. The manifest editor is only one way to change an existing URI's type to spa.",
       "label": "sourced",
-      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
-      "quote": "Update a redirect URI : Set the redirect URI's type to spa by using the application manifest editor in the Microsoft Entra admin center.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-redirect-uri",
+      "quote": "Single-page application | Enter a Redirect URI for client-side apps using JavaScript, Angular, React.js",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: SPA redirect URIs must be set to type spa using the application manifest editor."
     },
     {
       "id": "c7",
-      "text": "Some permissions like Directory.ReadWrite.All are admin-restricted and require Global Administrator consent.",
+      "text": "Admin-restricted permissions need tenant-wide admin consent. For delegated permissions this can come from a Cloud Application Administrator, Application Administrator, AI Administrator or Privileged Role Administrator. Microsoft Graph application permissions (app roles) need a Privileged Role Administrator. Global Administrator is not the only role that can grant it.",
       "label": "sourced",
-      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
-      "quote": "Some permissions are admin-restricted, for example, writing data to an organization's directory by using Directory.ReadWrite.All .",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent",
+      "quote": "Cloud Application Administrator, AI Administrator, or Application Administrator, for granting consent for apps requesting any permission for any API, except Microsoft Graph app roles",
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: Admin-restricted permissions require Global Administrator consent."
     },
     {
       "id": "c8",
@@ -336,7 +342,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/graph/auth-v2-user",
       "quote": "The offline_access permission is a standard OIDC scope that's requested so that the app can get a refresh token.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c10",
@@ -344,7 +351,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/graph/auth-v2-user",
       "quote": "The app uses the authorization code received in the previous step to request an access token by sending a POST request to the /token endpoint.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c11",
@@ -376,7 +384,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
       "quote": "The developer must have a Partner One ID for a valid Microsoft AI Cloud Partner Program account that has completed the verification process.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c15",
@@ -384,7 +393,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
       "quote": "The app that's to be publisher verified must be registered by using a Microsoft Entra work or school account.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c16",
@@ -392,7 +402,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
       "quote": "users can't consent to most newly registered multitenant apps that aren't publisher verified.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c17",
@@ -400,7 +411,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
       "quote": "When the publisher of an app has been verified, a blue verified badge appears in the Microsoft Entra consent prompt",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c18",
@@ -408,7 +420,8 @@
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
       "quote": "Microsoft doesn't charge developers for publisher verification. No license is required to become a verified publisher.",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01T11:43:28.626Z",
+      "note": "Confirmed against primary source in review 2026-11-01."
     },
     {
       "id": "c19",
@@ -420,11 +433,11 @@
     },
     {
       "id": "c20",
-      "text": "Client credentials flow requires an Application ID URI as scope rather than a traditional redirect URI.",
+      "text": "label: community. The source is a Microsoft Q&A forum answer, not product documentation, and the guide's OAuth user flow does not depend on this claim.",
       "label": "sourced",
       "url": "https://learn.microsoft.com/en-us/answers/questions/1502925/do-i-need-a-redirect-uri-when-using-a-windows-app",
-      "quote": "Redirect-URI is recommended but not required for client-credential flow. In order to obtain an access token, you will need to provide an Application ID URI as scope .",
-      "checkedAt": "2026-11-01T11:43:28.626Z"
+      "checkedAt": "2026-11-01",
+      "note": "Corrected in review round 2, 2026-11-01; it previously said: label: sourced (official)"
     },
     {
       "id": "t1",
@@ -443,6 +456,177 @@
       "method": "Sent authorization request with an unknown client_id",
       "artifact": "GET https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=oauthready-probe-invalid-client&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=probe&scope=openid (no redirects followed) → HTTP 200\nBody excerpt: Sign in to your account",
       "checkedAt": "2026-11-01T12:18:58.259Z"
+    },
+    {
+      "id": "o1",
+      "text": "Microsoft Marketplace (AppSource) SaaS offer: For publishers who want discovery or to sell through Microsoft. It is not needed for OAuth; Microsoft documents automated steps in minutes but gives no duration for the manual certification phase.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/partner-center/marketplace-offers/review-publish-offer",
+      "label": "sourced",
+      "quote": "Offers submitted to Microsoft Marketplace must be certified before being published."
+    },
+    {
+      "id": "o2",
+      "text": "Microsoft 365 App Compliance - Publisher Attestation: A self-service security questionnaire, renewed yearly, that produces a public docs page for enterprise security reviewers; useful when customer admins will be asked to grant mail or files consent.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/microsoft-365-app-certification/docs/certification",
+      "label": "sourced",
+      "quote": "Publisher Attestation is a self-service process where app developers (ISVs) complete a set of questions about their security practices"
+    },
+    {
+      "id": "o3",
+      "text": "Microsoft 365 Certification: A paid audit through Claranet (pentest if none in the last 12 months) for selling to security-strict enterprises; the ISV gets a 14-day window for initial documents and 60 days (+60 discretionary) for evidence, but no total review time is stated.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/microsoft-365-app-certification/docs/certification",
+      "label": "sourced",
+      "quote": "ISV will work with audit firm to pay for the certification."
+    },
+    {
+      "id": "o4",
+      "text": "Microsoft Entra App Gallery listing: Only for SaaS vendors who want SSO (SAML/OIDC) or SCIM provisioning to show up in customers' Enterprise apps gallery; needs a Partner One ID and isn't needed for Graph OAuth.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "label": "sourced",
+      "quote": "Is publisher verification the same as the Microsoft Entra application gallery? No."
+    },
+    {
+      "id": "l1",
+      "text": "The Microsoft-managed default user consent policy (default for new tenants) excludes Mail.*, Calendars.*, Files.Read(Write).All, Sites.Read(Write).All, Chat.*, Contacts.*, Tasks.*, People.Read and others from end-user consent: An email, calendar or files agent cannot be self-connected by ordinary users in most tenants, so your onboarding must route customers to a tenant admin through the admin consent URL or the admin consent workflow.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/manage-app-consent-policies",
+      "label": "sourced",
+      "quote": "End users can consent for any user consentable delegated permissions EXCEPT"
+    },
+    {
+      "id": "l2",
+      "text": "Risk-based step-up consent (on by default) turns user consent into an admin requirement for unverified multitenant apps that ask for more than basic permissions: Without publisher verification even low-risk scopes beyond sign-in/profile fail with AADSTS90094 for users in other tenants, which makes publisher verification practically required.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-risk-based-step-up-consent",
+      "label": "sourced",
+      "quote": "This step-up capability is enabled by default, but it results in a behavior change only when user consent is enabled."
+    },
+    {
+      "id": "l3",
+      "text": "Tenants can disable user consent, or allow it only for verified publishers and low-impact permissions (microsoft-user-default-low): Some customers will never allow user consent, so the agent must support an admin-consent-first onboarding path.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-user-consent",
+      "label": "sourced",
+      "quote": "Allow limited user consent only for apps from verified publishers and apps that are registered in your tenant"
+    },
+    {
+      "id": "l4",
+      "text": "Microsoft Graph application permissions (app roles) can only be granted by a Privileged Role Administrator; apps with assignment required always need admin consent: Background or daemon agent access to all mailboxes needs a highly privileged customer admin to approve it, which slows sales.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent",
+      "label": "sourced",
+      "quote": "Privileged Role Administrator, for granting consent for apps requesting any permission, for any API."
+    },
+    {
+      "id": "l5",
+      "text": "Refresh tokens last 90 days by default (24 hours for SPA redirect URIs) and can be revoked by password reset or admin action: A long-running agent must use a confidential (web) client, rotate refresh tokens, and handle invalid_grant by asking the user to reconnect.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/refresh-tokens",
+      "label": "sourced",
+      "quote": "24 hours for single-page applications... 90 days for all other scenarios."
+    },
+    {
+      "id": "l6",
+      "text": "Outlook throttling: 10,000 requests per 10 minutes and 4 concurrent requests per app per mailbox; 130,000 requests per 10 seconds per app across all tenants; 429 with Retry-After: An agent that scans mail has to use delta queries or change notifications and honour Retry-After, not poll.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/graph/throttling-limits",
+      "label": "sourced",
+      "quote": "10,000 API requests in a 10-minute period | v1.0 and beta endpoints"
+    },
+    {
+      "id": "l7",
+      "text": "Client secrets expire after at most 24 months (12 months or less recommended): Plan secret rotation or use certificates, or every customer connection breaks when the secret expires.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/graph/auth-register-app-v2",
+      "label": "sourced",
+      "quote": "You can't specify a custom lifetime longer than 24 months."
+    },
+    {
+      "id": "m1",
+      "text": "The Microsoft-managed default consent policy (default for new tenants) blocks user consent for Mail, Calendars, Files/Sites .All, Chat, Contacts, Tasks and other permissions regardless of publisher verification, so admin consent is the normal path for email or calendar agents.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/manage-app-consent-policies",
+      "label": "sourced"
+    },
+    {
+      "id": "m2",
+      "text": "Risky consent requests show AADSTS90094 unless the customer has the admin consent workflow enabled.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-risk-based-step-up-consent",
+      "label": "sourced"
+    },
+    {
+      "id": "m3",
+      "text": "Admin consent URL format",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://login.microsoftonline.com/{organization}/adminconsent?client_id={client-id}",
+      "label": "sourced"
+    },
+    {
+      "id": "m4",
+      "text": "Publisher domain can't be *.onmicrosoft.com; you need a DNS-verified custom domain on the tenant.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "label": "sourced"
+    },
+    {
+      "id": "m5",
+      "text": "Publisher verification isn't supported in national clouds or Azure AD B2C tenants.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview",
+      "label": "sourced"
+    },
+    {
+      "id": "m6",
+      "text": "PKCE is recommended for all client types, including confidential web apps.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
+      "label": "sourced"
+    },
+    {
+      "id": "m7",
+      "text": "Refresh tokens: 90 days by default, 24 hours for spa redirect URIs; they replace themselves on use.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/entra/identity-platform/refresh-tokens",
+      "label": "sourced"
+    },
+    {
+      "id": "m8",
+      "text": "Outlook throttling limits per app per mailbox (10,000 requests per 10 min, 4 concurrent) and a global per-app limit of 130,000 requests per 10 s.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/graph/throttling-limits",
+      "label": "sourced"
+    },
+    {
+      "id": "m9",
+      "text": "Partner Center verification usually takes 3-5 business days; only the primary contact gets the document requests.",
+      "checkedAt": "2026-11-01",
+      "note": "Added in review round 2, 2026-11-01.",
+      "url": "https://learn.microsoft.com/en-us/partner-center/enroll/understand-the-verification-process",
+      "label": "sourced"
     }
   ],
   "gaps": [
@@ -505,5 +689,148 @@
       "official": false,
       "fetched": false
     }
-  ]
+  ],
+  "reviewNote": "Moved approvalWait from 1-5 to 3-7 days, using Microsoft's official 3-5 business-day Partner Center estimate. Raised effort because CPP enrollment needs business, domain and identity documents plus a DNS-verified publisher domain. Changed topBlocker from 'unverified publisher' to tenant admin consent: Microsoft's managed default policy excludes Mail/Calendar/Files/Chat scopes from user consent whatever the publisher status. Difficulty stays at 3.",
+  "optionalPaths": [
+    {
+      "name": "Microsoft Marketplace (AppSource) SaaS offer",
+      "wait": "unknown",
+      "why": "For publishers who want discovery or to sell through Microsoft. It is not needed for OAuth; Microsoft documents automated steps in minutes but gives no duration for the manual certification phase.",
+      "claimIds": [
+        "o1"
+      ]
+    },
+    {
+      "name": "Microsoft 365 App Compliance - Publisher Attestation",
+      "wait": "unknown",
+      "why": "A self-service security questionnaire, renewed yearly, that produces a public docs page for enterprise security reviewers; useful when customer admins will be asked to grant mail or files consent.",
+      "claimIds": [
+        "o2"
+      ]
+    },
+    {
+      "name": "Microsoft 365 Certification",
+      "wait": "unknown",
+      "why": "A paid audit through Claranet (pentest if none in the last 12 months) for selling to security-strict enterprises; the ISV gets a 14-day window for initial documents and 60 days (+60 discretionary) for evidence, but no total review time is stated.",
+      "claimIds": [
+        "o3"
+      ]
+    },
+    {
+      "name": "Microsoft Entra App Gallery listing",
+      "wait": "unknown",
+      "why": "Only for SaaS vendors who want SSO (SAML/OIDC) or SCIM provisioning to show up in customers' Enterprise apps gallery; needs a Partner One ID and isn't needed for Graph OAuth.",
+      "claimIds": [
+        "o4"
+      ]
+    }
+  ],
+  "limits": [
+    {
+      "limit": "The Microsoft-managed default user consent policy (default for new tenants) excludes Mail.*, Calendars.*, Files.Read(Write).All, Sites.Read(Write).All, Chat.*, Contacts.*, Tasks.*, People.Read and others from end-user consent",
+      "impact": "An email, calendar or files agent cannot be self-connected by ordinary users in most tenants, so your onboarding must route customers to a tenant admin through the admin consent URL or the admin consent workflow.",
+      "claimIds": [
+        "l1"
+      ]
+    },
+    {
+      "limit": "Risk-based step-up consent (on by default) turns user consent into an admin requirement for unverified multitenant apps that ask for more than basic permissions",
+      "impact": "Without publisher verification even low-risk scopes beyond sign-in/profile fail with AADSTS90094 for users in other tenants, which makes publisher verification practically required.",
+      "claimIds": [
+        "l2"
+      ]
+    },
+    {
+      "limit": "Tenants can disable user consent, or allow it only for verified publishers and low-impact permissions (microsoft-user-default-low)",
+      "impact": "Some customers will never allow user consent, so the agent must support an admin-consent-first onboarding path.",
+      "claimIds": [
+        "l3"
+      ]
+    },
+    {
+      "limit": "Microsoft Graph application permissions (app roles) can only be granted by a Privileged Role Administrator; apps with assignment required always need admin consent",
+      "impact": "Background or daemon agent access to all mailboxes needs a highly privileged customer admin to approve it, which slows sales.",
+      "claimIds": [
+        "l4"
+      ]
+    },
+    {
+      "limit": "Refresh tokens last 90 days by default (24 hours for SPA redirect URIs) and can be revoked by password reset or admin action",
+      "impact": "A long-running agent must use a confidential (web) client, rotate refresh tokens, and handle invalid_grant by asking the user to reconnect.",
+      "claimIds": [
+        "l5"
+      ]
+    },
+    {
+      "limit": "Outlook throttling: 10,000 requests per 10 minutes and 4 concurrent requests per app per mailbox; 130,000 requests per 10 seconds per app across all tenants; 429 with Retry-After",
+      "impact": "An agent that scans mail has to use delta queries or change notifications and honour Retry-After, not poll.",
+      "claimIds": [
+        "l6"
+      ]
+    },
+    {
+      "limit": "Client secrets expire after at most 24 months (12 months or less recommended)",
+      "impact": "Plan secret rotation or use certificates, or every customer connection breaks when the secret expires.",
+      "claimIds": [
+        "l7"
+      ]
+    }
+  ],
+  "reviewAdditions": [
+    {
+      "text": "The Microsoft-managed default consent policy (default for new tenants) blocks user consent for Mail, Calendars, Files/Sites .All, Chat, Contacts, Tasks and other permissions regardless of publisher verification, so admin consent is the normal path for email or calendar agents.",
+      "claimIds": [
+        "m1"
+      ]
+    },
+    {
+      "text": "Risky consent requests show AADSTS90094 unless the customer has the admin consent workflow enabled.",
+      "claimIds": [
+        "m2"
+      ]
+    },
+    {
+      "text": "Admin consent URL format",
+      "claimIds": [
+        "m3"
+      ]
+    },
+    {
+      "text": "Publisher domain can't be *.onmicrosoft.com; you need a DNS-verified custom domain on the tenant.",
+      "claimIds": [
+        "m4"
+      ]
+    },
+    {
+      "text": "Publisher verification isn't supported in national clouds or Azure AD B2C tenants.",
+      "claimIds": [
+        "m5"
+      ]
+    },
+    {
+      "text": "PKCE is recommended for all client types, including confidential web apps.",
+      "claimIds": [
+        "m6"
+      ]
+    },
+    {
+      "text": "Refresh tokens: 90 days by default, 24 hours for spa redirect URIs; they replace themselves on use.",
+      "claimIds": [
+        "m7"
+      ]
+    },
+    {
+      "text": "Outlook throttling limits per app per mailbox (10,000 requests per 10 min, 4 concurrent) and a global per-app limit of 130,000 requests per 10 s.",
+      "claimIds": [
+        "m8"
+      ]
+    },
+    {
+      "text": "Partner Center verification usually takes 3-5 business days; only the primary contact gets the document requests.",
+      "claimIds": [
+        "m9"
+      ]
+    }
+  ],
+  "reviewedAt": "2026-11-01"
 }

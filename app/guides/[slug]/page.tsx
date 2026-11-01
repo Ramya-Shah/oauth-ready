@@ -41,12 +41,15 @@ const TICKS = [
   { d: 90, t: "3 months" },
 ];
 
-function Schedule({ effort, wait }: { effort: { min: number; max: number }; wait: DayRange }) {
+function Schedule({ effort, wait, optional }: { effort: { min: number; max: number }; wait: DayRange; optional?: { name: string; wait: DayRange } }) {
   const workEnd = Math.max(x(effort.max / 6), 0.8);
   const known = wait !== "unknown";
   const none = known && wait.maxDays === 0;
   const minEnd = known ? x(effort.max / 6 + wait.minDays) : workEnd;
   const maxEnd = known ? x(effort.max / 6 + wait.maxDays) : 100;
+  // An optional listing is drawn on its own lane, outlined only: it is never on the critical path.
+  const opt = optional && optional.wait !== "unknown" && optional.wait.maxDays > 0 ? optional : undefined;
+  const optWait = opt && opt.wait !== "unknown" ? opt.wait : undefined;
   return (
     <figure className="cp-axis" aria-label={`${hoursText(effort)} of hands-on work, ${waitText(wait)}`}>
       <div className="cp-axis-ticks" aria-hidden>
@@ -71,10 +74,16 @@ function Schedule({ effort, wait }: { effort: { min: number; max: number }; wait
             <span className="cp-unknown" style={{ left: `${workEnd}%`, right: 0 }}>Review time not published</span>
           )}
         </div>
+        {opt && optWait && (
+          <div className="cp-lane cp-lane-opt">
+            <span className="cp-opt" style={{ left: `${workEnd}%`, width: `${x(effort.max / 6 + optWait.maxDays) - workEnd}%` }}>Optional: {opt.name}</span>
+          </div>
+        )}
       </div>
       <figcaption>
         <span><i className="cp-key cp-key-work" />Your work, {hoursText(effort)}</span>
-        {!none && known && <span><i className="cp-key cp-key-wait" />Provider wait, {formatWait(wait)}</span>}
+        {!none && known && <span><i className="cp-key cp-key-wait" />Required provider wait, {formatWait(wait)}</span>}
+        {opt && optWait && <span><i className="cp-key cp-key-opt" />Optional listing, {formatWait(optWait)}</span>}
       </figcaption>
     </figure>
   );
@@ -111,7 +120,7 @@ export default async function GuidePage({ params }: P) {
           <p className="cp-lede">{v.summary}<Refs ids={v.claimIds} claims={g.claims} /></p>
         </div>
 
-        <Schedule effort={v.activeEffortHours} wait={v.approvalWait} />
+        <Schedule effort={v.activeEffortHours} wait={v.approvalWait} optional={g.optionalPaths[0]} />
 
         <div className="cp-foot">
           <section className="cp-stop" aria-labelledby="cp-stop-h">
@@ -184,6 +193,35 @@ export default async function GuidePage({ params }: P) {
             <p className="cp-review">{g.reviewNote} <Link href="/verification">See the verification log</Link></p>
           </section>
         )}
+        {g.optionalPaths.length > 0 && (
+          <section>
+            <h2>Optional listings</h2>
+            <p className="cp-quiet">Not needed for your users to connect through OAuth. Worth it only for the reason given.</p>
+            <table>
+              <thead><tr><th>Listing</th><th>Wait</th><th>Why you might want it</th></tr></thead>
+              <tbody>
+                {g.optionalPaths.map((o, i) => (
+                  <tr key={i}><td><b>{o.name}</b></td><td>{formatWait(o.wait)}</td><td>{o.why}<Refs ids={o.claimIds} claims={g.claims} /></td></tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
+
+        {g.limits.length > 0 && (
+          <section>
+            <h2>Limits after users connect</h2>
+            <table>
+              <thead><tr><th>Limit</th><th>What it means for your agent</th></tr></thead>
+              <tbody>
+                {g.limits.map((l, i) => (
+                  <tr key={i}><td><b>{l.limit}</b></td><td>{l.impact}<Refs ids={l.claimIds} claims={g.claims} /></td></tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
+
         {g.requirements.length > 0 && (
           <section>
             <h2>Requirements</h2>
