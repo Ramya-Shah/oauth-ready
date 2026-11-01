@@ -1,4 +1,3 @@
-import { revalidatePath } from "next/cache";
 import { runPipeline, friendlyError } from "@/lib/pipeline";
 import { rateLimit, isStopRequested } from "@/lib/store";
 
@@ -35,14 +34,8 @@ export async function POST(req: Request) {
       const hb = setInterval(() => send({ type: "heartbeat" }), 10_000);
       try {
         const shouldStop = runId ? () => isStopRequested(String(runId)) : undefined;
-        for await (const ev of runPipeline(String(query ?? ""), { shouldStop })) {
-          if (ev.type === "result" && !ev.cached) {
-            // Cached pages: show the new guide and its library row right away.
-            revalidatePath(`/guides/${ev.slug}`);
-            revalidatePath("/");
-          }
-          send(ev);
-        }
+        // The page refreshes cached guide and library pages through /api/guide-ready once it gets the result.
+        for await (const ev of runPipeline(String(query ?? ""), { shouldStop })) send(ev);
       } catch (e) {
         send({ type: "fatal", message: friendlyError(e, "writing the guide") });
       } finally {

@@ -68,8 +68,9 @@ export default function Generator() {
       await new Promise((r) => setTimeout(r, RECOVER_EVERY_MS));
       if (userStopped.current) return;
       try {
-        const r = await fetch(`/guides/${s}`, { method: "GET", cache: "no-store" });
-        if (r.ok) {
+        const r = await fetch(`/api/guide-ready?slug=${encodeURIComponent(s)}`, { cache: "no-store" });
+        const j = r.ok ? ((await r.json()) as { ready?: boolean }) : null;
+        if (j?.ready) {
           router.push(`/guides/${s}?new=1`);
           return;
         }
@@ -78,6 +79,16 @@ export default function Generator() {
       }
     }
     finish("failed", "The connection dropped and the guide hasn't appeared after 2½ minutes. Try again; if it was nearly done, it may still show up in the library shortly.");
+  }
+
+  // Refresh the cached guide page and library first, so a new guide never opens as "not found".
+  async function openGuide(s: string, cached: boolean) {
+    try {
+      await fetch(`/api/guide-ready?slug=${encodeURIComponent(s)}`, { cache: "no-store" });
+    } catch {
+      // the page still opens; at worst it shows the cached version until it refreshes
+    }
+    router.push(`/guides/${s}${cached ? "" : "?new=1"}`);
   }
 
   async function run(query: string) {
@@ -127,7 +138,7 @@ export default function Generator() {
           if (ev.type === "slug") slug.current = ev.slug;
           if (ev.type === "fatal") { terminal = true; finish("failed", ev.message); }
           if (ev.type === "stopped") { terminal = true; finish("stopped", "Stopped. Nothing was saved, and the agent won't use any more of the free quota."); }
-          if (ev.type === "result") { terminal = true; router.push(`/guides/${ev.slug}${ev.cached ? "" : "?new=1"}`); }
+          if (ev.type === "result") { terminal = true; openGuide(ev.slug, ev.cached); }
           setEvents((e) => [...e, ev]);
         }
       }
