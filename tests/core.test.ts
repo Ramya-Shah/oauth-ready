@@ -69,3 +69,30 @@ describe("authorize URL extraction", () => {
     expect(findAuthorizeUrls(t, "google.com")).toEqual(["https://accounts.google.com/o/oauth2/v2/auth"]);
   });
 });
+
+import { isOfficial } from "../lib/enforce";
+describe("official domain check", () => {
+  it("treats vendor forums as community, not official", () => {
+    expect(isOfficial("https://devcommunity.pipedrive.com/t/x", "pipedrive.com")).toBe(false);
+    expect(isOfficial("https://community.slack.com/x", "slack.com")).toBe(false);
+    expect(isOfficial("https://developers.pipedrive.com/docs", "pipedrive.com")).toBe(true);
+  });
+  it("scopes shared docs platforms to the vendor subdomain", () => {
+    expect(isOfficial("https://pipedrive.readme.io/docs/oauth", "pipedrive.readme.io")).toBe(true);
+    expect(isOfficial("https://someoneelse.readme.io/docs", "pipedrive.readme.io")).toBe(false);
+  });
+});
+
+import { matchesQuery } from "../lib/pipeline";
+describe("identified product must match the query", () => {
+  it("accepts real matches", () => {
+    expect(matchesQuery("intuit", "Intuit QuickBooks", "intuit.com")).toBe(true);
+    expect(matchesQuery("Microsoft Graph Entra ID", "Microsoft Entra ID", "microsoft.com")).toBe(true);
+    expect(matchesQuery("hubspot crm", "HubSpot", "hubspot.com")).toBe(true);
+    expect(matchesQuery("Gmail Google", "Gmail", "google.com")).toBe(true);
+  });
+  it("rejects a substituted product", () => {
+    expect(matchesQuery("zzqxv flurbo tool", "Zuplo", "zuplo.com")).toBe(false);
+    expect(matchesQuery("abcdefu", "Abacus", "abacus.com")).toBe(false);
+  });
+});

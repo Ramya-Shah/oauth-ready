@@ -38,7 +38,7 @@ export function isOfficial(url: string, officialRoot: string): boolean {
   try {
     const h = new URL(url).hostname;
     // Vendor-hosted forums are user content, not official documentation.
-    if (/^(community|forums?|discuss|answers|support-community)\./.test(h)) return false;
+    if (/^[a-z-]*(community|forums?|discuss|answers)\./.test(h)) return false;
     return h === officialRoot || h.endsWith("." + officialRoot);
   } catch {
     return false;

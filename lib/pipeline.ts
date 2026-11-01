@@ -10,8 +10,22 @@ import { findExisting, saveGenerated } from "./store";
 export type Stage = "identify" | "search" | "fetch" | "probe" | "write" | "enforce";
 export type PipelineEvent =
   | { type: "stage"; stage: Stage; status: "start" | "progress" | "done" | "error"; detail: string }
+  | { type: "slug"; slug: string }
   | { type: "result"; slug: string; cached: boolean }
+  | { type: "stopped" }
   | { type: "fatal"; message: string };
+
+// Turn any internal failure into a sentence a developer can act on. The raw error goes to the server log.
+export function friendlyError(e: unknown, doing: string): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  console.error(`[generate] failed while ${doing}:`, msg);
+  if (/GEMINI_API_KEY/.test(msg)) return "Guide writing isn't set up on this server yet (the AI key is missing).";
+  if (/No free-tier model available|quota|429|busy/i.test(msg))
+    return "The free AI models are busy or have used up today's quota. Wait a few minutes and try again.";
+  if (/timeout|timed out|aborted|ETIMEDOUT|ECONNRESET|fetch failed|network/i.test(msg))
+    return `An outside service took too long to answer while ${doing}. Try again in a moment.`;
+  return `Something went wrong while ${doing}. Try again; if it keeps happening, enter the app's website instead of its name.`;
+}
 
 export function slugify(s: string): string {
   return s.toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\.[a-z]{2,}(\/.*)?$/, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50);
@@ -21,6 +35,19 @@ function rootDomain(host: string): string {
   const parts = host.toLowerCase().replace(/^www\./, "").split(".");
   const twoLevel = /^(co|com|org|net|gov|ac)\.[a-z]{2}$/.test(parts.slice(-2).join("."));
   return parts.slice(twoLevel ? -3 : -2).join(".");
+}
+
+// Platforms that host many companies' docs or sites; a vendor owns only its subdomain there.
+const SHARED_HOSTS = new Set(["readme.io", "gitbook.io", "github.io", "notion.site", "zendesk.com", "helpscoutdocs.com", "mintlify.app", "netlify.app", "vercel.app", "webflow.io", "medium.com", "postman.com", "stoplight.io", "apiary.io", "swaggerhub.com"]);
+
+// The identified product must share a word with what the user typed, so a typo or an
+// unknown name never silently becomes a guide for a different product.
+export function matchesQuery(query: string, name: string, domain: string): boolean {
+  const norm = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const hay = `${norm(name)} ${norm(domain)} ${norm(name).replace(/ /g, "")}`;
+  const words = norm(query).split(" ").filter((w) => w.length >= 3);
+  if (!words.length) return hay.includes(norm(query));
+  return words.some((w) => hay.includes(w) || norm(name).split(" ").some((n) => n.length >= 3 && w.includes(n)));
 }
 
 const Identity = z.object({
@@ -101,7 +128,12 @@ SOURCES:
 ${src}`;
 }
 
-export async function* runPipeline(input: string, opts: { force?: boolean } = {}): AsyncGenerator<PipelineEvent> {
+export async function* runPipeline(
+  input: string,
+  opts: { force?: boolean; shouldStop?: () => Promise<boolean> } = {},
+): AsyncGenerator<PipelineEvent> {
+  // Checked between stages, so a Stop costs at most the stage already running.
+  const stopped = async () => (opts.shouldStop ? opts.shouldStop().catch(() => false) : false);
   const q = input.trim().slice(0, 120);
   if (!q) return yield { type: "fatal", message: "Enter an app name or website." };
 
@@ -125,16 +157,32 @@ export async function* runPipeline(input: string, opts: { force?: boolean } = {}
     const { text } = await generateJson(
       `Identify the software product the user means by: "${q}"${hintedRoot ? ` (website ${hintedRoot})` : ""}.
 Search results:\n${idHits.map((h) => `- ${h.url} — ${h.title}: ${h.content.slice(0, 200)}`).join("\n") || "(none)"}
-Return JSON: {"name": product name, "officialRoot": registrable domain of the vendor (e.g. "xero.com"), "alsoOfficial": other domains the vendor owns that host its developer docs or OAuth endpoints (max 3), "supportsOAuth": whether it offers OAuth 2.0 for third-party apps (true/false/"unknown"), "candidateUrls": up to 5 official URLs you believe document creating an OAuth app, app review/verification/publishing, and scopes, "notAnApp": true if this is not a software product}`,
+Return JSON: {"name": product name, "officialRoot": registrable domain of the vendor (e.g. "xero.com"), "alsoOfficial": other domains the vendor owns that host its developer docs or OAuth endpoints (max 3), "supportsOAuth": whether it offers OAuth 2.0 for third-party apps (true/false/"unknown"), "candidateUrls": up to 5 official URLs you believe document creating an OAuth app, app review/verification/publishing, and scopes, "notAnApp": true if this is not a software product, or if you are not confident which real product the user means. Never substitute a different product with a similar name.}`,
       { timeoutMs: 40_000, tier: "light" },
     );
-    identity = Identity.parse(parseJsonLoose(text));
+    const parsed = Identity.safeParse(parseJsonLoose(text));
+    if (!parsed.success) throw new Error(`identity shape: ${parsed.error.issues.map((i) => i.path.join(".")).join(", ")}`);
+    identity = parsed.data;
   } catch (e) {
-    return yield { type: "fatal", message: `Could not identify the app: ${(e as Error).message}` };
+    const msg = (e as Error).message;
+    if (/identity shape|JSON|Unexpected token/i.test(msg)) {
+      console.error("[generate] identify returned an unusable answer:", msg);
+      return yield { type: "fatal", message: `We couldn't work out which app "${q}" is. Check the spelling, or enter its website (for example, example.com).` };
+    }
+    return yield { type: "fatal", message: friendlyError(e, "identifying the app") };
   }
-  if (identity.notAnApp) return yield { type: "fatal", message: `"${q}" doesn't look like a software product with an API.` };
+  if (!identity.notAnApp && identity.officialRoot && !hintedRoot && !matchesQuery(q, identity.name, identity.officialRoot)) {
+    return yield { type: "fatal", message: `We couldn't find a product called "${q}". Did you mean ${identity.name} (${identity.officialRoot})? If so, enter that name to continue.` };
+  }
+  if (identity.notAnApp || !identity.officialRoot)
+    return yield { type: "fatal", message: `We couldn't find a software product called "${q}". Check the spelling, or enter its website (for example, example.com).` };
   const root = rootDomain(hintedRoot ?? identity.officialRoot.replace(/^https?:\/\//, "").split("/")[0]);
-  const alsoOfficial = [...new Set(identity.alsoOfficial.map((d) => rootDomain(d.replace(/^https?:\/\//, "").split("/")[0])))].filter((d) => d && d !== root).slice(0, 3);
+  // On shared docs platforms (pipedrive.readme.io) only the vendor's own subdomain is official, never the whole platform.
+  const alsoOfficial = [...new Set(identity.alsoOfficial.map((d) => {
+    const host = d.replace(/^https?:\/\//, "").split("/")[0].toLowerCase();
+    const r = rootDomain(host);
+    return SHARED_HOSTS.has(r) ? (host !== r ? host : "") : r;
+  }))].filter((d) => d && d !== root).slice(0, 3);
   const slug = slugify(identity.name) || slugify(root);
   if (!opts.force) {
     const existing = await findExisting(slug, root);
@@ -148,6 +196,8 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
   const official = (u: string) => officialRoots.some((r) => isOfficial(u, r));
 
   // 2. Search
+  yield { type: "slug", slug };
+  if (await stopped()) return yield { type: "stopped" };
   yield { type: "stage", stage: "search", status: "start", detail: "Searching official docs and community reports" };
   const name = identity.name;
   const queries: [string, string[] | undefined][] = [
@@ -164,6 +214,7 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
   yield { type: "stage", stage: "search", status: "done", detail: `${officialHits.length} official, ${communityHits.length} community results` };
 
   // 3. Fetch
+  if (await stopped()) return yield { type: "stopped" };
   yield { type: "stage", stage: "fetch", status: "start", detail: "Reading pages" };
   const candidates: { url: string; hit?: SearchHit }[] = [];
   const add = (url: string, hit?: SearchHit) => {
@@ -203,6 +254,9 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
     yield { type: "stage", stage: "fetch", status: "error", detail: "No official pages could be read; the guide will be mostly uncertain." };
 
   // 4. Probe
+  if (sources.length === 0)
+    return yield { type: "fatal", message: `We couldn't read any developer documentation for ${name}. It may not offer OAuth for third-party apps, or its docs block automated reading.` };
+  if (await stopped()) return yield { type: "stopped" };
   yield { type: "stage", stage: "probe", status: "start", detail: `Probing OAuth endpoints on ${officialRoots.join(", ")}` };
   const rawProbes: Omit<Probe, "id">[] = [];
   for (const r of officialRoots) rawProbes.push(...(await probeDiscovery(r)));
@@ -219,6 +273,7 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
   yield { type: "stage", stage: "probe", status: "done", detail: probes.length ? `${probes.filter((p) => p.ok).length}/${probes.length} probes succeeded` : "No discovery document or authorize URL found" };
 
   // 5. Write
+  if (await stopped()) return yield { type: "stopped" };
   yield { type: "stage", stage: "write", status: "start", detail: "Drafting the guide from the evidence" };
   let draft: Draft | null = null;
   let model = "";
@@ -234,10 +289,11 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
         prompt += `\n\nYour previous JSON failed validation:\n${parsed.error.issues.slice(0, 15).map((i) => `${i.path.join(".")}: ${i.message}`).join("\n")}\nReturn corrected JSON.`;
       }
     } catch (e) {
-      return yield { type: "fatal", message: (e as Error).message };
+      return yield { type: "fatal", message: friendlyError(e, "writing the guide") };
     }
   }
-  if (!draft) return yield { type: "fatal", message: "The model did not return a valid guide. Try again." };
+  if (!draft) return yield { type: "fatal", message: "The AI's draft didn't pass our checks twice in a row, so nothing was saved. Try again; a second run usually works." };
+  if (await stopped()) return yield { type: "stopped" };
   yield { type: "stage", stage: "write", status: "done", detail: `${draft.steps.length} steps, ${draft.claims.length} claims (${model})` };
 
   // 6. Enforce evidence
@@ -248,6 +304,10 @@ Return JSON: {"name": product name, "officialRoot": registrable domain of the ve
   const downgraded = draft.claims.filter((d) => d.sourceRef && d.quote && guide.claims.find((g) => g.id === d.id)?.label === "uncertain").length;
   yield { type: "stage", stage: "enforce", status: "done", detail: `tested ${c.tested} · sourced ${c.sourced} · community ${c.community} · uncertain ${c.uncertain}${downgraded ? ` (${downgraded} quotes not found on page → downgraded)` : ""}` };
 
-  await saveGenerated(guide);
+  try {
+    await saveGenerated(guide);
+  } catch (e) {
+    return yield { type: "fatal", message: friendlyError(e, "saving the guide") };
+  }
   yield { type: "result", slug, cached: false };
 }

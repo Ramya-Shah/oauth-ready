@@ -117,3 +117,23 @@ export async function rateLimit(key: string, max: number, windowSec: number): Pr
   e.n++;
   return e.n <= max;
 }
+
+// Stop flags for running generations. Redis on Vercel, so a Stop handled by a different
+// server instance still reaches the run; in memory locally.
+const stops = new Map<string, number>();
+const validRun = (id: string) => /^[a-zA-Z0-9-]{8,64}$/.test(id);
+
+export async function requestStop(runId: string): Promise<void> {
+  if (!validRun(runId)) return;
+  if (redisUrl && redisToken) {
+    await redis(["SET", `stop:${runId}`, "1", "EX", 900]);
+    return;
+  }
+  stops.set(runId, Date.now());
+}
+
+export async function isStopRequested(runId: string): Promise<boolean> {
+  if (!validRun(runId)) return false;
+  if (redisUrl && redisToken) return (await redis(["GET", `stop:${runId}`])) === "1";
+  return stops.has(runId);
+}

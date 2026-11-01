@@ -10,7 +10,7 @@ let slug = "";
 for await (const ev of runPipeline(name, { force: args.includes("--force") || curated })) {
   if (ev.type === "stage") console.log(`[${ev.stage}] ${ev.status}: ${ev.detail}`);
   else if (ev.type === "fatal") { console.error("FATAL", ev.message); process.exit(1); }
-  else { slug = ev.slug; console.log("RESULT", ev.slug, ev.cached ? "(cached)" : ""); }
+  else if (ev.type === "result") { slug = ev.slug; console.log("RESULT", ev.slug, ev.cached ? "(cached)" : ""); }
 }
 if (curated && slug) {
   const src = path.join("data", "generated", `${slug}.json`);
