@@ -16,7 +16,8 @@ async function redis(cmd: (string | number)[]): Promise<unknown> {
     method: "POST",
     headers: { Authorization: `Bearer ${redisToken}` },
     body: JSON.stringify(cmd),
-    cache: "no-store",
+    // No `cache: "no-store"`: it would force cached pages (library, guides) back to rendering on every
+    // request. POST requests aren't stored in Next's data cache anyway, so reads here are always fresh.
   });
   const j = (await res.json()) as { result?: unknown; error?: string };
   if (j.error) throw new Error(j.error);
