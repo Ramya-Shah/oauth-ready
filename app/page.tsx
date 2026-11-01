@@ -20,16 +20,15 @@ export default async function Home() {
   return (
     <>
       <section className="hero">
-        <h1>How long until your users can connect?</h1>
-        <p className="muted">
-          Setup and approval guides for provider OAuth apps — difficulty, hands-on effort vs. waiting on review, the blocker most
-          likely to stop you, and which steps an agent can do for you. Every claim is labelled{" "}
-          <span className="pill tested">tested</span> <span className="pill sourced">official source</span>{" "}
-          <span className="pill community">community</span> or <span className="pill uncertain">uncertain</span>.
+        <h1 className="hero-h">An hour, or six weeks?</h1>
+        <p className="hero-p">
+          Before your users can connect an app to your agent, you register an OAuth app with the provider and often wait for
+          their review. Each guide shows how much of that is your work, how much is waiting, and what is most likely to stop you.
         </p>
-        <form action="/generate" className="row" style={{ maxWidth: 560, marginTop: 16 }}>
-          <input type="text" name="q" placeholder="Any app name or website — e.g. Linear, docusign.com" aria-label="App name or website" />
-          <button className="btn primary" type="submit">Generate guide</button>
+        <form action="/generate" className="row hero-form">
+          <label htmlFor="q" className="sr-only">App name or website</label>
+          <input id="q" type="text" name="q" placeholder="Any app, e.g. Linear or docusign.com" />
+          <button className="btn primary" type="submit">Write a guide</button>
         </form>
       </section>
       <Library curated={curated.map(slim)} generated={generated.map(slim)} />

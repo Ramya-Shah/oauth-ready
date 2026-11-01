@@ -28,7 +28,7 @@ export function Refs({ ids, claims }: { ids: string[]; claims: Claim[] }) {
   if (!ids?.length) return null;
   return (
     <>
-      {ids.map((id) => {
+      {[...new Set(ids)].map((id) => {
         const c = claims.find((x) => x.id === id);
         if (!c) return null;
         return (
